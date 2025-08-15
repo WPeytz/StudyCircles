@@ -1,0 +1,87 @@
+
+:root {
+  --bg: #0b1020;
+  --card: #151c33;
+  --text: #e8edff;
+  --muted: #a8b2d1;
+  --accent: #7aa2f7;
+  --accent-2: #a9d1ff;
+  --danger: #ff7a7a;
+  --success: #7affc2;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+  background: radial-gradient(1200px 800px at 20% -10%, #1b2445 0%, var(--bg) 50%);
+  color: var(--text);
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+}
+
+.input, .select, .button, .file {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #10162a;
+  color: var(--text);
+  outline: none;
+}
+
+.button {
+  cursor: pointer;
+  background: linear-gradient(90deg, #6aa1ff, #9dc0ff);
+  color: #0b1020;
+  font-weight: 600;
+  border: none;
+  transition: transform .05s ease;
+}
+.button:active { transform: translateY(1px); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(122,162,247,0.15);
+  border: 1px solid rgba(122,162,247,0.35);
+  color: var(--accent-2);
+  font-size: 12px;
+}
+.small { font-size: 12px; color: var(--muted); }
+h1,h2,h3 { margin: 0 0 10px; }
+h1 { font-size: 28px; }
+h2 { font-size: 22px; }
+nav { position: sticky; top: 0; backdrop-filter: blur(8px); background: rgba(11,16,32,0.6); border-bottom: 1px solid rgba(255,255,255,0.06); }
+nav .inner { display:flex; gap: 12px; align-items:center; justify-content:space-between; }
+nav .links { display:flex; gap: 12px; flex-wrap: wrap; }
+nav .brand { font-weight: 800; letter-spacing: 0.3px; }
+.tag { opacity:.8 }
+footer { margin-top: 40px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.06); color: var(--muted); }

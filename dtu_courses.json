@@ -1,0 +1,6102 @@
+[
+  {
+    "code": "01001",
+    "title": "Mathematics 1a (Polytechnical foundation)"
+  },
+  {
+    "code": "01002",
+    "title": "Mathematics 1b (Polytechnical foundation)"
+  },
+  {
+    "code": "01003",
+    "title": "Mathematics 1a (Polytechnical foundation)"
+  },
+  {
+    "code": "01004",
+    "title": "Mathematics 1b (Polytechnical foundation)"
+  },
+  {
+    "code": "01017",
+    "title": "Discrete Mathematics"
+  },
+  {
+    "code": "01018",
+    "title": "Discrete mathematics 2: algebra"
+  },
+  {
+    "code": "01020",
+    "title": "Advanced Linear Algebra"
+  },
+  {
+    "code": "01025",
+    "title": "Advanced Mathematics 2 for Mathematics and Technology"
+  },
+  {
+    "code": "01034",
+    "title": "Advanced Engineering Mathematics 2"
+  },
+  {
+    "code": "01035",
+    "title": "Advanced Engineering Mathematics 2"
+  },
+  {
+    "code": "01037",
+    "title": "Advanced Engineering Mathematics 2 (Summer University)"
+  },
+  {
+    "code": "01125",
+    "title": "Fundamental topological concepts and metric spaces"
+  },
+  {
+    "code": "01227",
+    "title": "Graph Theory"
+  },
+  {
+    "code": "01237",
+    "title": "Differential geometry and parametric design"
+  },
+  {
+    "code": "01238",
+    "title": "Differential Geometry"
+  },
+  {
+    "code": "01257",
+    "title": "Advanced Modelling - Applied Mathematics"
+  },
+  {
+    "code": "01325",
+    "title": "Mathematics 4: Analysis - a Toolbox in Physics and Engineering"
+  },
+  {
+    "code": "01405",
+    "title": "Algebraic Error-Correcting Codes"
+  },
+  {
+    "code": "01415",
+    "title": "Computational Discrete Mathematics"
+  },
+  {
+    "code": "01418",
+    "title": "Introduction to Partial Differential Equations"
+  },
+  {
+    "code": "01425",
+    "title": "Advanced Cryptography"
+  },
+  {
+    "code": "01426",
+    "title": "Research Topics in Cryptography"
+  },
+  {
+    "code": "01527",
+    "title": "Graph Theory II"
+  },
+  {
+    "code": "01617",
+    "title": "Introduction to Dynamical Systems"
+  },
+  {
+    "code": "01621",
+    "title": "Perturbation theory for differential equations"
+  },
+  {
+    "code": "01622",
+    "title": "Advanced Dynamical Systems: Applications in Science and Engineering"
+  },
+  {
+    "code": "01666",
+    "title": "Project work - Bachelor of Applied Mathematics"
+  },
+  {
+    "code": "01715",
+    "title": "Functional Analysis"
+  },
+  {
+    "code": "01716",
+    "title": "Advanced Partial Differential Equations: Theory and Applications"
+  },
+  {
+    "code": "01904",
+    "title": "Discrete mathematics"
+  },
+  {
+    "code": "01910",
+    "title": "Calculus and algebra 1 - Digital Twin"
+  },
+  {
+    "code": "01911",
+    "title": "Mathematical Analysis and Modelling"
+  },
+  {
+    "code": "01915",
+    "title": "Calculus and Algebra 2"
+  },
+  {
+    "code": "01922",
+    "title": "Linear Algebra and Modelling"
+  },
+  {
+    "code": "02002",
+    "title": "Computer Programming (Polytechnical Foundation)"
+  },
+  {
+    "code": "02003",
+    "title": "Computer Programming (Polytechnical Foundation)"
+  },
+  {
+    "code": "02100",
+    "title": "Introductory Programming and Software Technology"
+  },
+  {
+    "code": "02104",
+    "title": "Introductory programming project in Software Technology"
+  },
+  {
+    "code": "02105",
+    "title": "Algorithms and Data Structures 1"
+  },
+  {
+    "code": "02110",
+    "title": "Algorithms and Data Structures 2"
+  },
+  {
+    "code": "02112",
+    "title": "Embedded Systems Programming"
+  },
+  {
+    "code": "02113",
+    "title": "Digital Systems Design Project"
+  },
+  {
+    "code": "02114",
+    "title": "Design of a RISC-V Microprocessor"
+  },
+  {
+    "code": "02116",
+    "title": "Networked Embedded Systems"
+  },
+  {
+    "code": "02118",
+    "title": "Introduction to Chip Design"
+  },
+  {
+    "code": "02122",
+    "title": "Software Technology Project"
+  },
+  {
+    "code": "02123",
+    "title": "Project Work – Bachelor in Computer Engineering"
+  },
+  {
+    "code": "02132",
+    "title": "Computer Systems"
+  },
+  {
+    "code": "02135",
+    "title": "Introduction to Cyber Systems"
+  },
+  {
+    "code": "02138",
+    "title": "Digital Electronics 1"
+  },
+  {
+    "code": "02139",
+    "title": "Digital Electronics 2"
+  },
+  {
+    "code": "02141",
+    "title": "Computer Science Modelling"
+  },
+  {
+    "code": "02143",
+    "title": "Formal Languages and Semantics"
+  },
+  {
+    "code": "02148",
+    "title": "Introduction to Coordination in Distributed Applications"
+  },
+  {
+    "code": "02155",
+    "title": "Computer Architecture and Engineering"
+  },
+  {
+    "code": "02156",
+    "title": "Logical Systems and Logic Programming"
+  },
+  {
+    "code": "02157",
+    "title": "Functional Programming"
+  },
+  {
+    "code": "02159",
+    "title": "Operating Systems"
+  },
+  {
+    "code": "02160",
+    "title": "Agile Object-oriented Software Development"
+  },
+  {
+    "code": "02161",
+    "title": "Software Engineering 1"
+  },
+  {
+    "code": "02162",
+    "title": "Software Engineering 2"
+  },
+  {
+    "code": "02170",
+    "title": "Database Systems"
+  },
+  {
+    "code": "02180",
+    "title": "Introduction to Artificial Intelligence"
+  },
+  {
+    "code": "02182",
+    "title": "Symbolic Artificial Intelligence"
+  },
+  {
+    "code": "02195",
+    "title": "Quantum Algorithms and Machine Learning"
+  },
+  {
+    "code": "02196",
+    "title": "Quantum Compilers"
+  },
+  {
+    "code": "02201",
+    "title": "Agile Hardware Design"
+  },
+  {
+    "code": "02203",
+    "title": "Design of Digital Systems"
+  },
+  {
+    "code": "02205",
+    "title": "VLSI Design"
+  },
+  {
+    "code": "02207",
+    "title": "Verification of Digital Systems"
+  },
+  {
+    "code": "02209",
+    "title": "Test of Digital Systems"
+  },
+  {
+    "code": "02211",
+    "title": "Research Topics in Computer Architecture"
+  },
+  {
+    "code": "02214",
+    "title": "Hardware/Software Codesign"
+  },
+  {
+    "code": "02225",
+    "title": "Distributed Real-Time Systems"
+  },
+  {
+    "code": "02226",
+    "title": "Networked Embedded Systems"
+  },
+  {
+    "code": "02231",
+    "title": "Cryptography Fundamentals"
+  },
+  {
+    "code": "02232",
+    "title": "Applied Cryptography"
+  },
+  {
+    "code": "02234",
+    "title": "Research Topics in Cybersecurity"
+  },
+  {
+    "code": "02242",
+    "title": "Program Analysis"
+  },
+  {
+    "code": "02244",
+    "title": "Logic for Security"
+  },
+  {
+    "code": "02245",
+    "title": "Program Verification"
+  },
+  {
+    "code": "02246",
+    "title": "Model Checking"
+  },
+  {
+    "code": "02247",
+    "title": "Compiler Construction"
+  },
+  {
+    "code": "02249",
+    "title": "Computationally Hard Problems"
+  },
+  {
+    "code": "02256",
+    "title": "Automated Reasoning"
+  },
+  {
+    "code": "02258",
+    "title": "Parallel Computer Systems"
+  },
+  {
+    "code": "02262",
+    "title": "Formal Aspects of Process Science"
+  },
+  {
+    "code": "02266",
+    "title": "User Experience Engineering"
+  },
+  {
+    "code": "02267",
+    "title": "Software Development of Web Services"
+  },
+  {
+    "code": "02268",
+    "title": "Process-oriented and Event-driven Software Systems"
+  },
+  {
+    "code": "02269",
+    "title": "Process Mining"
+  },
+  {
+    "code": "02270",
+    "title": "Cybersecurity Fundamentals"
+  },
+  {
+    "code": "02271",
+    "title": "Advanced Cybersecurity"
+  },
+  {
+    "code": "02275",
+    "title": "Ethical Hacking"
+  },
+  {
+    "code": "02276",
+    "title": "Usable Security and Privacy"
+  },
+  {
+    "code": "02277",
+    "title": "Cyber Risk Management and Incident Response"
+  },
+  {
+    "code": "02278",
+    "title": "Post-Quantum Cryptography"
+  },
+  {
+    "code": "02282",
+    "title": "Algorithms for Massive Data Sets"
+  },
+  {
+    "code": "02285",
+    "title": "Artificial Intelligence and Multi-Agent Systems"
+  },
+  {
+    "code": "02287",
+    "title": "Logical Theories for Uncertainty and Learning"
+  },
+  {
+    "code": "02289",
+    "title": "Algorithmic Techniques for Modern Data Models"
+  },
+  {
+    "code": "02291",
+    "title": "System Integration"
+  },
+  {
+    "code": "02311",
+    "title": "Introduction to embedded systems"
+  },
+  {
+    "code": "02312",
+    "title": "Introductory Programming"
+  },
+  {
+    "code": "02321",
+    "title": "Hardware/Software Programming"
+  },
+  {
+    "code": "02322",
+    "title": "Machine oriented programming"
+  },
+  {
+    "code": "02323",
+    "title": "Introduction to Statistics"
+  },
+  {
+    "code": "02324",
+    "title": "Advanced Programming"
+  },
+  {
+    "code": "02325",
+    "title": "Programming Project"
+  },
+  {
+    "code": "02326",
+    "title": "Algorithms and Data Structures"
+  },
+  {
+    "code": "02327",
+    "title": "Introductory Databases and Database Programming"
+  },
+  {
+    "code": "02328",
+    "title": "Digital electronics"
+  },
+  {
+    "code": "02329",
+    "title": "Digital systems CDIO project"
+  },
+  {
+    "code": "02335",
+    "title": "Operating Systems"
+  },
+  {
+    "code": "02339",
+    "title": "Cybersecurity Fundamentals"
+  },
+  {
+    "code": "02343",
+    "title": "Compilers and Interpreters"
+  },
+  {
+    "code": "02349",
+    "title": "Programming for Parallel Computers"
+  },
+  {
+    "code": "02369",
+    "title": "Software Processes and Patterns"
+  },
+  {
+    "code": "02402",
+    "title": "Statistics (Polytechnical Foundation)"
+  },
+  {
+    "code": "02403",
+    "title": "Introduction to Mathematical Statistics"
+  },
+  {
+    "code": "02405",
+    "title": "Probability theory"
+  },
+  {
+    "code": "02407",
+    "title": "Stochastic Processes - Probability 2"
+  },
+  {
+    "code": "02409",
+    "title": "Multivariate Statistics"
+  },
+  {
+    "code": "02411",
+    "title": "Statistical Design and Analysis of Experiments"
+  },
+  {
+    "code": "02413",
+    "title": "Statistical Quality Control"
+  },
+  {
+    "code": "02417",
+    "title": "Time Series Analysis"
+  },
+  {
+    "code": "02419",
+    "title": "Statistical modelling: Theory and practice"
+  },
+  {
+    "code": "02421",
+    "title": "Stochastic Adaptive Control"
+  },
+  {
+    "code": "02425",
+    "title": "Diffusions and stochastic differential equations"
+  },
+  {
+    "code": "02426",
+    "title": "Non-linear random effect models: time-independent and dynamic models"
+  },
+  {
+    "code": "02427",
+    "title": "Advanced Time Series Analysis"
+  },
+  {
+    "code": "02428",
+    "title": "Dynamic Optimization"
+  },
+  {
+    "code": "02429",
+    "title": "Analysis of correlated data: Mixed linear models"
+  },
+  {
+    "code": "02431",
+    "title": "Risk Management"
+  },
+  {
+    "code": "02435",
+    "title": "Decision-Making Under Uncertainty"
+  },
+  {
+    "code": "02441",
+    "title": "Applied Statistics and Statistical Software"
+  },
+  {
+    "code": "02443",
+    "title": "Stochastic Simulation"
+  },
+  {
+    "code": "02445",
+    "title": "Project in Statistical Evaluation for Artificial Intelligence and Data"
+  },
+  {
+    "code": "02451",
+    "title": "Introduction to Machine Learning"
+  },
+  {
+    "code": "02452",
+    "title": "Machine Learning"
+  },
+  {
+    "code": "02455",
+    "title": "Experiment in Cognitive Science"
+  },
+  {
+    "code": "02456",
+    "title": "Deep learning"
+  },
+  {
+    "code": "02458",
+    "title": "Cognitive Modelling"
+  },
+  {
+    "code": "02460",
+    "title": "Advanced Machine Learning"
+  },
+  {
+    "code": "02461",
+    "title": "Introduction to Intelligent Systems"
+  },
+  {
+    "code": "02462",
+    "title": "Signals and data"
+  },
+  {
+    "code": "02463",
+    "title": "Active machine learning and agency."
+  },
+  {
+    "code": "02464",
+    "title": "Artificial Intelligence and Human Cognition"
+  },
+  {
+    "code": "02465",
+    "title": "Introduction to reinforcement learning and control"
+  },
+  {
+    "code": "02466",
+    "title": "Project work - Bachelor of Artificial Intelligence and Data"
+  },
+  {
+    "code": "02467",
+    "title": "Computational Social Science"
+  },
+  {
+    "code": "02471",
+    "title": "Machine learning for signal processing"
+  },
+  {
+    "code": "02476",
+    "title": "Machine Learning Operations"
+  },
+  {
+    "code": "02477",
+    "title": "Bayesian machine learning"
+  },
+  {
+    "code": "02492",
+    "title": "Digital Learning Technology and Entrepreneurship"
+  },
+  {
+    "code": "02501",
+    "title": "Advanced Deep Learning in Computer Vision"
+  },
+  {
+    "code": "02503",
+    "title": "Image analysis"
+  },
+  {
+    "code": "02504",
+    "title": "Computer Vision"
+  },
+  {
+    "code": "02506",
+    "title": "Advanced Image Analysis"
+  },
+  {
+    "code": "02510",
+    "title": "Deep learning and data engineering for image analysis"
+  },
+  {
+    "code": "02515",
+    "title": "Image analysis"
+  },
+  {
+    "code": "02516",
+    "title": "Introduction to Deep Learning in Computer Vision"
+  },
+  {
+    "code": "02517",
+    "title": "Responsible AI: Algorithmic fairness and explainability"
+  },
+  {
+    "code": "02518",
+    "title": "Computational 3D Imaging and Analysis"
+  },
+  {
+    "code": "02525",
+    "title": "Introduction to Mathematics and Technology"
+  },
+  {
+    "code": "02526",
+    "title": "Mathematical Modeling"
+  },
+  {
+    "code": "02561",
+    "title": "Computer Graphics"
+  },
+  {
+    "code": "02562",
+    "title": "Rendering - Introduction"
+  },
+  {
+    "code": "02563",
+    "title": "Generative Methods for Computer Graphics"
+  },
+  {
+    "code": "02566",
+    "title": "Creating Digital Visual Experiences"
+  },
+  {
+    "code": "02581",
+    "title": "Geometric Data Analysis and Processing"
+  },
+  {
+    "code": "02582",
+    "title": "Computational Data Analysis"
+  },
+  {
+    "code": "02586",
+    "title": "Statistical Genetics"
+  },
+  {
+    "code": "02601",
+    "title": "Introduction to Numerical Algorithms"
+  },
+  {
+    "code": "02611",
+    "title": "Optimization for Data Science"
+  },
+  {
+    "code": "02612",
+    "title": "Constrained Optimization"
+  },
+  {
+    "code": "02613",
+    "title": "Python and High-Performance Computing"
+  },
+  {
+    "code": "02614",
+    "title": "High-Performance Computing"
+  },
+  {
+    "code": "02615",
+    "title": "Optimization and Data Fitting"
+  },
+  {
+    "code": "02616",
+    "title": "Large-scale Modelling"
+  },
+  {
+    "code": "02619",
+    "title": "Model Predictive Control"
+  },
+  {
+    "code": "02623",
+    "title": "The Finite Element Method for Partial Differential Equations"
+  },
+  {
+    "code": "02624",
+    "title": "Inverse problems and Imaging"
+  },
+  {
+    "code": "02635",
+    "title": "Mathematical software programming"
+  },
+  {
+    "code": "02686",
+    "title": "Scientific computing for differential equations"
+  },
+  {
+    "code": "02687",
+    "title": "Scientific Computing for ordinary and partial differential equations"
+  },
+  {
+    "code": "02689",
+    "title": "Advanced Numerical Methods for Differential Equations"
+  },
+  {
+    "code": "02805",
+    "title": "Social graphs and interactions"
+  },
+  {
+    "code": "02806",
+    "title": "Social data analysis and visualization"
+  },
+  {
+    "code": "02807",
+    "title": "Computational Tools for Data Science"
+  },
+  {
+    "code": "02808",
+    "title": "Personal Data Interaction for Mobile and Wearables"
+  },
+  {
+    "code": "02810",
+    "title": "UX Design Prototyping"
+  },
+  {
+    "code": "02830",
+    "title": "Advanced Project in Digital Media Engineering"
+  },
+  {
+    "code": "02840",
+    "title": "Computer Game Programming Fundamentals (DADIU)"
+  },
+  {
+    "code": "02841",
+    "title": "Computer Game Programming in a Production (DADIU)"
+  },
+  {
+    "code": "02901",
+    "title": "Advanced Topics in Machine Learning"
+  },
+  {
+    "code": "02910",
+    "title": "Applied computational data analysis"
+  },
+  {
+    "code": "02935",
+    "title": "Introduction to applied statistics and R for PhD students"
+  },
+  {
+    "code": "02946",
+    "title": "Scientific Computing for X-Ray Computed Tomography"
+  },
+  {
+    "code": "02949",
+    "title": "DTU Compute PhD Seminar"
+  },
+  {
+    "code": "02955",
+    "title": "Pseudodifferential operators for boundary value problems"
+  },
+  {
+    "code": "02960",
+    "title": "Time Series Analysis - with a focus on Modelling and Forecasting in Energy Systems"
+  },
+  {
+    "code": "02975",
+    "title": "Introduction to Bayesian inverse problems"
+  },
+  {
+    "code": "02980",
+    "title": "Young Researcher Entrepreneurship Bootcamp"
+  },
+  {
+    "code": "02981",
+    "title": "Generative Modeling Summer School (GeMMS)"
+  },
+  {
+    "code": "02982",
+    "title": "DTU Compute Academic Writing Bootcamp"
+  },
+  {
+    "code": "02983",
+    "title": "Algebraic Graph Theory"
+  },
+  {
+    "code": "10031",
+    "title": "Introduction to Engineering Physics"
+  },
+  {
+    "code": "10033",
+    "title": "Mechanics and Physical Modeling"
+  },
+  {
+    "code": "10034",
+    "title": "Thermodynamics and statistical physics"
+  },
+  {
+    "code": "10035",
+    "title": "Laboratory work in engineering physics"
+  },
+  {
+    "code": "10036",
+    "title": "Electromagnetism for physicists"
+  },
+  {
+    "code": "10037",
+    "title": "Continuum physics and modelling"
+  },
+  {
+    "code": "10054",
+    "title": "Model Physics"
+  },
+  {
+    "code": "10060",
+    "title": "Physics (Polytechnical Foundation)"
+  },
+  {
+    "code": "10065",
+    "title": "Physics (Polytechnical Foundation)"
+  },
+  {
+    "code": "10080",
+    "title": "Physics for materials and energy"
+  },
+  {
+    "code": "10081",
+    "title": "Physics for materials and energy, digital version"
+  },
+  {
+    "code": "10102",
+    "title": "Quantum Mechanics"
+  },
+  {
+    "code": "10104",
+    "title": "Introduction to Quantum Mechanics"
+  },
+  {
+    "code": "10112",
+    "title": "Advanced Quantum Mechanics"
+  },
+  {
+    "code": "10122",
+    "title": "Statistical Physics"
+  },
+  {
+    "code": "10200",
+    "title": "The structure and dynamics of materials studied with X-rays and neutrons"
+  },
+  {
+    "code": "10208",
+    "title": "Diffraction, Spectroscopy and Imaging of Materials"
+  },
+  {
+    "code": "10209",
+    "title": "X-ray and Neutron Experiments at International Research Facilities"
+  },
+  {
+    "code": "10240",
+    "title": "Design-Build 2: Rational catalyst design for General Engineering"
+  },
+  {
+    "code": "10255",
+    "title": "Advanced 3D X-ray imaging"
+  },
+  {
+    "code": "10260",
+    "title": "Physics of solar energy and energy storage"
+  },
+  {
+    "code": "10302",
+    "title": "Electronic Structure Methods in Material Physics, Chemistry and Biology"
+  },
+  {
+    "code": "10304",
+    "title": "Experimental Surface Physics"
+  },
+  {
+    "code": "10306",
+    "title": "Theory of 2D materials and Strong Light-Matter Interaction"
+  },
+  {
+    "code": "10314",
+    "title": "Magnetism and Magnetic Materials"
+  },
+  {
+    "code": "10315",
+    "title": "Magnetism and Magnetic Materials - with project"
+  },
+  {
+    "code": "10316",
+    "title": "Materials design with machine learning and artificial intelligence"
+  },
+  {
+    "code": "10317",
+    "title": "Condensed Matter Physics"
+  },
+  {
+    "code": "10319",
+    "title": "Advanced solid state physics"
+  },
+  {
+    "code": "10321",
+    "title": "Nanosystems engineering"
+  },
+  {
+    "code": "10325",
+    "title": "Quantum mechanical modelling of nanoelectronics"
+  },
+  {
+    "code": "10331",
+    "title": "Experimental introduction to physics of sustainable energy"
+  },
+  {
+    "code": "10333",
+    "title": "Physics of Sustainable Energy"
+  },
+  {
+    "code": "10337",
+    "title": "Theoretical microfluidics"
+  },
+  {
+    "code": "10339",
+    "title": "Concepts in heterogeneous catalysis and applications to energy conversion"
+  },
+  {
+    "code": "10346",
+    "title": "Advanced Continuum Physics"
+  },
+  {
+    "code": "10350",
+    "title": "Numerical studies in physics"
+  },
+  {
+    "code": "10380",
+    "title": "Quantum Optics"
+  },
+  {
+    "code": "10384",
+    "title": "Quantum information"
+  },
+  {
+    "code": "10385",
+    "title": "Quantum Information Technology"
+  },
+  {
+    "code": "10386",
+    "title": "Experimental Techniques in Quantum Technology"
+  },
+  {
+    "code": "10387",
+    "title": "Scientific computing in quantum information science"
+  },
+  {
+    "code": "10400",
+    "title": "Plasma Physics"
+  },
+  {
+    "code": "10401",
+    "title": "Experimental plasma physics"
+  },
+  {
+    "code": "10402",
+    "title": "Fusion energy – engineering and physics"
+  },
+  {
+    "code": "10405",
+    "title": "Theory of Relativity"
+  },
+  {
+    "code": "10411",
+    "title": "Nuclear reactor physics"
+  },
+  {
+    "code": "10413",
+    "title": "Defects in solids"
+  },
+  {
+    "code": "10414",
+    "title": "Neutronics Monte-Carlo simulation of nuclear reactors"
+  },
+  {
+    "code": "10420",
+    "title": "Physics of Sports"
+  },
+  {
+    "code": "10506",
+    "title": "Journal club on nanostructures, reactivity, and Catalysis"
+  },
+  {
+    "code": "10507",
+    "title": "Surface Physics and Catalysis"
+  },
+  {
+    "code": "10508",
+    "title": "Electronic structure journal club"
+  },
+  {
+    "code": "10509",
+    "title": "Journal club on atomic structures and dynamics studied by electron beams"
+  },
+  {
+    "code": "10511",
+    "title": "Physics PhD bootcamp and network"
+  },
+  {
+    "code": "10512",
+    "title": "Journal club in Quantum Optics"
+  },
+  {
+    "code": "10514",
+    "title": "Summer School Complex Motion in Fluids"
+  },
+  {
+    "code": "10515",
+    "title": "FLUIDS Journal Club"
+  },
+  {
+    "code": "10519",
+    "title": "Advanced electron microscopy physics"
+  },
+  {
+    "code": "10520",
+    "title": "Journal club on plasma physics and fusion energy"
+  },
+  {
+    "code": "10521",
+    "title": "Physics and technology of two-dimensional materials"
+  },
+  {
+    "code": "10530",
+    "title": "SURFCAT Summer School: The Science of Sustainable Fuels and Chemicals"
+  },
+  {
+    "code": "10540",
+    "title": "CAMD Summer School on Electronic Structure Theory and Materials Design"
+  },
+  {
+    "code": "10550",
+    "title": "DigiQ PhD School on Quantum Technology"
+  },
+  {
+    "code": "10590",
+    "title": "Illustration of scientific content related to catalysis"
+  },
+  {
+    "code": "10603",
+    "title": "Knowledge cultures – history and philosophy of knowledge in theory and practice"
+  },
+  {
+    "code": "10605",
+    "title": "History of Technology"
+  },
+  {
+    "code": "10610",
+    "title": "History of Technology"
+  },
+  {
+    "code": "10720",
+    "title": "Research Immersion BSc (June) - Department of Physics"
+  },
+  {
+    "code": "10721",
+    "title": "Research Immersion BSc (July) - Department of Physics"
+  },
+  {
+    "code": "10722",
+    "title": "Research Immersion BSc (August) - Department of Physics"
+  },
+  {
+    "code": "10730",
+    "title": "Research Immersion MSc (June) - Department of Physics"
+  },
+  {
+    "code": "10731",
+    "title": "Research Immersion MSc (July) - Department of Physics"
+  },
+  {
+    "code": "10732",
+    "title": "Research Immersion MSc (August) - Department of Physics"
+  },
+  {
+    "code": "10750",
+    "title": "Innovation Projects at the Physics Department"
+  },
+  {
+    "code": "10850",
+    "title": "Micro- and nanofabrication for quantum engineering"
+  },
+  {
+    "code": "10851",
+    "title": "Introduction to cleanroom-based microfabrication"
+  },
+  {
+    "code": "10852",
+    "title": "Introduction to cleanroom-based microfabrication"
+  },
+  {
+    "code": "10855",
+    "title": "Advanced fabrication of micro- and nanostructures"
+  },
+  {
+    "code": "10862",
+    "title": "Polymer micro fabrication"
+  },
+  {
+    "code": "10863",
+    "title": "Two-photon 3D & 4D printing and characterisation of polymer microstructures E"
+  },
+  {
+    "code": "10864",
+    "title": "Two-photon 3D & 4D printing and characterisation of polymer microstructures F"
+  },
+  {
+    "code": "10870",
+    "title": "Experimental Methods and Instruments in Physics"
+  },
+  {
+    "code": "10871",
+    "title": "Advanced design and simulation of solar cells"
+  },
+  {
+    "code": "10916",
+    "title": "Physics 1"
+  },
+  {
+    "code": "10935",
+    "title": "Physics 1"
+  },
+  {
+    "code": "12000",
+    "title": "Introduction to Environmental Technology and Management"
+  },
+  {
+    "code": "12003",
+    "title": "Introductory Environmental Laboratory and Field Course"
+  },
+  {
+    "code": "12100",
+    "title": "Quantitative methods to assess sustainability (Polytechnical Foundation)"
+  },
+  {
+    "code": "12101",
+    "title": "Quantitative methods to assess sustainability (Polytechnical Foundation)"
+  },
+  {
+    "code": "12102",
+    "title": "Environmental Processes"
+  },
+  {
+    "code": "12104",
+    "title": "Environmental Modelling"
+  },
+  {
+    "code": "12105",
+    "title": "Quantitative methods to assess sustainability (Polytechnical Foundation)"
+  },
+  {
+    "code": "12106",
+    "title": "Quantitative methods to assess sustainability (Polytechnical Foundation)"
+  },
+  {
+    "code": "12109",
+    "title": "Physico-Chemical Water Treatment Technologies"
+  },
+  {
+    "code": "12111",
+    "title": "Environmental Processes for MSc students"
+  },
+  {
+    "code": "12115",
+    "title": "Wastewater treatment and valorization"
+  },
+  {
+    "code": "12121",
+    "title": "Water Supply"
+  },
+  {
+    "code": "12122",
+    "title": "Urban Drainage and Stormwater Management"
+  },
+  {
+    "code": "12125",
+    "title": "Design and planning of climate adaptation measures in the built environment"
+  },
+  {
+    "code": "12130",
+    "title": "Solid Waste Technology and Management"
+  },
+  {
+    "code": "12132",
+    "title": "LCA Modelling of Waste Management Systems"
+  },
+  {
+    "code": "12134",
+    "title": "Environmental Microbiology"
+  },
+  {
+    "code": "12139",
+    "title": "Resource Engineering"
+  },
+  {
+    "code": "12143",
+    "title": "Bioresources"
+  },
+  {
+    "code": "12145",
+    "title": "Terrestrial Ecology for Engineers"
+  },
+  {
+    "code": "12202",
+    "title": "Environment and Sustainability"
+  },
+  {
+    "code": "12203",
+    "title": "Environmental project work"
+  },
+  {
+    "code": "12205",
+    "title": "Climate change – impacts, mitigation and adaptation"
+  },
+  {
+    "code": "12211",
+    "title": "Environmental solutions in water, sanitation, and waste management - with and for low-income countries"
+  },
+  {
+    "code": "12227",
+    "title": "Regional and global air pollution effects"
+  },
+  {
+    "code": "12228",
+    "title": "Urban air pollution"
+  },
+  {
+    "code": "12231",
+    "title": "Applied Analytical Environmental Chemistry"
+  },
+  {
+    "code": "12237",
+    "title": "Chemicals in the environment"
+  },
+  {
+    "code": "12238",
+    "title": "Priority Organic Pollutants - Transport, Distribution and Transformation"
+  },
+  {
+    "code": "12240",
+    "title": "Environmental Management, innovation and Ethics"
+  },
+  {
+    "code": "12245",
+    "title": "Water Pollution"
+  },
+  {
+    "code": "12250",
+    "title": "Next Generation [] Action - Sustainable by Design"
+  },
+  {
+    "code": "12320",
+    "title": "Hydrology"
+  },
+  {
+    "code": "12330",
+    "title": "Contaminated Sites"
+  },
+  {
+    "code": "12331",
+    "title": "Field investigations of contaminated sites"
+  },
+  {
+    "code": "12336",
+    "title": "Groundwater Quality"
+  },
+  {
+    "code": "12345",
+    "title": "Data analysis, prediction and data-driven modelling of environmental systems"
+  },
+  {
+    "code": "12350",
+    "title": "Introduction to Indoor Environment"
+  },
+  {
+    "code": "12360",
+    "title": "Indoor Climate"
+  },
+  {
+    "code": "12361",
+    "title": "Ventilation and Climatic Systems"
+  },
+  {
+    "code": "12362",
+    "title": "Daylighting and Lighting"
+  },
+  {
+    "code": "12363",
+    "title": "Simulation of indoor environment and energy consumption using IDA ICE"
+  },
+  {
+    "code": "12410",
+    "title": "Geology for Engineers – an introductory course"
+  },
+  {
+    "code": "12411",
+    "title": "Basic Soil Mechanics"
+  },
+  {
+    "code": "12412",
+    "title": "Basic Geotechnical Engineering"
+  },
+  {
+    "code": "12415",
+    "title": "Pavement Engineering: Introduction to Construction, Design and Materials"
+  },
+  {
+    "code": "12421",
+    "title": "Advanced Soil Mechanics"
+  },
+  {
+    "code": "12422",
+    "title": "Advanced Geotechnical Engineering"
+  },
+  {
+    "code": "12423",
+    "title": "Numerical modelling in soil mechanics"
+  },
+  {
+    "code": "12430",
+    "title": "Mineral resources"
+  },
+  {
+    "code": "12431",
+    "title": "Principles of Rock Mechanics"
+  },
+  {
+    "code": "12451",
+    "title": "Pavement Mechanics"
+  },
+  {
+    "code": "12452",
+    "title": "Railway Design and Maintenance"
+  },
+  {
+    "code": "12551",
+    "title": "Material science"
+  },
+  {
+    "code": "12552",
+    "title": "Geotechnical engineering and civil engineering structures"
+  },
+  {
+    "code": "12601",
+    "title": "Thermal Building Physics"
+  },
+  {
+    "code": "12603",
+    "title": "Materials Science for Civil Engineers"
+  },
+  {
+    "code": "12604",
+    "title": "Construction Materials - use and testing"
+  },
+  {
+    "code": "12605",
+    "title": "Sustainability and Life Cycle Assessment in the Built Environment"
+  },
+  {
+    "code": "12611",
+    "title": "Heat and mass transfer in buildings"
+  },
+  {
+    "code": "12612",
+    "title": "Concrete Technology"
+  },
+  {
+    "code": "12614",
+    "title": "Brick and masonry"
+  },
+  {
+    "code": "12615",
+    "title": "System sustainability tools for the built environment"
+  },
+  {
+    "code": "12616",
+    "title": "Construction Materials and the Green Transition"
+  },
+  {
+    "code": "12701",
+    "title": "Introduction to Living systems"
+  },
+  {
+    "code": "12772",
+    "title": "Life Cycle Assessment of Products and Systems"
+  },
+  {
+    "code": "12773",
+    "title": "Advanced life cycle assessment methods"
+  },
+  {
+    "code": "12775",
+    "title": "Life cycle impact assessment modelling in the context of planetary boundaries"
+  },
+  {
+    "code": "12821",
+    "title": "Site Investigations"
+  },
+  {
+    "code": "12831",
+    "title": "Construction"
+  },
+  {
+    "code": "12832",
+    "title": "Engineering in Greenland"
+  },
+  {
+    "code": "12836",
+    "title": "Environmental Engineering in Greenland"
+  },
+  {
+    "code": "12854",
+    "title": "Infrastructure Constructions in the Arctic"
+  },
+  {
+    "code": "12856",
+    "title": "Natural Hazards in the Arctic"
+  },
+  {
+    "code": "12902",
+    "title": "Life Cycle Assessment Modelling of Solid Waste Systems"
+  },
+  {
+    "code": "12911",
+    "title": "Introduction to good science in environmental and resource engineering"
+  },
+  {
+    "code": "12919",
+    "title": "Introduction to Urban Water Technology"
+  },
+  {
+    "code": "12920",
+    "title": "Introduction to Urban Water Technology"
+  },
+  {
+    "code": "12936",
+    "title": "Numerical Methods for Building Energy Technology"
+  },
+  {
+    "code": "12950",
+    "title": "Sustainability evaluation and communication"
+  },
+  {
+    "code": "12951",
+    "title": "Sustainability evaluation and communication"
+  },
+  {
+    "code": "12952",
+    "title": "Sustainability evaluation and communication"
+  },
+  {
+    "code": "12953",
+    "title": "Absolute environmental sustainability assessment of production and consumption in a systems perspective"
+  },
+  {
+    "code": "12954",
+    "title": "Assessing human & ecosystems impacts with the scientific consensus model USEtox"
+  },
+  {
+    "code": "22001",
+    "title": "Acoustic signal processing"
+  },
+  {
+    "code": "22002",
+    "title": "Experimental hearing science"
+  },
+  {
+    "code": "22003",
+    "title": "Auditory signal processing and perception"
+  },
+  {
+    "code": "22005",
+    "title": "Advanced topics in hearing research"
+  },
+  {
+    "code": "22006",
+    "title": "Acoustic Communication"
+  },
+  {
+    "code": "22007",
+    "title": "Audiology and hearing devices"
+  },
+  {
+    "code": "22050",
+    "title": "Continuous time signals and linear systems"
+  },
+  {
+    "code": "22051",
+    "title": "Signals and linear systems in discrete time"
+  },
+  {
+    "code": "22052",
+    "title": "Applied Signal Processing"
+  },
+  {
+    "code": "22053",
+    "title": "Principles of Brain Computer Interface"
+  },
+  {
+    "code": "22054",
+    "title": "Literature study in biomedical signal analysis"
+  },
+  {
+    "code": "22058",
+    "title": "Wearable Sensors: Designing and Prototyping"
+  },
+  {
+    "code": "22059",
+    "title": "Laboratory Course on Advanced Wearable Sensor Design and Prototyping"
+  },
+  {
+    "code": "22060",
+    "title": "Mobile Health Technology"
+  },
+  {
+    "code": "22061",
+    "title": "Introduction to Digital Health"
+  },
+  {
+    "code": "22062",
+    "title": "Introduction to Medical Data Science"
+  },
+  {
+    "code": "22100",
+    "title": "R for Bio Data Science"
+  },
+  {
+    "code": "22102",
+    "title": "Applied Single Cell Bioinformatics"
+  },
+  {
+    "code": "22107",
+    "title": "Research Immersion, Life Science"
+  },
+  {
+    "code": "22111",
+    "title": "Introduction to Bioinformatics"
+  },
+  {
+    "code": "22112",
+    "title": "High Performance Computing in Life Science"
+  },
+  {
+    "code": "22115",
+    "title": "Computational Molecular Evolution"
+  },
+  {
+    "code": "22116",
+    "title": "Python programming in Life Science"
+  },
+  {
+    "code": "22117",
+    "title": "Protein structure and computational biology"
+  },
+  {
+    "code": "22118",
+    "title": "Advanced Unix & Python for Bioinformaticians"
+  },
+  {
+    "code": "22123",
+    "title": "Computational Precision Medicine"
+  },
+  {
+    "code": "22125",
+    "title": "Algorithms in bioinformatics"
+  },
+  {
+    "code": "22126",
+    "title": "Next-Generation-Sequencing Analysis"
+  },
+  {
+    "code": "22140",
+    "title": "Introduction to Systems Biology, BSc"
+  },
+  {
+    "code": "22145",
+    "title": "Immunological Bioinformatics"
+  },
+  {
+    "code": "22150",
+    "title": "Introduction to Systems Biology; MSc"
+  },
+  {
+    "code": "22160",
+    "title": "R for Bio Data Science"
+  },
+  {
+    "code": "22166",
+    "title": "Python programming in Life Science, Msc"
+  },
+  {
+    "code": "22168",
+    "title": "Advanced Unix & Python for Bioinformaticians, Msc"
+  },
+  {
+    "code": "22172",
+    "title": "Applied Single-Cell Bioinformatics, PhD"
+  },
+  {
+    "code": "22175",
+    "title": "Algorithms in bioinformatics, PhD"
+  },
+  {
+    "code": "22179",
+    "title": "Module 3: Value creation in pharma- and biotechnology"
+  },
+  {
+    "code": "22180",
+    "title": "Design-build in Life Science"
+  },
+  {
+    "code": "22201",
+    "title": "Immune System, Anatomy & Development"
+  },
+  {
+    "code": "22203",
+    "title": "Conceive, Design, Implement, and Operate a Healthcare Product"
+  },
+  {
+    "code": "22205",
+    "title": "Project in healthcare engineering, June"
+  },
+  {
+    "code": "22206",
+    "title": "Project in healthcare engineering, August"
+  },
+  {
+    "code": "22207",
+    "title": "Project in healthcare engineering, January"
+  },
+  {
+    "code": "22208",
+    "title": "Human Physiology"
+  },
+  {
+    "code": "22210",
+    "title": "Immune System in Health and Disease"
+  },
+  {
+    "code": "22211",
+    "title": "Basic Techniques in Immunology and bio safety"
+  },
+  {
+    "code": "22212",
+    "title": "Stem cell technology for engineers"
+  },
+  {
+    "code": "22213",
+    "title": "Experimental human cell biology"
+  },
+  {
+    "code": "22230",
+    "title": "Development and production of vaccines"
+  },
+  {
+    "code": "22231",
+    "title": "Module 1: From idea to project plan in biotech and pharmaceutical research"
+  },
+  {
+    "code": "22232",
+    "title": "Drug delivery – using nano and microtechnologies"
+  },
+  {
+    "code": "22235",
+    "title": "Drug delivery"
+  },
+  {
+    "code": "22236",
+    "title": "Immunotherapy"
+  },
+  {
+    "code": "22237",
+    "title": "Preclinical drug development"
+  },
+  {
+    "code": "22238",
+    "title": "Module 2: Pilot project in Pharmaceutical Design and Engineering"
+  },
+  {
+    "code": "22239",
+    "title": "Module 2: Pilot project in Pharmaceutical Design and Engineering (3 weeks)"
+  },
+  {
+    "code": "22281",
+    "title": "Biomaterials"
+  },
+  {
+    "code": "22282",
+    "title": "Advanced Topics in Biomaterials Science and Engineering"
+  },
+  {
+    "code": "22283",
+    "title": "Molecular thermodynamics, transport, and analytics"
+  },
+  {
+    "code": "22284",
+    "title": "Living models of body barriers and organs"
+  },
+  {
+    "code": "22285",
+    "title": "Applied Biomaterials"
+  },
+  {
+    "code": "22400",
+    "title": "Design-build 4: Autonomous devices for controlling and studying living systems"
+  },
+  {
+    "code": "22403",
+    "title": "Micro and Nano Sensors"
+  },
+  {
+    "code": "22439",
+    "title": "Rapid Prototyping of Digital Sensor Systems"
+  },
+  {
+    "code": "22449",
+    "title": "Introduction to Biomedical product development"
+  },
+  {
+    "code": "22450",
+    "title": "Applied Biomedical Product Development"
+  },
+  {
+    "code": "22460",
+    "title": "Introduction to Biomedical Engineering"
+  },
+  {
+    "code": "22461",
+    "title": "Construction and Programming of DC Sensor Stystems"
+  },
+  {
+    "code": "22462",
+    "title": "Construction and Programming of AC Sensor Systems"
+  },
+  {
+    "code": "22475",
+    "title": "Tissue and movement biomechanics DTU"
+  },
+  {
+    "code": "22476",
+    "title": "Electromagnetism for Health Technology"
+  },
+  {
+    "code": "22481",
+    "title": "Introduction to medical imaging"
+  },
+  {
+    "code": "22485",
+    "title": "Medical imaging systems"
+  },
+  {
+    "code": "22486",
+    "title": "Literature study in medical ultrasound"
+  },
+  {
+    "code": "22487",
+    "title": "Advanced ultrasound research tools"
+  },
+  {
+    "code": "22490",
+    "title": "Advanced Ultrasound Imaging"
+  },
+  {
+    "code": "22506",
+    "title": "Medical magnetic resonance imaging"
+  },
+  {
+    "code": "22507",
+    "title": "Advanced magnetic resonance imaging"
+  },
+  {
+    "code": "22508",
+    "title": "Practical NMR spectroscopy: Making reactions in (bio)chemistry visible"
+  },
+  {
+    "code": "22511",
+    "title": "Biomedical optics"
+  },
+  {
+    "code": "22513",
+    "title": "Biophotonics"
+  },
+  {
+    "code": "22525",
+    "title": "Medical Image Analysis"
+  },
+  {
+    "code": "22530",
+    "title": "Computational radiation dosimetry"
+  },
+  {
+    "code": "22600",
+    "title": "Fabrication of micro- and nanostructures"
+  },
+  {
+    "code": "22602",
+    "title": "Visualisation of micro and nano structures"
+  },
+  {
+    "code": "22603",
+    "title": "Light microscopy for life science"
+  },
+  {
+    "code": "22604",
+    "title": "Optical Sensing and Imaging Systems Journal Club"
+  },
+  {
+    "code": "22605",
+    "title": "Energy Materials Journal Club"
+  },
+  {
+    "code": "22610",
+    "title": "Physics in Health Technology"
+  },
+  {
+    "code": "22611",
+    "title": "Research immersion - Physics in Health Technology, MSc"
+  },
+  {
+    "code": "22612",
+    "title": "Research immersion - Physics in Health Technology, BSc"
+  },
+  {
+    "code": "22680",
+    "title": "Computer-based Introduction to Data Analysis for Physics, Nano-, and Health Technology"
+  },
+  {
+    "code": "22681",
+    "title": "Topics in Advanced Micro and Nanofabrication"
+  },
+  {
+    "code": "22800",
+    "title": "DTU Health Tech PhD Introductory Course"
+  },
+  {
+    "code": "23101",
+    "title": "Introduction to food production chains"
+  },
+  {
+    "code": "23102",
+    "title": "Food safety in production chains"
+  },
+  {
+    "code": "23205",
+    "title": "Fighting infectious diseases"
+  },
+  {
+    "code": "23206",
+    "title": "Positive microbiology and biotechnology  - application of microbes in food production"
+  },
+  {
+    "code": "23210",
+    "title": "Predictive food microbiology and preservation"
+  },
+  {
+    "code": "23212",
+    "title": "Practical exercises in food fermentation"
+  },
+  {
+    "code": "23214",
+    "title": "Experimental microbiology"
+  },
+  {
+    "code": "23216",
+    "title": "Producing new sustainable food ingredients - processes and utilizations"
+  },
+  {
+    "code": "23220",
+    "title": "Food Microbiology"
+  },
+  {
+    "code": "23255",
+    "title": "The threat from antimicrobial resistance"
+  },
+  {
+    "code": "23256",
+    "title": "Epidemiology - an introduction"
+  },
+  {
+    "code": "23257",
+    "title": "Compositional data analysis with applications in genomics"
+  },
+  {
+    "code": "23258",
+    "title": "General medical microbiology"
+  },
+  {
+    "code": "23260",
+    "title": "Applied methods in metagenomics"
+  },
+  {
+    "code": "23261",
+    "title": "Epidemiological methods for surveillance of infectious diseases"
+  },
+  {
+    "code": "23262",
+    "title": "Infectious disease bioinformatics"
+  },
+  {
+    "code": "23263",
+    "title": "Advanced modeling of infectious diseases"
+  },
+  {
+    "code": "23272",
+    "title": "Risk analysis in food safety"
+  },
+  {
+    "code": "23301",
+    "title": "Practical chemical food analysis"
+  },
+  {
+    "code": "23302",
+    "title": "Food chemistry"
+  },
+  {
+    "code": "23360",
+    "title": "Practical green extraction and processing technologies"
+  },
+  {
+    "code": "23511",
+    "title": "Food production engineering basics"
+  },
+  {
+    "code": "23520",
+    "title": "Food process design"
+  },
+  {
+    "code": "23521",
+    "title": "Hygienic design in the food industry"
+  },
+  {
+    "code": "23522",
+    "title": "Rheology of food and biological materials"
+  },
+  {
+    "code": "23531",
+    "title": "Entrepreneurship in food and bio engineering"
+  },
+  {
+    "code": "23532",
+    "title": "Beer brewing and safe food production"
+  },
+  {
+    "code": "23552",
+    "title": "Development of innovative future food: Ecotrophelia and Blue Dot course"
+  },
+  {
+    "code": "23564",
+    "title": "Integrated product innovation in the food industry"
+  },
+  {
+    "code": "23662",
+    "title": "Introduction to molecular and reproductive toxicology"
+  },
+  {
+    "code": "23711",
+    "title": "Food technology"
+  },
+  {
+    "code": "23732",
+    "title": "Human nutrition"
+  },
+  {
+    "code": "23832",
+    "title": "Lipid Biochemistry, Technology, Applications and Analysis"
+  },
+  {
+    "code": "23837",
+    "title": "Introductory course for PhD students at DTU Food"
+  },
+  {
+    "code": "23839",
+    "title": "Risk-benefit assessment of foods: methods for quantifying health effects"
+  },
+  {
+    "code": "23841",
+    "title": "Whole genome sequencing analysis for microbial diagnostic, identification and cluster analysis"
+  },
+  {
+    "code": "23842",
+    "title": "Mastering WGS and Metagenomics using Oxford Nanopore Long Read Sequencing.  Bench-lab training"
+  },
+  {
+    "code": "23851",
+    "title": "Microbiological risk assessment"
+  },
+  {
+    "code": "23903",
+    "title": "Basic food analysis"
+  },
+  {
+    "code": "23904",
+    "title": "Introduction to food"
+  },
+  {
+    "code": "23925",
+    "title": "Food Microbiology"
+  },
+  {
+    "code": "23926",
+    "title": "Applied food microbiology"
+  },
+  {
+    "code": "23932",
+    "title": "Biological chemistry"
+  },
+  {
+    "code": "23936",
+    "title": "Chemical food analysis I"
+  },
+  {
+    "code": "23937",
+    "title": "Chemical food analysis II"
+  },
+  {
+    "code": "23952",
+    "title": "Food technology"
+  },
+  {
+    "code": "23953",
+    "title": "Applied statistical process control and quality management"
+  },
+  {
+    "code": "23954",
+    "title": "Food processes, quality, and safety in practice"
+  },
+  {
+    "code": "23963",
+    "title": "Raw materials, hygiene and HACCP"
+  },
+  {
+    "code": "23982",
+    "title": "Chemical Risk Analysis"
+  },
+  {
+    "code": "25102",
+    "title": "Oceanography"
+  },
+  {
+    "code": "25104",
+    "title": "An introduction to ocean science and technology"
+  },
+  {
+    "code": "25105",
+    "title": "Ecology"
+  },
+  {
+    "code": "25106",
+    "title": "Introduction to genetic methods in engineering"
+  },
+  {
+    "code": "25107",
+    "title": "Fisheries and aquaculture"
+  },
+  {
+    "code": "25108",
+    "title": "Applied molecular techniques"
+  },
+  {
+    "code": "25109",
+    "title": "Experimental aquatic bioscience"
+  },
+  {
+    "code": "25201",
+    "title": "Introduction to safety at sea and fieldwork in Greenland"
+  },
+  {
+    "code": "25202",
+    "title": "Fisheries Engineer I: Describe exploitation and management of fish"
+  },
+  {
+    "code": "25203",
+    "title": "Fisheries Engineer II: Comparison of exploitation and management of different fish and shellfish species"
+  },
+  {
+    "code": "25204",
+    "title": "Fisheries Engineer III: Improvement of exploitation and management of selected fish and shellfish species"
+  },
+  {
+    "code": "25205",
+    "title": "Basic modelling and statistics in R"
+  },
+  {
+    "code": "25206",
+    "title": "Preparatory chemistry and physics"
+  },
+  {
+    "code": "25207",
+    "title": "Introduction to Aquaculture"
+  },
+  {
+    "code": "25208",
+    "title": "Sustainability Solutions"
+  },
+  {
+    "code": "25209",
+    "title": "Fish Capture Technology II"
+  },
+  {
+    "code": "25210",
+    "title": "Aquatic ecosystem management – for fisheries engineers"
+  },
+  {
+    "code": "25211",
+    "title": "Applied genetics for improved fisheries management with special focus on recreational fisheries"
+  },
+  {
+    "code": "25212",
+    "title": "Fisheries Engineer Project in Greenland I"
+  },
+  {
+    "code": "25213",
+    "title": "Organisation and Change Management"
+  },
+  {
+    "code": "25214",
+    "title": "Calculus and Algebra 2 for Fisheries Technology"
+  },
+  {
+    "code": "25215",
+    "title": "Introduction to statistics in marine science"
+  },
+  {
+    "code": "25302",
+    "title": "Physical oceanography"
+  },
+  {
+    "code": "25303",
+    "title": "Mathematical biology"
+  },
+  {
+    "code": "25310",
+    "title": "Biological oceanography"
+  },
+  {
+    "code": "25311",
+    "title": "Fisheries oceanography"
+  },
+  {
+    "code": "25312",
+    "title": "Fisheries systems – management and modelling"
+  },
+  {
+    "code": "25313",
+    "title": "Genetic methods in fisheries and aquatic biodiversity conservation"
+  },
+  {
+    "code": "25314",
+    "title": "Computational marine ecological modelling"
+  },
+  {
+    "code": "25315",
+    "title": "Genetic methods in aquaculture"
+  },
+  {
+    "code": "25316",
+    "title": "Recirculating aquaculture systems"
+  },
+  {
+    "code": "25317",
+    "title": "Health management and disease control in aquaculture"
+  },
+  {
+    "code": "25318",
+    "title": "Management, biodiversity, and conservation of aquatic ecosystems"
+  },
+  {
+    "code": "25321",
+    "title": "Fish nutrition and bioenergetics"
+  },
+  {
+    "code": "25322",
+    "title": "Advanced course in recirculating aquaculture systems: Design and application"
+  },
+  {
+    "code": "25323",
+    "title": "Topics in aquatic science and technology"
+  },
+  {
+    "code": "25324",
+    "title": "Applied Ocean Observation Technologies"
+  },
+  {
+    "code": "25325",
+    "title": "Marine ecosystems and climate change"
+  },
+  {
+    "code": "25326",
+    "title": "Fish physiology and welfare"
+  },
+  {
+    "code": "25327",
+    "title": "Chemical oceanography"
+  },
+  {
+    "code": "25328",
+    "title": "Mathematical models in ecology"
+  },
+  {
+    "code": "25331",
+    "title": "Exercises in recirculating aquaculture systems"
+  },
+  {
+    "code": "25335",
+    "title": "Sustainability of Fish Capture Methods"
+  },
+  {
+    "code": "25336",
+    "title": "Fish Capture Technology"
+  },
+  {
+    "code": "25340",
+    "title": "Digital Ocean"
+  },
+  {
+    "code": "25341",
+    "title": "Dynamical Oceanography"
+  },
+  {
+    "code": "25342",
+    "title": "Evidence Based Advice for Aquatic Management"
+  },
+  {
+    "code": "25343",
+    "title": "Quantitative Modelling of Natural Resources"
+  },
+  {
+    "code": "25344",
+    "title": "Environmental effects of maritime activities"
+  },
+  {
+    "code": "25345",
+    "title": "Introduction to modelling observations of natural resources"
+  },
+  {
+    "code": "25346",
+    "title": "Water quality in aquaculture"
+  },
+  {
+    "code": "25347",
+    "title": "Fundamentals of Underwater Acoustic and Optical Systems"
+  },
+  {
+    "code": "25348",
+    "title": "Low Trophic Aquaculture: shellfish, micro- and macroalgae"
+  },
+  {
+    "code": "25349",
+    "title": "Applied Fisheries Ecology"
+  },
+  {
+    "code": "25350",
+    "title": "Introduction to aquatic ecosystems and their organisms"
+  },
+  {
+    "code": "25351",
+    "title": "Aquaculture End-of-pipe treatment with focus on residual resources"
+  },
+  {
+    "code": "25352",
+    "title": "Blue Bioeconomy Innovation"
+  },
+  {
+    "code": "25353",
+    "title": "Recreation fisheries; Biological impacts; management and human dimensions"
+  },
+  {
+    "code": "25354",
+    "title": "Applied Methods in Fisheries Technologies"
+  },
+  {
+    "code": "25355",
+    "title": "Genomic Methods for Breeding and Management for Aquatic Resources"
+  },
+  {
+    "code": "25616",
+    "title": "Fish capture technology"
+  },
+  {
+    "code": "25619",
+    "title": "Funding your research career"
+  },
+  {
+    "code": "25621",
+    "title": "Study group in Fisheries Technology"
+  },
+  {
+    "code": "25623",
+    "title": "Methods for implementation of surveillance procedures for listed fish diseases."
+  },
+  {
+    "code": "25624",
+    "title": "Advanced Fisheries Oceanography"
+  },
+  {
+    "code": "25625",
+    "title": "Evidence Based Advice for Aquatic Management"
+  },
+  {
+    "code": "25626",
+    "title": "Fisheries systems - management and modelling"
+  },
+  {
+    "code": "25627",
+    "title": "Quantitative Modelling of Natural resources"
+  },
+  {
+    "code": "25628",
+    "title": "Fisheries Ecology and Advice"
+  },
+  {
+    "code": "25801",
+    "title": "Aquatic science and living resources - research communication (1)"
+  },
+  {
+    "code": "25811",
+    "title": "Current topics in aquatic sciences (1)"
+  },
+  {
+    "code": "25812",
+    "title": "Current topics in aquatic sciences (2)"
+  },
+  {
+    "code": "25813",
+    "title": "Current topics in aquatic sciences (3)"
+  },
+  {
+    "code": "25823",
+    "title": "Study Group in Population Ecology and Genetics (1)"
+  },
+  {
+    "code": "25824",
+    "title": "Study Group in Population Ecology and Genetics (2)"
+  },
+  {
+    "code": "25825",
+    "title": "Study Group in Population Ecology and Genetics (3)"
+  },
+  {
+    "code": "25826",
+    "title": "Journal club in aquatic animal health (1)"
+  },
+  {
+    "code": "25827",
+    "title": "Journal club in aquatic animal health (2)"
+  },
+  {
+    "code": "25829",
+    "title": "Journal club in aquatic animal health (4)"
+  },
+  {
+    "code": "25830",
+    "title": "Journal club in aquatic animal health (4)"
+  },
+  {
+    "code": "25831",
+    "title": "Journal club in aquatic animal health (5)"
+  },
+  {
+    "code": "25832",
+    "title": "Journal club in aquatic animal health (6)"
+  },
+  {
+    "code": "25833",
+    "title": "Early Career Aquatic Seminar (1)"
+  },
+  {
+    "code": "25834",
+    "title": "Early Career Aquatic Seminar (2)"
+  },
+  {
+    "code": "25835",
+    "title": "Early Career Aquatic Seminar (3)"
+  },
+  {
+    "code": "26001",
+    "title": "General and inorganic chemistry"
+  },
+  {
+    "code": "26002",
+    "title": "Chemical Synthesis"
+  },
+  {
+    "code": "26003",
+    "title": "Chemical Synthesis"
+  },
+  {
+    "code": "26004",
+    "title": "Chemical Synthesis"
+  },
+  {
+    "code": "26008",
+    "title": "Exercises in Inorganic Chemistry"
+  },
+  {
+    "code": "26010",
+    "title": "Introductory Project in Chemistry"
+  },
+  {
+    "code": "26020",
+    "title": "Chemistry (Polytechnical Foundation)"
+  },
+  {
+    "code": "26021",
+    "title": "Chemistry (Polytechnical Foundation)"
+  },
+  {
+    "code": "26022",
+    "title": "Chemistry (Polytechnical Foundation)"
+  },
+  {
+    "code": "26050",
+    "title": "Chemistry for life sciences"
+  },
+  {
+    "code": "26124",
+    "title": "Coordination Chemistry (Inorganic Chemistry 2)"
+  },
+  {
+    "code": "26127",
+    "title": "Experimental Inorganic Chemistry"
+  },
+  {
+    "code": "26128",
+    "title": "Chemistry and applications of inorganic materials"
+  },
+  {
+    "code": "26130",
+    "title": "Spectroscopic methods"
+  },
+  {
+    "code": "26134",
+    "title": "Advanced Inorganic Chemistry (Inorganic Chemistry 3)"
+  },
+  {
+    "code": "26171",
+    "title": "General Chemistry"
+  },
+  {
+    "code": "26173",
+    "title": "Inorganic Chemistry"
+  },
+  {
+    "code": "26174",
+    "title": "Laboratory course for Bachelor of Engineering in food safety and quality"
+  },
+  {
+    "code": "26200",
+    "title": "Physical Chemistry 1"
+  },
+  {
+    "code": "26211",
+    "title": "Biophysics and biophysical chemistry"
+  },
+  {
+    "code": "26220",
+    "title": "Physical chemistry 2"
+  },
+  {
+    "code": "26225",
+    "title": "Quantitative Experiments and Modelling in Chemistry"
+  },
+  {
+    "code": "26231",
+    "title": "Physical Chemistry 3"
+  },
+  {
+    "code": "26236",
+    "title": "Statistical thermodynamics and reaction dynamics"
+  },
+  {
+    "code": "26241",
+    "title": "Applied Pharmacokinetics and Pharmacodynamics"
+  },
+  {
+    "code": "26245",
+    "title": "Applied computational chemistry"
+  },
+  {
+    "code": "26255",
+    "title": "Molecular dynamics and machine  learning"
+  },
+  {
+    "code": "26261",
+    "title": "Introduction to Quantum Chemistry"
+  },
+  {
+    "code": "26263",
+    "title": "Molecular electronic structure methods"
+  },
+  {
+    "code": "26271",
+    "title": "Physical Chemistry"
+  },
+  {
+    "code": "26280",
+    "title": "Chemistry and Physics in CO2 Storage"
+  },
+  {
+    "code": "26300",
+    "title": "Analytical Chemistry"
+  },
+  {
+    "code": "26317",
+    "title": "Instrumental Chemical Analysis"
+  },
+  {
+    "code": "26325",
+    "title": "Chromatographic (HPLC) Purification of Biological Macromolecules"
+  },
+  {
+    "code": "26371",
+    "title": "Inorganic Qualitative Analysis (Laboratory Exercises)"
+  },
+  {
+    "code": "26374",
+    "title": "Applications of Analytical Chemistry in Inorganic and Physical Chemistry, laboratory course"
+  },
+  {
+    "code": "26400",
+    "title": "Organic Chemistry 1"
+  },
+  {
+    "code": "26407",
+    "title": "Practical Organic Chemistry"
+  },
+  {
+    "code": "26411",
+    "title": "Organic Chemistry 2"
+  },
+  {
+    "code": "26416",
+    "title": "Laboratory Course in Organic Synthesis"
+  },
+  {
+    "code": "26422",
+    "title": "Biomolecular Chemistry"
+  },
+  {
+    "code": "26426",
+    "title": "Introduction to Medicinal Chemistry"
+  },
+  {
+    "code": "26428",
+    "title": "Spectroscopy of Organic Compounds"
+  },
+  {
+    "code": "26433",
+    "title": "Organic Chemistry 3"
+  },
+  {
+    "code": "26438",
+    "title": "NMR Spectroscopy"
+  },
+  {
+    "code": "26444",
+    "title": "Organic Chemistry 4"
+  },
+  {
+    "code": "26446",
+    "title": "Advanced Medicinal Chemistry"
+  },
+  {
+    "code": "26455",
+    "title": "Organic Reaction Mechanisms and Supramolecular Chemistry"
+  },
+  {
+    "code": "26471",
+    "title": "Organic Chemistry"
+  },
+  {
+    "code": "26474",
+    "title": "Organic and Inorganic Synthesis"
+  },
+  {
+    "code": "26510",
+    "title": "Catalysis and Sustainable Chemistry"
+  },
+  {
+    "code": "26620",
+    "title": "Chemistry and Innovation"
+  },
+  {
+    "code": "26800",
+    "title": "General and Inorganic Chemistry (online)"
+  },
+  {
+    "code": "26805",
+    "title": "Exercises in chemistry"
+  },
+  {
+    "code": "26820",
+    "title": "Physical Chemistry"
+  },
+  {
+    "code": "26840",
+    "title": "Organic Chemistry"
+  },
+  {
+    "code": "26932",
+    "title": "Presentation and Discussion of Research in Organic Chemistry"
+  },
+  {
+    "code": "26933",
+    "title": "Problems in the Organic Chemistry of Natural Products"
+  },
+  {
+    "code": "26944",
+    "title": "Advanced NMR spectroscopy"
+  },
+  {
+    "code": "26960",
+    "title": "Green Chemistry and Technology"
+  },
+  {
+    "code": "26970",
+    "title": "Presentation and Discussion of Research and Literature within Inorganic Chemistry and Materials Science"
+  },
+  {
+    "code": "26991",
+    "title": "Topics in Modern Polymer Chemistry and Physics"
+  },
+  {
+    "code": "27002",
+    "title": "Life Science"
+  },
+  {
+    "code": "27003",
+    "title": "Biosolutions"
+  },
+  {
+    "code": "27016",
+    "title": "Design-Build 1: Devices for measuring cell growth"
+  },
+  {
+    "code": "27020",
+    "title": "Bioengineering (Polytechnical Foundation)"
+  },
+  {
+    "code": "27021",
+    "title": "Bioengineering - online  (Polytechnical Foundation)"
+  },
+  {
+    "code": "27022",
+    "title": "Biochemistry"
+  },
+  {
+    "code": "27023",
+    "title": "Experimental biochemistry"
+  },
+  {
+    "code": "27026",
+    "title": "Molecular biology"
+  },
+  {
+    "code": "27027",
+    "title": "Experimental molecular microbiology"
+  },
+  {
+    "code": "27030",
+    "title": "Biomedical cell and tissue biology"
+  },
+  {
+    "code": "27034",
+    "title": "Fermentation technology"
+  },
+  {
+    "code": "27035",
+    "title": "Experimental fermentation technology"
+  },
+  {
+    "code": "27051",
+    "title": "Diversity and application of microorganisms"
+  },
+  {
+    "code": "27062",
+    "title": "Methods in protein science: Structure, interactions and molecular properties"
+  },
+  {
+    "code": "27070",
+    "title": "Immunology"
+  },
+  {
+    "code": "27075",
+    "title": "Discovery and design of biotherapeutics"
+  },
+  {
+    "code": "27101",
+    "title": "Assay Technology"
+  },
+  {
+    "code": "27220",
+    "title": "Advanced prokaryotic biotechnology"
+  },
+  {
+    "code": "27230",
+    "title": "Prokaryotic cell biology"
+  },
+  {
+    "code": "27246",
+    "title": "Applied enzyme technology and kinetics"
+  },
+  {
+    "code": "27247",
+    "title": "Experimental enzyme technology"
+  },
+  {
+    "code": "27255",
+    "title": "Advanced experimental prokaryotic molecular biology and ecology"
+  },
+  {
+    "code": "27325",
+    "title": "Advanced protein structure engineering and analysis"
+  },
+  {
+    "code": "27330",
+    "title": "Quantitative analysis and modeling in protein science"
+  },
+  {
+    "code": "27419",
+    "title": "Filamentous Fungi: Biology and Biotechnology"
+  },
+  {
+    "code": "27422",
+    "title": "Biosynthesis of natural products"
+  },
+  {
+    "code": "27423",
+    "title": "Metabolomics and proteomics"
+  },
+  {
+    "code": "27430",
+    "title": "Eukaryotic cell biology"
+  },
+  {
+    "code": "27432",
+    "title": "Experimental molecular biology of eukaryotes"
+  },
+  {
+    "code": "27436",
+    "title": "Innovations in biopharmaceutical drug development"
+  },
+  {
+    "code": "27455",
+    "title": "Microbial adaptation to industrial processes"
+  },
+  {
+    "code": "27460",
+    "title": "Synthetic biology"
+  },
+  {
+    "code": "27470",
+    "title": "Mammalian cell technology for manufacturing of biologics"
+  },
+  {
+    "code": "27472",
+    "title": "Biopharmaceutical protein production in mammalian cells in practice"
+  },
+  {
+    "code": "27510",
+    "title": "Biosensors and bioanalysis"
+  },
+  {
+    "code": "27665",
+    "title": "LabChip: Design of Lab-on-a-chip systems"
+  },
+  {
+    "code": "27666",
+    "title": "AI-guided Protein Science: From Design to Engineering"
+  },
+  {
+    "code": "27800",
+    "title": "PhD Introductory Course (February)"
+  },
+  {
+    "code": "27802",
+    "title": "PhD Introductory Course (April)"
+  },
+  {
+    "code": "27803",
+    "title": "PhD Introductory Course (June)"
+  },
+  {
+    "code": "27804",
+    "title": "PhD Introductory Course (October)"
+  },
+  {
+    "code": "27805",
+    "title": "PhD Introductory Course (December)"
+  },
+  {
+    "code": "27823",
+    "title": "Industrial Mycology"
+  },
+  {
+    "code": "27828",
+    "title": "Upstream Process Development"
+  },
+  {
+    "code": "27832",
+    "title": "Biosynthesis of natural products"
+  },
+  {
+    "code": "27845",
+    "title": "Advanced protein structure engineering and analysis"
+  },
+  {
+    "code": "28010",
+    "title": "Products and Processes - Introduction to Chemical Engineering"
+  },
+  {
+    "code": "28012",
+    "title": "Chemical and Biochemical Process Engineering"
+  },
+  {
+    "code": "28016",
+    "title": "Mathematical models for chemical and biochemical systems"
+  },
+  {
+    "code": "28020",
+    "title": "Introduction to Chemical and Biochemical Engineering"
+  },
+  {
+    "code": "28021",
+    "title": "Chemical and Biochemical Process Engineering online"
+  },
+  {
+    "code": "28022",
+    "title": "Unit Operations of Chemical Engineering and Biotechnology"
+  },
+  {
+    "code": "28025",
+    "title": "Bio Process Technology"
+  },
+  {
+    "code": "28121",
+    "title": "Chemical Unit Operations Laboratory"
+  },
+  {
+    "code": "28123",
+    "title": "Large Scale Exercises in Process Technology and Chemical Unit Operations  - 4 weeks Summer University for International students"
+  },
+  {
+    "code": "28125",
+    "title": "Chemical Unit Operations Laboratory"
+  },
+  {
+    "code": "28140",
+    "title": "Introduction to Chemical Reaction Engineering"
+  },
+  {
+    "code": "28145",
+    "title": "Introduction to Chemical Reaction Engineering"
+  },
+  {
+    "code": "28150",
+    "title": "Introduction to Process Control"
+  },
+  {
+    "code": "28155",
+    "title": "Introduction to Process Control"
+  },
+  {
+    "code": "28157",
+    "title": "Process Design"
+  },
+  {
+    "code": "28160",
+    "title": "Mathematical models in chemical engineering"
+  },
+  {
+    "code": "28165",
+    "title": "Mathematical models in chemical engineering"
+  },
+  {
+    "code": "28212",
+    "title": "Polymer Chemistry"
+  },
+  {
+    "code": "28213",
+    "title": "Polymer Technology"
+  },
+  {
+    "code": "28214",
+    "title": "Polymer synthesis and characterization"
+  },
+  {
+    "code": "28216",
+    "title": "Organic Coatings Science and Technology"
+  },
+  {
+    "code": "28217",
+    "title": "Organic Coatings Science and Technology – Practical Exercises"
+  },
+  {
+    "code": "28221",
+    "title": "Chemical Engineering Thermodynamics"
+  },
+  {
+    "code": "28233",
+    "title": "Recovery and purification of biological products"
+  },
+  {
+    "code": "28242",
+    "title": "Chemical Kinetics and Catalysis"
+  },
+  {
+    "code": "28244",
+    "title": "Combustion and High Temperature Processes"
+  },
+  {
+    "code": "28271",
+    "title": "Thermal gasification, pyrolysis and sustainability"
+  },
+  {
+    "code": "28311",
+    "title": "Chemical and Biochemical Product Design"
+  },
+  {
+    "code": "28315",
+    "title": "Applied Colloid and Surface Chemistry"
+  },
+  {
+    "code": "28316",
+    "title": "Laboratory Course in Colloid and Surface Chemistry"
+  },
+  {
+    "code": "28322",
+    "title": "Chemical Engineering Thermodynamics"
+  },
+  {
+    "code": "28342",
+    "title": "Chemical Reaction Engineering"
+  },
+  {
+    "code": "28344",
+    "title": "Biotechnology and process design"
+  },
+  {
+    "code": "28345",
+    "title": "Industrial BioReaction Engineering"
+  },
+  {
+    "code": "28346",
+    "title": "Advanced fermentation technology practicum"
+  },
+  {
+    "code": "28350",
+    "title": "Process Design: Principles and Methods"
+  },
+  {
+    "code": "28352",
+    "title": "Chemical Process Control"
+  },
+  {
+    "code": "28361",
+    "title": "Chemical engineering model analysis"
+  },
+  {
+    "code": "28412",
+    "title": "Advanced Chemical Product Design"
+  },
+  {
+    "code": "28420",
+    "title": "Separation Processes"
+  },
+  {
+    "code": "28423",
+    "title": "Phase Equilibria for non-ideal mixtures"
+  },
+  {
+    "code": "28434",
+    "title": "Membrane Technology"
+  },
+  {
+    "code": "28443",
+    "title": "Industrial Reaction Engineering"
+  },
+  {
+    "code": "28451",
+    "title": "Optimising Plantwide Control"
+  },
+  {
+    "code": "28455",
+    "title": "Process adaptation in Fermentation Based Biomanufacturing"
+  },
+  {
+    "code": "28485",
+    "title": "Biobusiness and Process Innovation"
+  },
+  {
+    "code": "28530",
+    "title": "Transport Processes"
+  },
+  {
+    "code": "28720",
+    "title": "Downstream Processing"
+  },
+  {
+    "code": "28725",
+    "title": "Bioprocess Unit Operations and GMP Exercises"
+  },
+  {
+    "code": "28730",
+    "title": "Transport Phenomena"
+  },
+  {
+    "code": "28737",
+    "title": "Applied Chromatography Project"
+  },
+  {
+    "code": "28745",
+    "title": "Industrial cell-based reaction engineering"
+  },
+  {
+    "code": "28747",
+    "title": "Applied Process Design and Intensification"
+  },
+  {
+    "code": "28750",
+    "title": "Systematic Methods for Process  Design and Analysis"
+  },
+  {
+    "code": "28751",
+    "title": "Control systems in biomanufacturing"
+  },
+  {
+    "code": "28755",
+    "title": "Process adaptation in Fermentation Based Biomanufacturing"
+  },
+  {
+    "code": "28761",
+    "title": "Mathematical modeling for industrial applications"
+  },
+  {
+    "code": "28811",
+    "title": "Polymers in processes and products"
+  },
+  {
+    "code": "28831",
+    "title": "Computational Fluid Dynamics in Chemical Engineering"
+  },
+  {
+    "code": "28845",
+    "title": "Chemical Reaction Engineering Laboratory"
+  },
+  {
+    "code": "28850",
+    "title": "Pharmaceutical Process Development"
+  },
+  {
+    "code": "28852",
+    "title": "Risk Assessment in Chemical and Biochemical Industry"
+  },
+  {
+    "code": "28855",
+    "title": "Good Manufacturing Practice (GMP) and quality in pharmaceutical, biotech and food industry - Theoretical version"
+  },
+  {
+    "code": "28857",
+    "title": "Good Manufacturing Practice (GMP) and quality in pharmaceutical, biotech and food industry - Practical version"
+  },
+  {
+    "code": "28870",
+    "title": "Energy and Sustainability"
+  },
+  {
+    "code": "28871",
+    "title": "Production of Biofuels"
+  },
+  {
+    "code": "28872",
+    "title": "Biorefinery"
+  },
+  {
+    "code": "28905",
+    "title": "Advanced Topics in Process Systems Engineering"
+  },
+  {
+    "code": "28908",
+    "title": "Rheology of complex fluids (heavy)"
+  },
+  {
+    "code": "28909",
+    "title": "Thermodynamic Models, Fundamentals and Computational Aspects"
+  },
+  {
+    "code": "28917",
+    "title": "Statistical Thermodynamics for Chemical Engineering"
+  },
+  {
+    "code": "28923",
+    "title": "Uncertainty and Sensitivity Analysis of Numerical Models"
+  },
+  {
+    "code": "28927",
+    "title": "Advanced Topics in Process Technology"
+  },
+  {
+    "code": "28928",
+    "title": "Electrolyte Solution Thermodynamics"
+  },
+  {
+    "code": "28930",
+    "title": "Advances in Chemical and Biochemical Engineering"
+  },
+  {
+    "code": "28932",
+    "title": "Process Engineering Laboratory"
+  },
+  {
+    "code": "28934",
+    "title": "Automation and control of yeast fermentation"
+  },
+  {
+    "code": "29905",
+    "title": "Introduction to Python for Data Analysis and Automation in Biology"
+  },
+  {
+    "code": "29907",
+    "title": "Practical Phylogenetics"
+  },
+  {
+    "code": "30010",
+    "title": "Programming Project"
+  },
+  {
+    "code": "30015",
+    "title": "Basic electronics for instrumentation"
+  },
+  {
+    "code": "30020",
+    "title": "Electronic Measurements and Instrumentation"
+  },
+  {
+    "code": "30021",
+    "title": "Digital Instrumentation"
+  },
+  {
+    "code": "30032",
+    "title": "Electrotechnics"
+  },
+  {
+    "code": "30035",
+    "title": "Engineering Electromagnetics"
+  },
+  {
+    "code": "30081",
+    "title": "Digital Engineering"
+  },
+  {
+    "code": "30082",
+    "title": "Project work in Digital design"
+  },
+  {
+    "code": "30101",
+    "title": "Introduction to GeoRum 1"
+  },
+  {
+    "code": "30102",
+    "title": "Introduction to GeoRum 2"
+  },
+  {
+    "code": "30110",
+    "title": "Project work -  Earth and Space Physics and Engineering"
+  },
+  {
+    "code": "30121",
+    "title": "Astrophysics I"
+  },
+  {
+    "code": "30131",
+    "title": "Geo- and Planetary Physics I"
+  },
+  {
+    "code": "30142",
+    "title": "Geo- and Planetary Physics ll"
+  },
+  {
+    "code": "30150",
+    "title": "Mathematical and Numerical Methods in solid Earth Physics"
+  },
+  {
+    "code": "30160",
+    "title": "Continuous and Discrete Time Signals"
+  },
+  {
+    "code": "30202",
+    "title": "Measurement Technologies in Earth and Space Physics"
+  },
+  {
+    "code": "30220",
+    "title": "Synthesis in Earth and Space Physics"
+  },
+  {
+    "code": "30221",
+    "title": "Projects in Earth & Space Physics and Engineering"
+  },
+  {
+    "code": "30222",
+    "title": "Projects in Earth & Space Physics and Engineering"
+  },
+  {
+    "code": "30223",
+    "title": "Projects in Earth & Space Physics and Engineering"
+  },
+  {
+    "code": "30224",
+    "title": "Projects in Earth & Space Physics and Engineering"
+  },
+  {
+    "code": "30230",
+    "title": "Data Analysis and Modeling in Geoscience and Astrophysics"
+  },
+  {
+    "code": "30300",
+    "title": "Introduction to Satellite Systems"
+  },
+  {
+    "code": "30310",
+    "title": "Space Systems Engineering"
+  },
+  {
+    "code": "30320",
+    "title": "Spacecraft Instrumentation Systems"
+  },
+  {
+    "code": "30330",
+    "title": "Image Analysis with Microcomputer"
+  },
+  {
+    "code": "30340",
+    "title": "Radar and Radiometer Systems"
+  },
+  {
+    "code": "30350",
+    "title": "Remote Sensing"
+  },
+  {
+    "code": "30400",
+    "title": "Electromagnetics"
+  },
+  {
+    "code": "30405",
+    "title": "Introduction to Wireless Technologies"
+  },
+  {
+    "code": "30410",
+    "title": "Antenna and microwave techniques"
+  },
+  {
+    "code": "30415",
+    "title": "RF communication circuits"
+  },
+  {
+    "code": "30421",
+    "title": "Advanced Microwave Techniques and High Speed Electronics"
+  },
+  {
+    "code": "30428",
+    "title": "Advanced electromagnetics"
+  },
+  {
+    "code": "30430",
+    "title": "Advanced antenna techniques and measurements"
+  },
+  {
+    "code": "30510",
+    "title": "GPS, GIS and Surveying"
+  },
+  {
+    "code": "30530",
+    "title": "Introduction to GIS"
+  },
+  {
+    "code": "30531",
+    "title": "GIS for Bachelor's of Engineering"
+  },
+  {
+    "code": "30540",
+    "title": "Mapping from Aerial and Satellite Images"
+  },
+  {
+    "code": "30545",
+    "title": "Analysis of spatial and temporal data within geoscience"
+  },
+  {
+    "code": "30552",
+    "title": "Satellite Geodesy"
+  },
+  {
+    "code": "30554",
+    "title": "Global Navigation Satellite Systems"
+  },
+  {
+    "code": "30555",
+    "title": "Microwave remote sensing models and data"
+  },
+  {
+    "code": "30561",
+    "title": "Physical Geodesy"
+  },
+  {
+    "code": "30564",
+    "title": "Summer School in Physical Geodesy and Climate"
+  },
+  {
+    "code": "30574",
+    "title": "Earth observations for monitoring changes (EO4Change)"
+  },
+  {
+    "code": "30720",
+    "title": "Space Physics - Physics of the space environment"
+  },
+  {
+    "code": "30742",
+    "title": "Exoplanets"
+  },
+  {
+    "code": "30745",
+    "title": "Earth and Planetary Magnetism"
+  },
+  {
+    "code": "30752",
+    "title": "Cryosphere physics and observation"
+  },
+  {
+    "code": "30755",
+    "title": "Climate change - physics and observations"
+  },
+  {
+    "code": "30760",
+    "title": "Inverse Problems and Machine Learning in Earth and Space Physics"
+  },
+  {
+    "code": "30784",
+    "title": "X-ray and gamma-ray detectors for space instrumentation"
+  },
+  {
+    "code": "30785",
+    "title": "Scientific instrumentation for Astronomical telescopes"
+  },
+  {
+    "code": "30791",
+    "title": "Physical processes in astronomy"
+  },
+  {
+    "code": "30794",
+    "title": "Astrophysical Data Analyses"
+  },
+  {
+    "code": "30857",
+    "title": "Extreme Climate and Physical Nature"
+  },
+  {
+    "code": "30911",
+    "title": "Journal Club in Geophysics, Astrophysics and Space Physics"
+  },
+  {
+    "code": "30970",
+    "title": "Advanced microwave and high-speed integrated circuits"
+  },
+  {
+    "code": "34019",
+    "title": "Physics project (Physics and nanotechnology)"
+  },
+  {
+    "code": "34020",
+    "title": "Optics and photonics"
+  },
+  {
+    "code": "34021",
+    "title": "Introduction to optics and photonics"
+  },
+  {
+    "code": "34023",
+    "title": "Projects in Quantum and Nanophotonics"
+  },
+  {
+    "code": "34024",
+    "title": "Optical properties of materials"
+  },
+  {
+    "code": "34029",
+    "title": "Physics project"
+  },
+  {
+    "code": "34031",
+    "title": "Applied mathematics for physicists"
+  },
+  {
+    "code": "34032",
+    "title": "Optical properties of solids"
+  },
+  {
+    "code": "34034",
+    "title": "Lasers and photonic systems"
+  },
+  {
+    "code": "34038",
+    "title": "Optical design and modelling"
+  },
+  {
+    "code": "34041",
+    "title": "Waveguide optics"
+  },
+  {
+    "code": "34042",
+    "title": "Quantum photonic communication"
+  },
+  {
+    "code": "34043",
+    "title": "Projects in Optics and Photonics"
+  },
+  {
+    "code": "34046",
+    "title": "Experimental methods in photonics"
+  },
+  {
+    "code": "34051",
+    "title": "Nanophotonics"
+  },
+  {
+    "code": "34052",
+    "title": "Nonlinear optics"
+  },
+  {
+    "code": "34053",
+    "title": "Numerical methods in photonics"
+  },
+  {
+    "code": "34060",
+    "title": "Ultrafast optics: fundamentals and applications"
+  },
+  {
+    "code": "34061",
+    "title": "Optical measurement methods and signal analysis"
+  },
+  {
+    "code": "34062",
+    "title": "Photonic integrated circuits"
+  },
+  {
+    "code": "34063",
+    "title": "Epitaxy: Principles and Applications"
+  },
+  {
+    "code": "34091",
+    "title": "PhD Course - Advanced photonic devices journal club"
+  },
+  {
+    "code": "34092",
+    "title": "PhD Course - Nano-optics"
+  },
+  {
+    "code": "34094",
+    "title": "PhD Course - Quantum Information Journal Club"
+  },
+  {
+    "code": "34120",
+    "title": "Electromagnetism for communication"
+  },
+  {
+    "code": "34121",
+    "title": "Introduction to Fibre Optic Communications"
+  },
+  {
+    "code": "34126",
+    "title": "Experimental course in optical communication"
+  },
+  {
+    "code": "34127",
+    "title": "Experimental optics and photonics"
+  },
+  {
+    "code": "34129",
+    "title": "Experimental course in optical communication"
+  },
+  {
+    "code": "34130",
+    "title": "Fundamentals of fibre-optic communication systems"
+  },
+  {
+    "code": "34153",
+    "title": "Physical concepts in optical communication"
+  },
+  {
+    "code": "34156",
+    "title": "Advanced Optical Communication Systems"
+  },
+  {
+    "code": "34190",
+    "title": "PhD Course - Digital Optical Communication Receivers"
+  },
+  {
+    "code": "34192",
+    "title": "Optical Communications Journal Club"
+  },
+  {
+    "code": "34193",
+    "title": "PhD Course - Advanced Concepts in Photovoltaics"
+  },
+  {
+    "code": "34194",
+    "title": "PhD Course - Advanced research practices"
+  },
+  {
+    "code": "34210",
+    "title": "Introduction to digital communication"
+  },
+  {
+    "code": "34220",
+    "title": "Coding in communication systems"
+  },
+  {
+    "code": "34229",
+    "title": "Project Work – Bachelor in Cyber Technology"
+  },
+  {
+    "code": "34231",
+    "title": "Digital communication 1"
+  },
+  {
+    "code": "34240",
+    "title": "Data Science, Compression and Image Communication"
+  },
+  {
+    "code": "34241",
+    "title": "Digital video technology"
+  },
+  {
+    "code": "34242",
+    "title": "Machine learning techniques for design and optimization of communication systems"
+  },
+  {
+    "code": "34249",
+    "title": "Synthesis Project for Communication Technologies"
+  },
+  {
+    "code": "34250",
+    "title": "Advanced image and video coding"
+  },
+  {
+    "code": "34251",
+    "title": "Advanced forward error correction and iterative decoding"
+  },
+  {
+    "code": "34269",
+    "title": "Computational imaging and spectroscopy"
+  },
+  {
+    "code": "34290",
+    "title": "PhD Course - Information Theory"
+  },
+  {
+    "code": "34302",
+    "title": "Introduction to Cyber Technology"
+  },
+  {
+    "code": "34313",
+    "title": "Introduction to Data Communication Networks"
+  },
+  {
+    "code": "34315",
+    "title": "Internet of things – application and infrastructure implementation"
+  },
+  {
+    "code": "34318",
+    "title": "Programming projects for Cyber Technology"
+  },
+  {
+    "code": "34322",
+    "title": "Communication Network for Control and Data Acquisition"
+  },
+  {
+    "code": "34325",
+    "title": "Communication technologies and application development for Internet-of-Things (IoT)"
+  },
+  {
+    "code": "34331",
+    "title": "Digital Hardwaredesign for Communications"
+  },
+  {
+    "code": "34332",
+    "title": "Projects in Digital hardwaredesign for Communications"
+  },
+  {
+    "code": "34333",
+    "title": "Technologies for Mobile communication and cellular IoT"
+  },
+  {
+    "code": "34334",
+    "title": "Advanced Data Networks and Cyber Security"
+  },
+  {
+    "code": "34338",
+    "title": "Telecommunication programming projects with Arduino"
+  },
+  {
+    "code": "34343",
+    "title": "Mobile backhaul networks"
+  },
+  {
+    "code": "34345",
+    "title": "Signalling systems and technology for railways"
+  },
+  {
+    "code": "34346",
+    "title": "Networking technologies and application development for Internet of Things (IoT)"
+  },
+  {
+    "code": "34349",
+    "title": "FPGA design for communication systems"
+  },
+  {
+    "code": "34351",
+    "title": "Access networks and home networks"
+  },
+  {
+    "code": "34359",
+    "title": "SDN: software-defined networking"
+  },
+  {
+    "code": "34365",
+    "title": "IoT Prototyping"
+  },
+  {
+    "code": "34366",
+    "title": "Intelligent systems"
+  },
+  {
+    "code": "34367",
+    "title": "Project in Intelligent Systems"
+  },
+  {
+    "code": "34368",
+    "title": "Global communication network infrastructure and design"
+  },
+  {
+    "code": "34369",
+    "title": "Project work in Global communication network infrastructure and design"
+  },
+  {
+    "code": "34370",
+    "title": "Cloud Networking"
+  },
+  {
+    "code": "34371",
+    "title": "Communication Network Security"
+  },
+  {
+    "code": "34373",
+    "title": "Introduction to microcontroller development for IoT using embedded C"
+  },
+  {
+    "code": "34374",
+    "title": "IoT Hardware and PCB Design"
+  },
+  {
+    "code": "34430",
+    "title": "Introduction to biophotonics"
+  },
+  {
+    "code": "34431",
+    "title": "Optical biosensors"
+  },
+  {
+    "code": "34440",
+    "title": "Novel optical fibers in life sciences"
+  },
+  {
+    "code": "34451",
+    "title": "Nonlinear mathematical physics"
+  },
+  {
+    "code": "34492",
+    "title": "PhD Course in nonlinear Optics"
+  },
+  {
+    "code": "34539",
+    "title": "Design, fabrication and characterization of optical planar waveguide components"
+  },
+  {
+    "code": "34540",
+    "title": "Light emitting diodes and photovoltaics for energy applications"
+  },
+  {
+    "code": "34541",
+    "title": "Entrepreneurship in photonics and communications"
+  },
+  {
+    "code": "34542",
+    "title": "Artificial lighting, science and practice"
+  },
+  {
+    "code": "34551",
+    "title": "Thin film photovoltaics"
+  },
+  {
+    "code": "34552",
+    "title": "Photovoltaic systems"
+  },
+  {
+    "code": "34553",
+    "title": "Applied photovoltaics"
+  },
+  {
+    "code": "34554",
+    "title": "Design of Ground Mounted Photovoltaic Power Plants"
+  },
+  {
+    "code": "34590",
+    "title": "Ph.D. Course - Entrepreneurship in Technical Science"
+  },
+  {
+    "code": "34600",
+    "title": "Electric circuits 1"
+  },
+  {
+    "code": "34601",
+    "title": "Electric circuits 2"
+  },
+  {
+    "code": "34602",
+    "title": "Engineering practices - Electrotechnology"
+  },
+  {
+    "code": "34620",
+    "title": "Basic power electronics in energy systems"
+  },
+  {
+    "code": "34621",
+    "title": "Electromagnetic sensors and digital signal processing"
+  },
+  {
+    "code": "34630",
+    "title": "Integrated analog electronics 1"
+  },
+  {
+    "code": "34636",
+    "title": "Integrated analog electronics 1"
+  },
+  {
+    "code": "34652",
+    "title": "Power Electronics 1"
+  },
+  {
+    "code": "34653",
+    "title": "Power Electronics 2. Laboratory course"
+  },
+  {
+    "code": "34654",
+    "title": "Circuit technology and EMC"
+  },
+  {
+    "code": "34655",
+    "title": "Integrated analog electronics 2"
+  },
+  {
+    "code": "34656",
+    "title": "Design and layout of integrated CMOS circuits"
+  },
+  {
+    "code": "34657",
+    "title": "System level integrated circuit design"
+  },
+  {
+    "code": "34658",
+    "title": "Research immersion 1 - Power electronics and IC design"
+  },
+  {
+    "code": "34659",
+    "title": "Research immersion 2 - Power electronics and IC design"
+  },
+  {
+    "code": "34690",
+    "title": "PhD Course - Journal Club in Power Electronics and IC design"
+  },
+  {
+    "code": "34720",
+    "title": "Introductory project - Electrotechnology"
+  },
+  {
+    "code": "34721",
+    "title": "Linear control design 1"
+  },
+  {
+    "code": "34722",
+    "title": "Linear control design 1"
+  },
+  {
+    "code": "34723",
+    "title": "Introduction to Programmable Logic Controllers"
+  },
+  {
+    "code": "34724",
+    "title": "Introduction to Programmable Logic Controllers"
+  },
+  {
+    "code": "34745",
+    "title": "Linear control design 2"
+  },
+  {
+    "code": "34746",
+    "title": "Robust and fault-tolerant control"
+  },
+  {
+    "code": "34748",
+    "title": "Modelling for operation of complex industrial plants"
+  },
+  {
+    "code": "34752",
+    "title": "Bio-inspired control for robots"
+  },
+  {
+    "code": "34753",
+    "title": "Robotics"
+  },
+  {
+    "code": "34755",
+    "title": "Building dependable robot systems"
+  },
+  {
+    "code": "34757",
+    "title": "Unmanned autonomous systems"
+  },
+  {
+    "code": "34759",
+    "title": "Perception for Autonomous Systems"
+  },
+  {
+    "code": "34760",
+    "title": "Safety and Reliability in Robotic and Automation Systems"
+  },
+  {
+    "code": "34761",
+    "title": "Robot Autonomy"
+  },
+  {
+    "code": "34763",
+    "title": "Autonomous Marine Robotics"
+  },
+  {
+    "code": "34764",
+    "title": "Robotics and Automation in Pharmaceutical Manufacturing"
+  },
+  {
+    "code": "34765",
+    "title": "Digital Control"
+  },
+  {
+    "code": "34791",
+    "title": "PhD Course - Topics in advanced control"
+  },
+  {
+    "code": "34792",
+    "title": "PhD Course - Advanced topics in Perception for Robotics and Autonomous Systems"
+  },
+  {
+    "code": "34840",
+    "title": "Fundamentals of acoustics and noise control"
+  },
+  {
+    "code": "34844",
+    "title": "Building acoustics"
+  },
+  {
+    "code": "34846",
+    "title": "Environmental acoustics"
+  },
+  {
+    "code": "34847",
+    "title": "Sound Tech Summer School - Innovation Camp"
+  },
+  {
+    "code": "34848",
+    "title": "Challenges in Acoustic Microsystems"
+  },
+  {
+    "code": "34850",
+    "title": "Architectural acoustics"
+  },
+  {
+    "code": "34860",
+    "title": "Advanced acoustics"
+  },
+  {
+    "code": "34865",
+    "title": "Numerical acoustics"
+  },
+  {
+    "code": "34867",
+    "title": "Acoustic conditions at the Roskilde Festival"
+  },
+  {
+    "code": "34870",
+    "title": "Electroacoustic transducers and systems"
+  },
+  {
+    "code": "34871",
+    "title": "Nonlinear transducers"
+  },
+  {
+    "code": "34880",
+    "title": "Structure-borne sound"
+  },
+  {
+    "code": "34895",
+    "title": "PhD Course - Research topics in acoustic technology"
+  },
+  {
+    "code": "41000",
+    "title": "Mechanical engineering practice"
+  },
+  {
+    "code": "41011",
+    "title": "User-centered design"
+  },
+  {
+    "code": "41012",
+    "title": "Visual communication"
+  },
+  {
+    "code": "41013",
+    "title": "Introduction to Prototyping"
+  },
+  {
+    "code": "41020",
+    "title": "Product analysis and redesign"
+  },
+  {
+    "code": "41028",
+    "title": "Design of mechatronic systems 1"
+  },
+  {
+    "code": "41029",
+    "title": "Design of mechatronic systems 2"
+  },
+  {
+    "code": "41031",
+    "title": "Industrial design 1"
+  },
+  {
+    "code": "41045",
+    "title": "Thermodynamic Modelling"
+  },
+  {
+    "code": "41046",
+    "title": "Materials and mechanics"
+  },
+  {
+    "code": "41051",
+    "title": "Product life and environmental issues"
+  },
+  {
+    "code": "41073",
+    "title": "Development and operation of product/service-systems"
+  },
+  {
+    "code": "41083",
+    "title": "Technology platforms and architectures"
+  },
+  {
+    "code": "41084",
+    "title": "Biologically Inspired Design"
+  },
+  {
+    "code": "41102",
+    "title": "Hydraulics in pipes and open channels"
+  },
+  {
+    "code": "41107",
+    "title": "Marine and ocean engineering"
+  },
+  {
+    "code": "41111",
+    "title": "Hydrodynamics 2"
+  },
+  {
+    "code": "41112",
+    "title": "Hydrodynamics - technical course"
+  },
+  {
+    "code": "41113",
+    "title": "Computer modelling for marine and coastal engineering"
+  },
+  {
+    "code": "41117",
+    "title": "Marine and Coastal Structures"
+  },
+  {
+    "code": "41126",
+    "title": "Fluvial and marine sediment transport"
+  },
+  {
+    "code": "41129",
+    "title": "Turbulent flows"
+  },
+  {
+    "code": "41201",
+    "title": "Fundamentals of ships and other floating structures"
+  },
+  {
+    "code": "41204",
+    "title": "Fundamental structural mechanics"
+  },
+  {
+    "code": "41216",
+    "title": "Structural assessment of ships"
+  },
+  {
+    "code": "41222",
+    "title": "Wave loads on ships and offshore structures"
+  },
+  {
+    "code": "41226",
+    "title": "Advanced Wave Hydrodynamics"
+  },
+  {
+    "code": "41236",
+    "title": "Structural mechanics"
+  },
+  {
+    "code": "41237",
+    "title": "Dynamics of structures: theory and analysis"
+  },
+  {
+    "code": "41239",
+    "title": "Numerical Methods in Advanced Structural Mechanics"
+  },
+  {
+    "code": "41263",
+    "title": "Experimental and numerical methods for ship resistance and propulsion"
+  },
+  {
+    "code": "41270",
+    "title": "Economic and environmental performance of ships"
+  },
+  {
+    "code": "41271",
+    "title": "Ship design"
+  },
+  {
+    "code": "41275",
+    "title": "Ship operations"
+  },
+  {
+    "code": "41280",
+    "title": "Maritime engineering at sea"
+  },
+  {
+    "code": "41292",
+    "title": "Advanced topics in marine engineering"
+  },
+  {
+    "code": "41312",
+    "title": "Basic fluid mechanics"
+  },
+  {
+    "code": "41315",
+    "title": "Applied CFD"
+  },
+  {
+    "code": "41316",
+    "title": "Advanced CFD"
+  },
+  {
+    "code": "41317",
+    "title": "Computational Fluid Dynamics"
+  },
+  {
+    "code": "41320",
+    "title": "Advanced fluid mechanics"
+  },
+  {
+    "code": "41321",
+    "title": "Complex flows"
+  },
+  {
+    "code": "41341",
+    "title": "Ecocar"
+  },
+  {
+    "code": "41342",
+    "title": "Ecocar"
+  },
+  {
+    "code": "41343",
+    "title": "Fuels and emissions from current and future transportation"
+  },
+  {
+    "code": "41346",
+    "title": "Internal combustion engines - experimental methods and data processing"
+  },
+  {
+    "code": "41348",
+    "title": "Internal combustion engines - theory for the application of conventional and renewable fuels"
+  },
+  {
+    "code": "41391",
+    "title": "High Performance Computing: FORTRAN, OpenMP and MPI"
+  },
+  {
+    "code": "41392",
+    "title": "Journal club in fluid mechanics"
+  },
+  {
+    "code": "41401",
+    "title": "Fundamentals of engineering thermodynamics"
+  },
+  {
+    "code": "41402",
+    "title": "Simulation of thermal energy systems"
+  },
+  {
+    "code": "41416",
+    "title": "Energy systems - analysis, design and optimization"
+  },
+  {
+    "code": "41417",
+    "title": "Digitalization of Thermal Energy Technologies – Modelling and Simulation Methods"
+  },
+  {
+    "code": "41418",
+    "title": "Green fuels and power-to-x"
+  },
+  {
+    "code": "41419",
+    "title": "Advanced Industrial Thermal energy Storage"
+  },
+  {
+    "code": "41420",
+    "title": "Refrigeration and Heat Pump Technology"
+  },
+  {
+    "code": "41451",
+    "title": "Ventilation and Indoor Climate"
+  },
+  {
+    "code": "41452",
+    "title": "Basic Building Design with Regard to Indoor Environment, Services and Energy"
+  },
+  {
+    "code": "41458",
+    "title": "Technical Building Services"
+  },
+  {
+    "code": "41459",
+    "title": "Energy and indoor environment"
+  },
+  {
+    "code": "41461",
+    "title": "Building Integrated Photovoltaics"
+  },
+  {
+    "code": "41462",
+    "title": "Building Performance Simulation"
+  },
+  {
+    "code": "41463",
+    "title": "High performance buildings"
+  },
+  {
+    "code": "41464",
+    "title": "Solar Heating Systems"
+  },
+  {
+    "code": "41465",
+    "title": "Computational Fluid Dynamics for Buildings"
+  },
+  {
+    "code": "41466",
+    "title": "Sustainable heating and cooling of buildings"
+  },
+  {
+    "code": "41468",
+    "title": "Sustainable District Heating"
+  },
+  {
+    "code": "41469",
+    "title": "Solar resource assessment and forecasting"
+  },
+  {
+    "code": "41490",
+    "title": "Journal club in internal combustion engines"
+  },
+  {
+    "code": "41491",
+    "title": "Advanced engineering thermodynamics"
+  },
+  {
+    "code": "41501",
+    "title": "Strength of materials 1"
+  },
+  {
+    "code": "41502",
+    "title": "Strength of materials 2"
+  },
+  {
+    "code": "41511",
+    "title": "Machine elements - basics"
+  },
+  {
+    "code": "41512",
+    "title": "Power transmitting machine elements - design and optimization"
+  },
+  {
+    "code": "41514",
+    "title": "Dynamics of machinery"
+  },
+  {
+    "code": "41515",
+    "title": "Computational multibody dynamics"
+  },
+  {
+    "code": "41516",
+    "title": "Anisotropy and fibre composites"
+  },
+  {
+    "code": "41517",
+    "title": "Stiffened plates and sandwich constructions"
+  },
+  {
+    "code": "41522",
+    "title": "Advanced dynamics and vibrations"
+  },
+  {
+    "code": "41524",
+    "title": "Tribology of machine elements"
+  },
+  {
+    "code": "41525",
+    "title": "Finite Element Methods"
+  },
+  {
+    "code": "41526",
+    "title": "Fracture mechanics"
+  },
+  {
+    "code": "41528",
+    "title": "Advanced mechanics of materials"
+  },
+  {
+    "code": "41533",
+    "title": "Dimensioning and strength 1"
+  },
+  {
+    "code": "41534",
+    "title": "Dimensioning and strength 2"
+  },
+  {
+    "code": "41561",
+    "title": "Structural optimization"
+  },
+  {
+    "code": "41563",
+    "title": "Fluid Power & Motion Control"
+  },
+  {
+    "code": "41564",
+    "title": "Dynamics and vibrations"
+  },
+  {
+    "code": "41591",
+    "title": "Topology Optimization - Theory, Methods and Applications"
+  },
+  {
+    "code": "41603",
+    "title": "Engineering design and problem solving"
+  },
+  {
+    "code": "41612",
+    "title": "Product design and documentation"
+  },
+  {
+    "code": "41615",
+    "title": "Mechanical CAD"
+  },
+  {
+    "code": "41619",
+    "title": "Introduction to Production"
+  },
+  {
+    "code": "41635",
+    "title": "Robust design of products and mechanisms"
+  },
+  {
+    "code": "41636",
+    "title": "Design for Circular Economy"
+  },
+  {
+    "code": "41637",
+    "title": "Mass Customization - application of product configuration"
+  },
+  {
+    "code": "41638",
+    "title": "Complexity Management"
+  },
+  {
+    "code": "41639",
+    "title": "Holistic Design of Engineering Systems"
+  },
+  {
+    "code": "41651",
+    "title": "Laboratory course in metallurgy"
+  },
+  {
+    "code": "41653",
+    "title": "Corrosion (theory and engineering)"
+  },
+  {
+    "code": "41656",
+    "title": "Materials in advanced applications and products"
+  },
+  {
+    "code": "41658",
+    "title": "Methods for experimental materials characterization"
+  },
+  {
+    "code": "41659",
+    "title": "Materials science"
+  },
+  {
+    "code": "41661",
+    "title": "Metals technology"
+  },
+  {
+    "code": "41662",
+    "title": "Physical metallurgy"
+  },
+  {
+    "code": "41667",
+    "title": "Project course in materials engineering"
+  },
+  {
+    "code": "41668",
+    "title": "Computational Materials Science"
+  },
+  {
+    "code": "41669",
+    "title": "Advanced surface engineering"
+  },
+  {
+    "code": "41680",
+    "title": "Introduction to advanced materials"
+  },
+  {
+    "code": "41681",
+    "title": "Materials science"
+  },
+  {
+    "code": "41684",
+    "title": "Materials technology"
+  },
+  {
+    "code": "41685",
+    "title": "Materials characterization and testing"
+  },
+  {
+    "code": "41686",
+    "title": "Materials science"
+  },
+  {
+    "code": "41689",
+    "title": "Corrosion and materials under demanding conditions"
+  },
+  {
+    "code": "41690",
+    "title": "Electron Microscopy and Analysis for Materials Research"
+  },
+  {
+    "code": "41691",
+    "title": "Ph.D. course on application of x-ray diffraction in materials science"
+  },
+  {
+    "code": "41714",
+    "title": "Manufacturing technology and operations management"
+  },
+  {
+    "code": "41730",
+    "title": "Industrial forming of metals"
+  },
+  {
+    "code": "41733",
+    "title": "Metallurgy, design and manufacturing of cast components"
+  },
+  {
+    "code": "41734",
+    "title": "Geometrical metrology and machine testing"
+  },
+  {
+    "code": "41735",
+    "title": "Experimental methods in 3D printing (additive manufacturing)"
+  },
+  {
+    "code": "41737",
+    "title": "Design of plastic products"
+  },
+  {
+    "code": "41739",
+    "title": "Experimental plastic and metal processing technology"
+  },
+  {
+    "code": "41740",
+    "title": "Digital Manufacturing - Industry 4.0"
+  },
+  {
+    "code": "41743",
+    "title": "Micro product design, development and production"
+  },
+  {
+    "code": "41747",
+    "title": "Modelling in materials and manufacturing engineering - heat transfer and diffusion"
+  },
+  {
+    "code": "41749",
+    "title": "Precision Machining"
+  },
+  {
+    "code": "41750",
+    "title": "Composites Manufacturing"
+  },
+  {
+    "code": "41784",
+    "title": "Process technology"
+  },
+  {
+    "code": "41787",
+    "title": "Production technology"
+  },
+  {
+    "code": "41789",
+    "title": "Introduction to 3D printing: processes and theory"
+  },
+  {
+    "code": "41791",
+    "title": "Nanotribology: theory and applications"
+  },
+  {
+    "code": "41792",
+    "title": "Measurement uncertainty estimation using statistical methods"
+  },
+  {
+    "code": "41801",
+    "title": "Project work"
+  },
+  {
+    "code": "41808",
+    "title": "Experimental solid mechanics"
+  },
+  {
+    "code": "41813",
+    "title": "Finite Element Methods for sound and vibrations"
+  },
+  {
+    "code": "41814",
+    "title": "Heat transfer"
+  },
+  {
+    "code": "41815",
+    "title": "Introduction to Finite Element Analysis"
+  },
+  {
+    "code": "41822",
+    "title": "Experimental fluid mechanics"
+  },
+  {
+    "code": "41832",
+    "title": "Experimental Structural Mechanics"
+  },
+  {
+    "code": "41833",
+    "title": "Introduction to Experimental Dynamics"
+  },
+  {
+    "code": "41843",
+    "title": "Project work on Vehicle dynamics"
+  },
+  {
+    "code": "41860",
+    "title": "Design of energy plants"
+  },
+  {
+    "code": "41861",
+    "title": "Production technology 1"
+  },
+  {
+    "code": "41862",
+    "title": "Production Technology 2"
+  },
+  {
+    "code": "41863",
+    "title": "Mechanical dimensioning"
+  },
+  {
+    "code": "41864",
+    "title": "Process technology"
+  },
+  {
+    "code": "41871",
+    "title": "Building Design 1"
+  },
+  {
+    "code": "41872",
+    "title": "Building design 2"
+  },
+  {
+    "code": "41873",
+    "title": "Building design 3"
+  },
+  {
+    "code": "41874",
+    "title": "Plan and Development"
+  },
+  {
+    "code": "41876",
+    "title": "General practice and administration of the building process in Greenland"
+  },
+  {
+    "code": "41881",
+    "title": "Sustainable building in extreme environments"
+  },
+  {
+    "code": "41882",
+    "title": "The Arctic Infrastructure and Society"
+  },
+  {
+    "code": "41903",
+    "title": "Introduction to Civil Engineering"
+  },
+  {
+    "code": "41905",
+    "title": "Project work  - Civil Engineering"
+  },
+  {
+    "code": "41906",
+    "title": "Project work - Architectural Engineering"
+  },
+  {
+    "code": "41911",
+    "title": "Introduction to Building Information Modeling (BIM)"
+  },
+  {
+    "code": "41919",
+    "title": "Digital design tools"
+  },
+  {
+    "code": "41925",
+    "title": "Introduction to Building Information Modeling (BIM)"
+  },
+  {
+    "code": "41927",
+    "title": "Open Building Information Modeling (OpenBIM)"
+  },
+  {
+    "code": "41928",
+    "title": "Building Design"
+  },
+  {
+    "code": "41929",
+    "title": "Digital design tools"
+  },
+  {
+    "code": "41931",
+    "title": "Building Fire Safety"
+  },
+  {
+    "code": "41932",
+    "title": "Fire dynamics"
+  },
+  {
+    "code": "41933",
+    "title": "Structural Fire Safety Design"
+  },
+  {
+    "code": "41934",
+    "title": "Advanced Building Information Modeling (BIM)"
+  },
+  {
+    "code": "41935",
+    "title": "Super-light structures"
+  },
+  {
+    "code": "41936",
+    "title": "Advanced Building Design"
+  },
+  {
+    "code": "41937",
+    "title": "Structural design of precast concrete buildings"
+  },
+  {
+    "code": "41938",
+    "title": "Agile Prototyping"
+  },
+  {
+    "code": "41940",
+    "title": "Advanced Digital Technologies in Construction Projects"
+  },
+  {
+    "code": "41941",
+    "title": "Construction and architecture"
+  },
+  {
+    "code": "41942",
+    "title": "Architectural Engineering Project 1, intro"
+  },
+  {
+    "code": "41943",
+    "title": "Indoor Climatic Design"
+  },
+  {
+    "code": "41944",
+    "title": "Architectural Engineering Design Project 2, indoor climatic design"
+  },
+  {
+    "code": "41945",
+    "title": "Design of Structures"
+  },
+  {
+    "code": "41946",
+    "title": "Architectural Engineering Design Project 3, Structural Design"
+  },
+  {
+    "code": "41947",
+    "title": "Renovation and transformation design"
+  },
+  {
+    "code": "41948",
+    "title": "Architectural Engineering Design Project 4, Building transformation design"
+  },
+  {
+    "code": "41950",
+    "title": "Timber Structures"
+  },
+  {
+    "code": "41953",
+    "title": "Structural engineering 1"
+  },
+  {
+    "code": "41954",
+    "title": "Structural engineering 2"
+  },
+  {
+    "code": "41955",
+    "title": "Structural engineering 3: Frame and Plate Structures"
+  },
+  {
+    "code": "41956",
+    "title": "Concrete Structures"
+  },
+  {
+    "code": "41957",
+    "title": "Steel Structures"
+  },
+  {
+    "code": "41958",
+    "title": "Computational Structural Modelling 1: The Finite Element Method"
+  },
+  {
+    "code": "41961",
+    "title": "Computational Structural Modelling 2: Non-linear Finite Element Method"
+  },
+  {
+    "code": "41963",
+    "title": "Advanced Concrete Structures"
+  },
+  {
+    "code": "41967",
+    "title": "Seismic and Wind Engineering"
+  },
+  {
+    "code": "41968",
+    "title": "Bridge Structures"
+  },
+  {
+    "code": "41969",
+    "title": "Probabilistic Modelling in Civil Engineering"
+  },
+  {
+    "code": "41970",
+    "title": "E-course in Random Vibrations"
+  },
+  {
+    "code": "41972",
+    "title": "Plated Steel Structures"
+  },
+  {
+    "code": "41991",
+    "title": "CASMaT International Summer School on Advanced Structural and Material Testing"
+  },
+  {
+    "code": "41992",
+    "title": "Design-Oriented Numerical Modelling of Reinforced Concrete Structures"
+  },
+  {
+    "code": "38001",
+    "title": "Sustainable Entrepreneurship"
+  },
+  {
+    "code": "38102",
+    "title": "Technology Entrepreneurship"
+  },
+  {
+    "code": "38103",
+    "title": "X-Tech Entrepreneurship"
+  },
+  {
+    "code": "38104",
+    "title": "Entrepreneurial Finance"
+  },
+  {
+    "code": "38106",
+    "title": "Developing an Entrepreneurial mindset"
+  },
+  {
+    "code": "38108",
+    "title": "Technology and Innovation Management"
+  },
+  {
+    "code": "38109",
+    "title": "X-Tech+"
+  },
+  {
+    "code": "38110",
+    "title": "Staging co-creation and creativity"
+  },
+  {
+    "code": "38111",
+    "title": "The Practice of Consulting"
+  },
+  {
+    "code": "38112",
+    "title": "Entrepreneurial Marketing"
+  },
+  {
+    "code": "38113",
+    "title": "Applied AI for Entrepreneurs"
+  },
+  {
+    "code": "38201",
+    "title": "Entrepreneurial Life Skills"
+  },
+  {
+    "code": "38202",
+    "title": "Entrepreneurial Leadership Journey"
+  },
+  {
+    "code": "38203",
+    "title": "Due Diligence of New Ventures"
+  },
+  {
+    "code": "38204",
+    "title": "Feasibility Studies"
+  },
+  {
+    "code": "38301",
+    "title": "Module 1: Start-up Exploration"
+  },
+  {
+    "code": "38302",
+    "title": "Module 2: Start-up Incubation"
+  },
+  {
+    "code": "38799",
+    "title": "Patent Course"
+  },
+  {
+    "code": "42001",
+    "title": "Large scale energy system analysis"
+  },
+  {
+    "code": "42009",
+    "title": "Introductory Economics"
+  },
+  {
+    "code": "42010",
+    "title": "Introduction to Business Studies"
+  },
+  {
+    "code": "42014",
+    "title": "Environmental and Resource Economics"
+  },
+  {
+    "code": "42015",
+    "title": "Energy Economics"
+  },
+  {
+    "code": "42016",
+    "title": "Business Economics and Finance"
+  },
+  {
+    "code": "42101",
+    "title": "Introduction to Operations Research"
+  },
+  {
+    "code": "42112",
+    "title": "Mathematical Programming Modelling"
+  },
+  {
+    "code": "42114",
+    "title": "Integer Programming"
+  },
+  {
+    "code": "42115",
+    "title": "Network Optimization"
+  },
+  {
+    "code": "42136",
+    "title": "Large Scale Optimization using Decomposition"
+  },
+  {
+    "code": "42137",
+    "title": "Optimization using metaheuristics"
+  },
+  {
+    "code": "42142",
+    "title": "Recent Research Results in Management Science"
+  },
+  {
+    "code": "42180",
+    "title": "Quantitative modelling of behaviour"
+  },
+  {
+    "code": "42186",
+    "title": "Model-based machine learning"
+  },
+  {
+    "code": "42189",
+    "title": "Transport System Analysis"
+  },
+  {
+    "code": "42380",
+    "title": "Supply Chain Analytics"
+  },
+  {
+    "code": "42402",
+    "title": "Sustainable Operations and Supply Chain Management (O&SCM)"
+  },
+  {
+    "code": "42403",
+    "title": "Advanced Operations Management for Production and Service Systems"
+  },
+  {
+    "code": "42404",
+    "title": "Maritime Logistics and Management"
+  },
+  {
+    "code": "42417",
+    "title": "Simulation in Operations Management"
+  },
+  {
+    "code": "42421",
+    "title": "Management and Organization"
+  },
+  {
+    "code": "42500",
+    "title": "Innovation in Engineering (Polytechnical Foundation)"
+  },
+  {
+    "code": "42501",
+    "title": "Innovation in Engineering (Polytechnical Foundation)"
+  },
+  {
+    "code": "42502",
+    "title": "Facilitating Innovation in Multidisciplinary Teams"
+  },
+  {
+    "code": "42503",
+    "title": "Facilitating Innovation in Multidisciplinary Teams"
+  },
+  {
+    "code": "42504",
+    "title": "Innovation in Engineering (Polytechnical Foundation)"
+  },
+  {
+    "code": "42505",
+    "title": "Facilitating Innovation in Multidisciplinary Teams"
+  },
+  {
+    "code": "42543",
+    "title": "Management of organizational change"
+  },
+  {
+    "code": "42576",
+    "title": "From Analytics to Action"
+  },
+  {
+    "code": "42577",
+    "title": "Introduction to Business Analytics"
+  },
+  {
+    "code": "42578",
+    "title": "Advanced Business Analytics"
+  },
+  {
+    "code": "42580",
+    "title": "Introduction to Data Science"
+  },
+  {
+    "code": "42584",
+    "title": "Project work - Data Science and Management"
+  },
+  {
+    "code": "42586",
+    "title": "Decisions under uncertainty"
+  },
+  {
+    "code": "42587",
+    "title": "Introduction to Operations and Supply Chain Management"
+  },
+  {
+    "code": "42588",
+    "title": "Data and data science"
+  },
+  {
+    "code": "42620",
+    "title": "Science, Technology and Society (Polytechnical Foundation)"
+  },
+  {
+    "code": "42622",
+    "title": "Science, Technology and Society (Polytechnical Foundation)"
+  },
+  {
+    "code": "42702",
+    "title": "Research and PhD studies at DTU Management"
+  },
+  {
+    "code": "42787",
+    "title": "Exploring the State-of-the-Art in quantitative transport science"
+  },
+  {
+    "code": "42879",
+    "title": "Decision Support and Strategic Assessment"
+  },
+  {
+    "code": "42893",
+    "title": "Psychology for engineers"
+  },
+  {
+    "code": "42894",
+    "title": "Empirical Behavioral Analysis – Methods and Ethics"
+  },
+  {
+    "code": "46000",
+    "title": "Introduction to Wind Energy"
+  },
+  {
+    "code": "46015",
+    "title": "Digital energy societies"
+  },
+  {
+    "code": "46020",
+    "title": "Design project: Energy conversion and storage"
+  },
+  {
+    "code": "46025",
+    "title": "Introduction to renewable energy technologies"
+  },
+  {
+    "code": "46030",
+    "title": "Electrical energy systems"
+  },
+  {
+    "code": "46035",
+    "title": "Energy management with embedded systems"
+  },
+  {
+    "code": "46040",
+    "title": "Introduction to energy analytics"
+  },
+  {
+    "code": "46045",
+    "title": "Design and Implementation of Coordinated Distributed Energy Systems"
+  },
+  {
+    "code": "46050",
+    "title": "Innovative energy solutions"
+  },
+  {
+    "code": "46055",
+    "title": "General electrical engineering"
+  },
+  {
+    "code": "46060",
+    "title": "Hybrid power plant design project"
+  },
+  {
+    "code": "46100",
+    "title": "Introduction to Micrometeorology for Wind Energy"
+  },
+  {
+    "code": "46110",
+    "title": "Fundamentals of Aerodynamics"
+  },
+  {
+    "code": "46115",
+    "title": "Turbulence modeling"
+  },
+  {
+    "code": "46120",
+    "title": "Scientific Programming for Wind Energy"
+  },
+  {
+    "code": "46200",
+    "title": "Planning and Development of Wind Farms"
+  },
+  {
+    "code": "46205",
+    "title": "Feasibility studies of energy projects"
+  },
+  {
+    "code": "46211",
+    "title": "Offshore Wind Energy"
+  },
+  {
+    "code": "46215",
+    "title": "Socio-technical dimensions of Renewable Energy"
+  },
+  {
+    "code": "46230",
+    "title": "Power system balancing with large scale wind power"
+  },
+  {
+    "code": "46300",
+    "title": "Wind Turbine Technology and Aerodynamics"
+  },
+  {
+    "code": "46310",
+    "title": "Wind Turbine Aeroelasticity"
+  },
+  {
+    "code": "46320",
+    "title": "Loads, Aerodynamics and Control of Wind Turbines"
+  },
+  {
+    "code": "46400",
+    "title": "Wind Turbine Measurement Technique"
+  },
+  {
+    "code": "46411",
+    "title": "Design of large composite structures"
+  },
+  {
+    "code": "46415",
+    "title": "Numerical design optimization of wind turbines"
+  },
+  {
+    "code": "46420",
+    "title": "Composite Materials and Fibres"
+  },
+  {
+    "code": "46440",
+    "title": "Manufacturing of Advanced Fiber Composites"
+  },
+  {
+    "code": "46500",
+    "title": "Probabilistic Methods in Wind Energy"
+  },
+  {
+    "code": "46550",
+    "title": "Offshore wind grid connection and high-voltage DC (HVDC) transmission"
+  },
+  {
+    "code": "46600",
+    "title": "Aeroacoustics"
+  },
+  {
+    "code": "46610",
+    "title": "Design-Build for Wind Energy competitions (BlueDot)"
+  },
+  {
+    "code": "46700",
+    "title": "Introduction to Electric Power Systems"
+  },
+  {
+    "code": "46705",
+    "title": "Power grid analysis"
+  },
+  {
+    "code": "46711",
+    "title": "Stability and control in electric power systems"
+  },
+  {
+    "code": "46715",
+    "title": "Transients in power systems"
+  },
+  {
+    "code": "46720",
+    "title": "High voltage engineering"
+  },
+  {
+    "code": "46725",
+    "title": "Electrical machines"
+  },
+  {
+    "code": "46735",
+    "title": "Wind, solar and energy storage electrical drive trains"
+  },
+  {
+    "code": "46740",
+    "title": "Distributed energy technologies, modelling and control"
+  },
+  {
+    "code": "46745",
+    "title": "Integration of wind power in the power system"
+  },
+  {
+    "code": "46750",
+    "title": "Optimization in modern power systems"
+  },
+  {
+    "code": "46755",
+    "title": "Renewables in electricity markets"
+  },
+  {
+    "code": "46760",
+    "title": "Hands-on microcontroller programming"
+  },
+  {
+    "code": "46765",
+    "title": "Machine learning for energy systems"
+  },
+  {
+    "code": "46770",
+    "title": "Integrated energy grids"
+  },
+  {
+    "code": "46775",
+    "title": "Real-time electro-magnetic transient simulation and protection testing in power systems"
+  },
+  {
+    "code": "46795",
+    "title": "Formula Student Electric: implementation, testing and design optimization (BlueDot)"
+  },
+  {
+    "code": "46797",
+    "title": "Formula Student Electric: implementation, testing and design optimization"
+  },
+  {
+    "code": "46910",
+    "title": "Advanced Finite Element Simulations Using Abaqus"
+  },
+  {
+    "code": "46920",
+    "title": "PhD Summer School: Remote Sensing for Wind Energy"
+  },
+  {
+    "code": "47201",
+    "title": "Engineering thermodynamics"
+  },
+  {
+    "code": "47202",
+    "title": "Introduction to future energy"
+  },
+  {
+    "code": "47203",
+    "title": "Design-Build 3: solar cooker"
+  },
+  {
+    "code": "47205",
+    "title": "Electrochemical energy technologies"
+  },
+  {
+    "code": "47209",
+    "title": "3D imaging, analysis and modelling"
+  },
+  {
+    "code": "47211",
+    "title": "Electrochemical energy storage and Power2X"
+  },
+  {
+    "code": "47212",
+    "title": "Computer simulation of materials"
+  },
+  {
+    "code": "47213",
+    "title": "Introduction to Power-to-X (online)"
+  },
+  {
+    "code": "47214",
+    "title": "Introduction to future energy technologies (online)"
+  },
+  {
+    "code": "47215",
+    "title": "Rational design of a heat exchanger for solar cells (online)"
+  },
+  {
+    "code": "47216",
+    "title": "AI-orchestrated self-driving labs (Online)"
+  },
+  {
+    "code": "47217",
+    "title": "Introduction to Electrochemistry (online)"
+  },
+  {
+    "code": "47218",
+    "title": "Energy materials for solid oxide cell applications (Online)"
+  },
+  {
+    "code": "47301",
+    "title": "Hydrogen energy and fuel cells"
+  },
+  {
+    "code": "47302",
+    "title": "Hydrogen and fuel cell chemistry - experimental course"
+  },
+  {
+    "code": "47304",
+    "title": "Ceramic science and engineering"
+  },
+  {
+    "code": "47305",
+    "title": "Electrochemistry"
+  },
+  {
+    "code": "47310",
+    "title": "Battery materials and chemistries: from fundamental mechanisms to battery cells"
+  },
+  {
+    "code": "47317",
+    "title": "Exergy analysis"
+  },
+  {
+    "code": "47319",
+    "title": "Functional materials"
+  },
+  {
+    "code": "47330",
+    "title": "Energy storage and conversion"
+  },
+  {
+    "code": "47332",
+    "title": "AI-orchestrated self-driving labs"
+  },
+  {
+    "code": "47333",
+    "title": "Electron microscopy for materials science"
+  },
+  {
+    "code": "47334",
+    "title": "Carbon capture, utilization, and storage"
+  },
+  {
+    "code": "47335",
+    "title": "Atomic-scale modelling of energy materials (online)"
+  },
+  {
+    "code": "47336",
+    "title": "Applications of X-ray and neutron scattering in biology, chemistry, and physics"
+  },
+  {
+    "code": "47338",
+    "title": "Organic energy materials"
+  },
+  {
+    "code": "47339",
+    "title": "Solid state and structural chemistry"
+  },
+  {
+    "code": "47341",
+    "title": "AI4Materials: Artificial Intelligence for Accelerated Materials Design and Discovery"
+  },
+  {
+    "code": "47342",
+    "title": "Molten salt chemistry and technologies"
+  },
+  {
+    "code": "47507",
+    "title": "PhD course in introduction to low-temperature fuel cells and electrolyser"
+  },
+  {
+    "code": "47508",
+    "title": "PhD course in introduction to batteries"
+  },
+  {
+    "code": "47509",
+    "title": "PhD course in introduction to SOFC and SOEC"
+  },
+  {
+    "code": "47514",
+    "title": "PhD course in advanced electrochemistry"
+  },
+  {
+    "code": "47517",
+    "title": "PhD course in how to make a scientific poster"
+  },
+  {
+    "code": "47519",
+    "title": "PhD course in sustainable electrofuels and -chemicals"
+  },
+  {
+    "code": "47520",
+    "title": "Training in experimental and/or theoretical methods – 3 point version"
+  },
+  {
+    "code": "47521",
+    "title": "Training in experimental and/or theoretical methods – 5 point version"
+  },
+  {
+    "code": "47522",
+    "title": "Reviewing scientific literature"
+  },
+  {
+    "code": "47523",
+    "title": "Scientific conference participation"
+  },
+  {
+    "code": "47525",
+    "title": "Scientific code of conduct and data management"
+  },
+  {
+    "code": "47527",
+    "title": "PhD course Hydrogen - a journey into key technologies, logistics and economy"
+  },
+  {
+    "code": "47528",
+    "title": "PhD course in how to make a scientific presentation"
+  },
+  {
+    "code": "47529",
+    "title": "SAMBA 2025 - Summer Academy for Modelling Batteries"
+  },
+  {
+    "code": "56868",
+    "title": "Methods in micro- and nanofabrication"
+  },
+  {
+    "code": "62000",
+    "title": "Managerial Economics"
+  },
+  {
+    "code": "62001",
+    "title": "Innovation, Design and Process Facilitation"
+  },
+  {
+    "code": "62008",
+    "title": "Product development - The stages and processes of product development"
+  },
+  {
+    "code": "62010",
+    "title": "Product understanding"
+  },
+  {
+    "code": "62014",
+    "title": "Green Entrepreneurship"
+  },
+  {
+    "code": "62019",
+    "title": "Interaction Design"
+  },
+  {
+    "code": "62024",
+    "title": "Prototyping"
+  },
+  {
+    "code": "62030",
+    "title": "From idea to checkout (3rd semester PI-project)"
+  },
+  {
+    "code": "62033",
+    "title": "Technology and Marketing"
+  },
+  {
+    "code": "62039",
+    "title": "Industrial Design"
+  },
+  {
+    "code": "62041",
+    "title": "Innovation in an Organizational Context"
+  },
+  {
+    "code": "62048",
+    "title": "Physical Computing"
+  },
+  {
+    "code": "62054",
+    "title": "Entrepreneurship in Greenland"
+  },
+  {
+    "code": "62074",
+    "title": "Project Management - Tools and practical management"
+  },
+  {
+    "code": "62079",
+    "title": "Operations Management"
+  },
+  {
+    "code": "62090",
+    "title": "Technology and Manufacturing"
+  },
+  {
+    "code": "62096",
+    "title": "IT in production"
+  },
+  {
+    "code": "62101",
+    "title": "Operations Management 2"
+  },
+  {
+    "code": "62104",
+    "title": "Automation in Manufacturing"
+  },
+  {
+    "code": "62107",
+    "title": "Quality management and GMP"
+  },
+  {
+    "code": "62108",
+    "title": "Crossfunctional development of technology and manufacturing"
+  },
+  {
+    "code": "62112",
+    "title": "Industry 4.0 in practice"
+  },
+  {
+    "code": "62118",
+    "title": "Organisation and Management"
+  },
+  {
+    "code": "62120",
+    "title": "Manufacturing and Business development (project no. 4)"
+  },
+  {
+    "code": "62133",
+    "title": "Supply Chain Management & Design"
+  },
+  {
+    "code": "62134",
+    "title": "Strategic Analysis and Development"
+  },
+  {
+    "code": "62139",
+    "title": "Advanced Financial Management"
+  },
+  {
+    "code": "62142",
+    "title": "Digitalization and Industry 4.0"
+  },
+  {
+    "code": "62143",
+    "title": "Mechanical product documentation and analysis"
+  },
+  {
+    "code": "62150",
+    "title": "Basic Mathematics"
+  },
+  {
+    "code": "62174",
+    "title": "Managerial Economics 2"
+  },
+  {
+    "code": "62177",
+    "title": "Marketing Concepts and Strategies"
+  },
+  {
+    "code": "62191",
+    "title": "Road traffic simulation"
+  },
+  {
+    "code": "62198",
+    "title": "Economics for engineers"
+  },
+  {
+    "code": "62199",
+    "title": "Road design and traffic safety"
+  },
+  {
+    "code": "62200",
+    "title": "The Business Potential of Generative Artificial Intelligence (GAI)"
+  },
+  {
+    "code": "62202",
+    "title": "Life Cycle Assessment"
+  },
+  {
+    "code": "62205",
+    "title": "Sustainable and responsible production"
+  },
+  {
+    "code": "62207",
+    "title": "Product documentation and mechanical manufacturing methods"
+  },
+  {
+    "code": "62210",
+    "title": "Project leadership - Leadership, Flow and Impact"
+  },
+  {
+    "code": "62211",
+    "title": "Business Science and Technology Management"
+  },
+  {
+    "code": "62218",
+    "title": "Basic Science"
+  },
+  {
+    "code": "62223",
+    "title": "Managerial Economics 1"
+  },
+  {
+    "code": "62224",
+    "title": "Communication and culture in a global context 1"
+  },
+  {
+    "code": "62225",
+    "title": "Communication and culture in a global context 2"
+  },
+  {
+    "code": "62229",
+    "title": "IT Business"
+  },
+  {
+    "code": "62231",
+    "title": "Intercultural business communication"
+  },
+  {
+    "code": "62233",
+    "title": "Macroeconomics"
+  },
+  {
+    "code": "62235",
+    "title": "International Business Environments and Operations"
+  },
+  {
+    "code": "62236",
+    "title": "Industrial Programming"
+  },
+  {
+    "code": "62243",
+    "title": "Innovation, production and business economics"
+  },
+  {
+    "code": "62249",
+    "title": "Interdisciplinary development project"
+  },
+  {
+    "code": "62261",
+    "title": "HVAC"
+  },
+  {
+    "code": "62263",
+    "title": "Concrete Structures"
+  },
+  {
+    "code": "62265",
+    "title": "Traffic and roads in urban areas"
+  },
+  {
+    "code": "62267",
+    "title": "SMART Energy Supply"
+  },
+  {
+    "code": "62268",
+    "title": "Soil and Groundwater Pollution"
+  },
+  {
+    "code": "62271",
+    "title": "Building Energy & heating systems"
+  },
+  {
+    "code": "62272",
+    "title": "Project based production: Planning and control of construction projects"
+  },
+  {
+    "code": "62273",
+    "title": "Steel Structures"
+  },
+  {
+    "code": "62276",
+    "title": "Road and railway design"
+  },
+  {
+    "code": "62277",
+    "title": "Water and climate adaption"
+  },
+  {
+    "code": "62278",
+    "title": "Sustainable water treatment and groundwater protection"
+  },
+  {
+    "code": "62283",
+    "title": "Digital Modeling and Technical Drawing Communication"
+  },
+  {
+    "code": "62284",
+    "title": "Tender project"
+  },
+  {
+    "code": "62285",
+    "title": "BIP 4. Execution phase with an international element"
+  },
+  {
+    "code": "62286",
+    "title": "Operation and Maintenance of Road and Drainage Systems"
+  },
+  {
+    "code": "62287",
+    "title": "Building Renewal - structures"
+  },
+  {
+    "code": "62288",
+    "title": "Building renovation registration and design proposals"
+  },
+  {
+    "code": "62289",
+    "title": "Building renovation energy and installations"
+  },
+  {
+    "code": "62319",
+    "title": "House building"
+  },
+  {
+    "code": "62324",
+    "title": "Urban Planning"
+  },
+  {
+    "code": "62326",
+    "title": "Urban Water and Road Infrastructure"
+  },
+  {
+    "code": "62329",
+    "title": "Water and soil properties"
+  },
+  {
+    "code": "62331",
+    "title": "Basic Statics"
+  },
+  {
+    "code": "62333",
+    "title": "Water and Road project – Sustainable Urban area"
+  },
+  {
+    "code": "62360",
+    "title": "Basement structures of insitu concrete"
+  },
+  {
+    "code": "62361",
+    "title": "Hgh-Rise Buildings - Structures"
+  },
+  {
+    "code": "62370",
+    "title": "Building installations and indoor climate"
+  },
+  {
+    "code": "62381",
+    "title": "Traffic and Transport Planning"
+  },
+  {
+    "code": "62389",
+    "title": "Climate adaption and cloud burst for Run off Water"
+  },
+  {
+    "code": "62410",
+    "title": "CDIO-Project"
+  },
+  {
+    "code": "62413",
+    "title": "Advanced object oriented programming using C# and .NET"
+  },
+  {
+    "code": "62416",
+    "title": "Advanced Mobile Application Development"
+  },
+  {
+    "code": "62417",
+    "title": "Mobile Application Development with Swift"
+  },
+  {
+    "code": "62420",
+    "title": "Information technology 1"
+  },
+  {
+    "code": "62422",
+    "title": "Bio-medical electronics 1"
+  },
+  {
+    "code": "62424",
+    "title": "Project work in practice"
+  },
+  {
+    "code": "62426",
+    "title": "Cyber defence and legal aspects"
+  },
+  {
+    "code": "62427",
+    "title": "Network Defense and attack handling"
+  },
+  {
+    "code": "62428",
+    "title": "Secure implementation of systems"
+  },
+  {
+    "code": "62443",
+    "title": "Data Communication"
+  },
+  {
+    "code": "62444",
+    "title": "Data visualization and analysis - project"
+  },
+  {
+    "code": "62450",
+    "title": "Information technology 2"
+  },
+  {
+    "code": "62452",
+    "title": "Bio-medical electronics 2"
+  },
+  {
+    "code": "62453",
+    "title": "Semester Project 2 Healthcare technology"
+  },
+  {
+    "code": "62454",
+    "title": "Healthcare Science 2"
+  },
+  {
+    "code": "62484",
+    "title": "Semester project 3 Healthcare technology"
+  },
+  {
+    "code": "62512",
+    "title": "Telemedicine 1"
+  },
+  {
+    "code": "62517",
+    "title": "Medical Imaging Systems"
+  },
+  {
+    "code": "62521",
+    "title": "Design-build project"
+  },
+  {
+    "code": "62523",
+    "title": "Healthcare Science 1"
+  },
+  {
+    "code": "62525",
+    "title": "Digital Signal Processing."
+  },
+  {
+    "code": "62531",
+    "title": "Development Methods for IT Systems"
+  },
+  {
+    "code": "62533",
+    "title": "Applied Machine Learning and Big Data"
+  },
+  {
+    "code": "62550",
+    "title": "User experience and mobile application development"
+  },
+  {
+    "code": "62560",
+    "title": "Standards, Safety and Quality in the Healthcare System"
+  },
+  {
+    "code": "62575",
+    "title": "Security in Embedded Systems"
+  },
+  {
+    "code": "62581",
+    "title": "IT and Computer Communication"
+  },
+  {
+    "code": "62582",
+    "title": "Complex Systems and Devops"
+  },
+  {
+    "code": "62589",
+    "title": "Business Intelligence"
+  },
+  {
+    "code": "62595",
+    "title": "Full Stack Development, Operations and Distributed Systems"
+  },
+  {
+    "code": "62602",
+    "title": "Mechanics and Thermodynamics for Electrical Engineers"
+  },
+  {
+    "code": "62604",
+    "title": "Thermodynamics and energy technology"
+  },
+  {
+    "code": "62614",
+    "title": "Advanced Engineering Dynamics"
+  },
+  {
+    "code": "62616",
+    "title": "Plastics technology"
+  },
+  {
+    "code": "62622",
+    "title": "Railway Technology and Operations: from initial idea to operating railway"
+  },
+  {
+    "code": "62629",
+    "title": "Heat and Mass Transfer"
+  },
+  {
+    "code": "62637",
+    "title": "Advanced analytics for mobility and transport"
+  },
+  {
+    "code": "62640",
+    "title": "Freight and Transport Logistics"
+  },
+  {
+    "code": "62641",
+    "title": "Sustainability, mobility, and society"
+  },
+  {
+    "code": "62642",
+    "title": "Planning of infrastructure"
+  },
+  {
+    "code": "62643",
+    "title": "Mechanical Vibrations"
+  },
+  {
+    "code": "62646",
+    "title": "Modeling and Programming"
+  },
+  {
+    "code": "62657",
+    "title": "Fluid Mechanics"
+  },
+  {
+    "code": "62664",
+    "title": "Matematical Methods in Physics"
+  },
+  {
+    "code": "62670",
+    "title": "Statistical Analysis and Data visualisation"
+  },
+  {
+    "code": "62675",
+    "title": "Mechanics"
+  },
+  {
+    "code": "62677",
+    "title": "Applied Control Engineering"
+  },
+  {
+    "code": "62683",
+    "title": "Mechanical Engineering Design"
+  },
+  {
+    "code": "62694",
+    "title": "Dynamics"
+  },
+  {
+    "code": "62696",
+    "title": "Product Development"
+  },
+  {
+    "code": "62704",
+    "title": "Electric machines"
+  },
+  {
+    "code": "62705",
+    "title": "Design of electrical installations 1"
+  },
+  {
+    "code": "62706",
+    "title": "Design of electrical installations 2"
+  },
+  {
+    "code": "62708",
+    "title": "High voltage"
+  },
+  {
+    "code": "62711",
+    "title": "Digital systems, design of"
+  },
+  {
+    "code": "62712",
+    "title": "Basic C Programming"
+  },
+  {
+    "code": "62716",
+    "title": "Digital Control Systems"
+  },
+  {
+    "code": "62733",
+    "title": "Project Work in Electrotechnics"
+  },
+  {
+    "code": "62734",
+    "title": "Data technique and programming"
+  },
+  {
+    "code": "62735",
+    "title": "Advanced Mathematics for diploma Electro Technology"
+  },
+  {
+    "code": "62743",
+    "title": "Digital Signal Processing"
+  },
+  {
+    "code": "62748",
+    "title": "General- and Electrochemistry"
+  },
+  {
+    "code": "62752",
+    "title": "Measurement and control using microprocessors"
+  },
+  {
+    "code": "62755",
+    "title": "Power Electronics"
+  },
+  {
+    "code": "62756",
+    "title": "Power electronics in energy systems"
+  },
+  {
+    "code": "62760",
+    "title": "Power Engineering 1"
+  },
+  {
+    "code": "62761",
+    "title": "Power Engineering 2"
+  },
+  {
+    "code": "62762",
+    "title": "Electric Power Technology"
+  },
+  {
+    "code": "62763",
+    "title": "Electrotechnique 1"
+  },
+  {
+    "code": "62764",
+    "title": "Electrotechnique 2"
+  },
+  {
+    "code": "62766",
+    "title": "Operation of electrical energy systems"
+  },
+  {
+    "code": "62768",
+    "title": "Electrical Energy Systems project"
+  },
+  {
+    "code": "62773",
+    "title": "Electrophysics 1"
+  },
+  {
+    "code": "62774",
+    "title": "Electrophysics 2"
+  },
+  {
+    "code": "62775",
+    "title": "Applied electrical engineering"
+  },
+  {
+    "code": "62782",
+    "title": "Applied circuit technique"
+  },
+  {
+    "code": "62783",
+    "title": "Project 3. sem"
+  },
+  {
+    "code": "62798",
+    "title": "Geometric Operations in Plane and Space"
+  },
+  {
+    "code": "62801",
+    "title": "Semesterproject 1: Wind turbine technology"
+  },
+  {
+    "code": "62802",
+    "title": "Semesterproject 2: sustainable product development"
+  },
+  {
+    "code": "62803",
+    "title": "Semesterproject 3: Future Energy Technology"
+  },
+  {
+    "code": "62804",
+    "title": "Semester project 4: Mechatronics og innovation"
+  },
+  {
+    "code": "62805",
+    "title": "Mechanical Design 1"
+  },
+  {
+    "code": "62806",
+    "title": "Mechanical Design 2"
+  },
+  {
+    "code": "62807",
+    "title": "Fluid Mechanics"
+  },
+  {
+    "code": "62809",
+    "title": "Modeling and Programming"
+  },
+  {
+    "code": "62810",
+    "title": "Geometric Operations in Plane and Space"
+  },
+  {
+    "code": "62811",
+    "title": "Introduction to mechatronics and robotics systems"
+  },
+  {
+    "code": "62908",
+    "title": "Humans in interaction with technology"
+  },
+  {
+    "code": "62990",
+    "title": "Innovation Pilot (summer edition)"
+  },
+  {
+    "code": "62999",
+    "title": "Innovation Pilot"
+  },
+  {
+    "code": "63851",
+    "title": "Project Management"
+  },
+  {
+    "code": "63852",
+    "title": "Project Management"
+  },
+  {
+    "code": "63853",
+    "title": "Sustainable Business in the pharmaceutical industry on emerging markets and developing countries - Access to health care"
+  },
+  {
+    "code": "63860",
+    "title": "System and Network Security"
+  },
+  {
+    "code": "63861",
+    "title": "System and Network Security - Project"
+  },
+  {
+    "code": "63870",
+    "title": "Needfinding at the Hospital"
+  },
+  {
+    "code": "63880",
+    "title": "Data analytics in transport with emphasis on railways"
+  },
+  {
+    "code": "63881",
+    "title": "Railway transport and sustainable logistics"
+  }
+]
