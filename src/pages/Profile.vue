@@ -28,8 +28,12 @@
           <input class="input" v-model="password" type="password" placeholder="••••••••" />
         </div>
         <div class="actions">
-          <button class="button primary" @click="signUp">Sign Up</button>
-          <button class="button" @click="signIn">Log In</button>
+          <button class="button primary" :disabled="isAuthing" @click="signUp">
+            {{ isAuthing ? 'Working…' : 'Sign Up' }}
+          </button>
+          <button class="button" :disabled="isAuthing" @click="signIn">
+            {{ isAuthing ? 'Working…' : 'Log In' }}
+          </button>
         </div>
       </div>
       <div class="card tips">
@@ -85,7 +89,13 @@
           <div class="label">Courses</div>
           <div class="value">
             <template v-if="courses && courses.length">
-              <span v-for="c in courses" :key="c" class="badge">{{ c }}</span>
+              <div
+                v-for="c in courses"
+                :key="c"
+                class="badge course-row"
+              >
+                {{ c }}<span v-if="courseTitles[c]"> — {{ courseTitles[c] }}</span>
+              </div>
             </template>
             <span v-else class="muted">No courses saved yet.</span>
           </div>
@@ -100,19 +110,81 @@
           <li>DP Notes</li>
         </ul>
       </div>
+
+      <!-- Friends -->
+      <div class="card friends">
+        <div class="section-head">
+          <h2>Friends</h2>
+          <span class="muted">Add friends by username or email</span>
+        </div>
+
+        <div class="field" style="margin-top:6px;">
+          <label>Find user</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input class="input" v-model="friendQuery" placeholder="username or email…" />
+            <button class="button" :disabled="!friendQuery || isAddingFriend" @click="addFriend">
+              {{ isAddingFriend ? 'Adding…' : 'Add friend' }}
+            </button>
+          </div>
+          <div v-if="friendNotice" class="small" style="margin-top:6px;">{{ friendNotice }}</div>
+        </div>
+
+        <h3 style="margin:12px 0 6px;">Your friends</h3>
+        <div v-if="!friends.length" class="small muted">No friends yet.</div>
+        <div v-else class="friend-list">
+          <div v-for="f in friends" :key="f.friend_id" class="friend-row">
+            <div class="avatar small">{{ (f.friend_username || f.friend_email || 'U').substring(0,1).toUpperCase() }}</div>
+            <div class="col">
+              <div class="strong">{{ f.friend_username || f.friend_email }}</div>
+              <div class="small muted">{{ f.friend_email }}</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="button" @click="removeFriend(f.friend_id)">Remove</button>
+          </div>
+        </div>
+
+        <h3 style="margin:12px 0 6px;">Incoming requests</h3>
+        <div v-if="!incomingRequests.length" class="small muted">No incoming requests.</div>
+        <div v-else class="friend-list">
+          <div v-for="r in incomingRequests" :key="r.id" class="friend-row">
+            <div class="avatar small">{{ (r.sender_username || r.sender_email || 'U').substring(0,1).toUpperCase() }}</div>
+            <div class="col">
+              <div class="strong">{{ r.sender_username || r.sender_email }}</div>
+              <div class="small muted">wants to be friends</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="button" @click="acceptRequest(r)">Accept</button>
+            <button class="button" @click="declineRequest(r)">Decline</button>
+          </div>
+        </div>
+
+        <h3 style="margin:12px 0 6px;">Outgoing requests</h3>
+        <div v-if="!outgoingRequests.length" class="small muted">No outgoing requests.</div>
+        <div v-else class="friend-list">
+          <div v-for="r in outgoingRequests" :key="r.id" class="friend-row">
+            <div class="avatar small">{{ (r.receiver_username || r.receiver_email || 'U').substring(0,1).toUpperCase() }}</div>
+            <div class="col">
+              <div class="strong">{{ r.receiver_username || r.receiver_email }}</div>
+              <div class="small muted">pending…</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="button" @click="cancelRequest(r)">Cancel</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
-import { onMounted } from 'vue'
-import { supabase } from '../services/supabase'
+import { ref, watch, onMounted, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { supabase, currentUser, getSession } from '../services/supabase'
 
 const username = ref('')
 const name = username // backward-compat alias if referenced elsewhere
 const uni = ref('')
 const points = ref(0)
-const user = ref(null)
+const user = currentUser
 const email = ref('')
 const password = ref('')
 
@@ -120,29 +192,57 @@ const profileUni = ref('')
 const profileStudyLine = ref('')
 const studyLine = ref('')
 const courses = ref([])
+const courseTitles = reactive({})
 const notice = ref('')
 const isSaving = ref(false)
 
+const friendQuery = ref('')
+const friends = ref([])
+const friendNotice = ref('')
+const isAddingFriend = ref(false)
+const incomingRequests = ref([])
+const outgoingRequests = ref([])
+const requestNotice = ref('')
+const isProcessingRequest = ref(false)
+const router = useRouter()
+const isAuthing = ref(false)
+
+async function hydrateFromUser(u) {
+  if (!u) return
+  username.value = u.user_metadata?.full_name || u.email
+  uni.value = u.user_metadata?.university || ''
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('points, university, courses, username, study_line')
+    .eq('id', u.id)
+    .single()
+  points.value = profile?.points || 0
+  profileUni.value = profile?.university || ''
+  profileStudyLine.value = profile?.study_line || ''
+  studyLine.value = profile?.study_line || ''
+  username.value = profile?.username || u.user_metadata?.full_name || u.email
+  courses.value = Array.isArray(profile?.courses) ? profile.courses : []
+  await ensureAllCourseTitles()
+  await fetchFriends()
+  await fetchRequests()
+}
+
 onMounted(async () => {
   if (!supabase) return
-  const { data: { user: u } } = await supabase.auth.getUser()
-  if (u) {
-    user.value = u
-    username.value = u.user_metadata?.full_name || u.email
-    uni.value = u.user_metadata?.university || ''
-    // fetch profile details
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('points, university, courses, username, study_line')
-      .eq('id', u.id)
-      .single()
-    points.value = profile?.points || 0
-    profileUni.value = profile?.university || ''
-    profileStudyLine.value = profile?.study_line || ''
-    studyLine.value = profile?.study_line || ''
-    username.value = profile?.username || u.user_metadata?.full_name || u.email
-    courses.value = Array.isArray(profile?.courses) ? profile.courses : []
+  // restore immediately from persisted session
+  const session = await getSession()
+  if (session?.user) {
+    user.value = session.user
   }
+  const u = user.value
+  if (u) {
+    await hydrateFromUser(u)
+  }
+})
+
+watch(currentUser, async (u) => {
+  if (!supabase) return
+  await hydrateFromUser(u)
 })
 
 async function saveBasics() {
@@ -226,21 +326,47 @@ async function saveBasics() {
 
 async function signUp() {
   if (!supabase) return
-  const { error } = await supabase.auth.signUp({
-    email: email.value,
-    password: password.value,
-    options: { data: { full_name: name.value, university: uni.value } }
-  })
-  if (error) console.error('Sign-up error:', error)
+  isAuthing.value = true
+  try {
+    const { error } = await supabase.auth.signUp({
+      email: email.value,
+      password: password.value,
+      options: { data: { full_name: name.value, university: uni.value } }
+    })
+    if (error) { console.error('Sign-up error:', error); return }
+    const session = await getSession()
+    if (session?.user) {
+      user.value = session.user
+      await hydrateFromUser(session.user)
+      if (router.currentRoute.value.path !== '/profile') {
+        router.replace('/profile')
+      }
+    }
+  } finally {
+    isAuthing.value = false
+  }
 }
 
 async function signIn() {
   if (!supabase) return
-  const { error } = await supabase.auth.signInWithPassword({
-    email: email.value,
-    password: password.value
-  })
-  if (error) console.error('Sign-in error:', error)
+  isAuthing.value = true
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.value,
+      password: password.value
+    })
+    if (error) { console.error('Sign-in error:', error); return }
+    const session = await getSession()
+    if (session?.user) {
+      user.value = session.user
+      await hydrateFromUser(session.user)
+      if (router.currentRoute.value.path !== '/profile') {
+        router.replace('/profile')
+      }
+    }
+  } finally {
+    isAuthing.value = false
+  }
 }
 
 async function logout() {
@@ -249,35 +375,210 @@ async function logout() {
   user.value = null
 }
 
-if (supabase) {
-  supabase.auth.onAuthStateChange(async (_event, session) => {
-    const u = session?.user || null
-    user.value = u
-    if (u) {
-      username.value = u.user_metadata?.full_name || u.email
-      uni.value = u.user_metadata?.university || ''
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('points, university, courses, username, study_line')
-        .eq('id', u.id)
-        .single()
-      points.value = profile?.points || 0
-      profileUni.value = profile?.university || ''
-      profileStudyLine.value = profile?.study_line || ''
-      studyLine.value = profile?.study_line || ''
-      username.value = profile?.username || u.user_metadata?.full_name || u.email
-      courses.value = Array.isArray(profile?.courses) ? profile.courses : []
-    } else {
-      username.value = ''
-      uni.value = ''
-      points.value = 0
-      profileUni.value = ''
-      profileStudyLine.value = ''
-      studyLine.value = ''
-      courses.value = []
-    }
-  })
+async function fetchFriends() {
+  if (!supabase || !user.value) return
+  // Get all rows where I am the requester
+  const { data, error } = await supabase
+    .from('friends')
+    .select(`friend_id, created_at,
+             friend:friend_id (username, email)`)
+    .eq('user_id', user.value.id)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('[friends.select] error:', error)
+    return
+  }
+
+  friends.value = (data || []).map(r => ({
+    friend_id: r.friend_id,
+    friend_username: r.friend?.username || null,
+    friend_email: r.friend?.email || null,
+    created_at: r.created_at,
+  }))
 }
+
+async function addFriend() {
+  if (!supabase || !user.value) { friendNotice.value = 'Not signed in.'; return }
+  const query = (friendQuery.value || '').trim()
+  if (!query) return
+  isAddingFriend.value = true
+  friendNotice.value = ''
+  try {
+    // lookup by username first, then email view
+    let target = null
+    const byUsername = await supabase
+      .from('profiles')
+      .select('id, username')
+      .ilike('username', query)
+      .maybeSingle()
+    if (byUsername.data?.id) {
+      target = { id: byUsername.data.id }
+    } else {
+      const { data: viaView } = await supabase
+        .from('user_emails')
+        .select('id, email')
+        .ilike('email', query)
+        .maybeSingle()
+      if (viaView?.id) target = { id: viaView.id }
+    }
+
+    if (!target) { friendNotice.value = 'User not found.'; return }
+    if (target.id === user.value.id) { friendNotice.value = "You can't add yourself."; return }
+
+    // create or ignore duplicate pending request
+    const { error: reqErr } = await supabase
+      .from('friend_requests')
+      .upsert({ sender_id: user.value.id, receiver_id: target.id, status: 'pending' }, { onConflict: 'sender_id,receiver_id' })
+
+    if (reqErr) {
+      friendNotice.value = `Could not request: ${reqErr.message}`
+      return
+    }
+
+    friendNotice.value = 'Request sent!'
+    friendQuery.value = ''
+    await fetchRequests()
+    setTimeout(() => (friendNotice.value = ''), 1500)
+  } finally {
+    isAddingFriend.value = false
+  }
+}
+
+async function fetchRequests() {
+  if (!supabase || !user.value) return
+  // incoming
+  const incoming = await supabase
+    .from('friend_requests')
+    .select(`id, sender_id, receiver_id, status, created_at, sender:sender_id(username, email)`) 
+    .eq('receiver_id', user.value.id)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+  if (!incoming.error) {
+    incomingRequests.value = (incoming.data || []).map(r => ({
+      id: r.id,
+      sender_id: r.sender_id,
+      receiver_id: r.receiver_id,
+      sender_username: r.sender?.username || null,
+      sender_email: r.sender?.email || null,
+      created_at: r.created_at,
+    }))
+  }
+  // outgoing
+  const outgoing = await supabase
+    .from('friend_requests')
+    .select(`id, sender_id, receiver_id, status, created_at, receiver:receiver_id(username, email)`) 
+    .eq('sender_id', user.value.id)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+  if (!outgoing.error) {
+    outgoingRequests.value = (outgoing.data || []).map(r => ({
+      id: r.id,
+      sender_id: r.sender_id,
+      receiver_id: r.receiver_id,
+      receiver_username: r.receiver?.username || null,
+      receiver_email: r.receiver?.email || null,
+      created_at: r.created_at,
+    }))
+  }
+}
+
+async function acceptRequest(r) {
+  if (!supabase || !user.value) return
+  isProcessingRequest.value = true
+  try {
+    // mark accepted
+    const { error: upErr } = await supabase
+      .from('friend_requests')
+      .update({ status: 'accepted' })
+      .eq('id', r.id)
+      .eq('receiver_id', user.value.id)
+    if (upErr) { requestNotice.value = `Could not accept: ${upErr.message}`; return }
+    // create mutual friendship rows
+    await supabase.from('friends').upsert([
+      { user_id: user.value.id, friend_id: r.sender_id },
+      { user_id: r.sender_id, friend_id: user.value.id },
+    ], { onConflict: 'user_id,friend_id' })
+    await fetchFriends()
+    await fetchRequests()
+  } finally { isProcessingRequest.value = false }
+}
+
+async function declineRequest(r) {
+  if (!supabase || !user.value) return
+  isProcessingRequest.value = true
+  try {
+    await supabase
+      .from('friend_requests')
+      .update({ status: 'declined' })
+      .eq('id', r.id)
+      .eq('receiver_id', user.value.id)
+    await fetchRequests()
+  } finally { isProcessingRequest.value = false }
+}
+
+async function cancelRequest(r) {
+  if (!supabase || !user.value) return
+  isProcessingRequest.value = true
+  try {
+    await supabase
+      .from('friend_requests')
+      .delete()
+      .eq('id', r.id)
+      .eq('sender_id', user.value.id)
+    await fetchRequests()
+  } finally { isProcessingRequest.value = false }
+}
+
+async function removeFriend(friendId) {
+  if (!supabase || !user.value) return
+  const { error } = await supabase
+    .from('friends')
+    .delete()
+    .or(`and(user_id.eq.${user.value.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${user.value.id})`)
+
+  if (error) {
+    console.error('[friends.delete] error:', error)
+    friendNotice.value = 'Could not remove.'
+  } else {
+    friends.value = friends.value.filter(f => f.friend_id !== friendId)
+  }
+}
+
+
+async function ensureCourseTitle(code) {
+  try {
+    if (!code || courseTitles[code] || !supabase) return
+    const { data, error } = await supabase
+      .from('courses')
+      .select('title')
+      .eq('code', code)
+      .single()
+    if (!error && data?.title) {
+      courseTitles[code] = data.title
+    }
+  } catch (e) {
+    // ignore tooltip failures silently
+  }
+}
+
+async function ensureAllCourseTitles() {
+  try {
+    if (!supabase || !Array.isArray(courses.value) || courses.value.length === 0) return
+    const missing = courses.value.filter(code => code && !courseTitles[code])
+    if (!missing.length) return
+    const { data, error } = await supabase
+      .from('courses')
+      .select('code, title')
+      .in('code', missing)
+    if (!error && Array.isArray(data)) {
+      for (const row of data) {
+        if (row?.code && row?.title) courseTitles[row.code] = row.title
+      }
+    }
+  } catch (_) { /* silent */ }
+}
+
 </script>
 <style scoped>
 .profile-page { max-width: 980px; }
@@ -309,5 +610,14 @@ label { font-size: 0.9rem; opacity: 0.85; }
 .snapshot .label { opacity: .8; }
 .badge { background: rgba(255,255,255,0.08); padding: 6px 10px; border-radius: 999px; margin-right: 6px; display: inline-flex; }
 
+
+.course-row { display: block; margin: 4px 0; }
+
 .contrib ul { margin: 6px 0 0; }
+
+.friend-list { display: grid; gap: 8px; }
+.friend-row { display: flex; gap: 10px; align-items: center; padding: 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; }
+.avatar.small { width: 32px; height: 32px; font-size: 0.9rem; }
+.col { display: grid; }
+.spacer { flex: 1; }
 </style>
