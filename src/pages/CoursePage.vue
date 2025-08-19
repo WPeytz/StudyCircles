@@ -8,46 +8,90 @@
     <div class="tabs">
       <button :class="{active: tab==='feed'}" @click="tab='feed'">Feed</button>
       <button :class="{active: tab==='files'}" @click="tab='files'">Files</button>
-      <button :class="{active: tab==='questions'}" @click="tab='questions'">Questions</button>
       <button :class="{active: tab==='groups'}" @click="tab='groups'">Study Groups</button>
     </div>
 
     <!-- FEED -->
     <section v-if="tab==='feed'" class="card">
       <h2>Latest activity</h2>
-      <div v-if="!feed.length" class="muted">No activity yet.</div>
+
+      <!-- Composer -->
+      <div class="composer">
+        <div class="avatar large">{{ (displayName || 'U').slice(0,1).toUpperCase() }}</div>
+        <div class="composer-col">
+          <textarea
+            class="input composer-input"
+            rows="2"
+            v-model="postBody"
+            :placeholder="`What\'s on your mind, ${displayName || 'student'}?`"
+          />
+          <div class="composer-actions">
+            <div class="muted small" v-if="postErr">{{ postErr }}</div>
+            <div class="spacer"></div>
+            <button class="button primary" :disabled="posting || !postBody.trim()" @click="createPost">
+              {{ posting ? 'Posting…' : 'Post' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="chips" style="margin:8px 0 6px;">
+        <button class="chip" :class="{active: isKindOn('file')}" @click="toggleKind('file')">Files</button>
+        <button class="chip" :class="{active: isKindOn('question')}" @click="toggleKind('question')">Questions</button>
+        <button class="chip" :class="{active: isKindOn('group')}" @click="toggleKind('group')">Groups</button>
+      </div>
+
+      <div v-if="!filteredFeed.length" class="muted">No activity yet.</div>
       <div v-else class="feed-list">
-        <div v-for="item in feed" :key="item.kind + ':' + item.id" class="feed-row">
-          <span class="badge" :class="'k-' + item.kind">{{ item.kind }}</span>
-          <div class="col">
-            <div class="strong">
+        <div v-for="item in filteredFeed" :key="item.kind + ':' + item.id">
+          <div class="feed-row">
+            <span class="badge" :class="'k-' + item.kind">{{ item.kind }}</span>
+            <div class="col clickable" @click="openItem(item)">
+              <div class="strong">
+                <template v-if="item.kind==='file'">
+                  {{ item.title }}
+                </template>
+                <template v-else-if="item.kind==='question'">
+                  {{ item.body }}
+                </template>
+                <template v-else>
+                  {{ item.title }}
+                </template>
+                <span v-if="item.pinned" class="pin-badge">📌 pinned</span>
+              </div>
+              <div class="small muted">
+                {{ prettyDate(item.created_at) }}
+                <template v-if="item.kind==='question' && item.display_name"> — {{ item.display_name }}</template>
+                <template v-if="item.kind==='group' && (item.place || item.time)"> — {{ item.place || '—' }} {{ item.time ? ' · ' + item.time : '' }}</template>
+              </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="actions">
+              <button class="iconbtn vote" @click="toggleVote(item)" :title="(item._voted ? 'Remove upvote' : 'Upvote') + ' (▲ ' + (item.upvotes ?? 0) + ')'">
+                <span class="tri">▲</span>
+                <span class="count">{{ item.upvotes ?? 0 }}</span>
+              </button>
+              <button class="iconbtn pin" :class="{active: !!item.pinned}" @click="togglePin(item)" :title="item.pinned ? 'Unpin' : 'Pin'">📌</button>
               <template v-if="item.kind==='file'">
-                {{ item.title }}
+                <a class="iconbtn ghost" :href="item.public_url" target="_blank" rel="noopener" title="Open file">Open</a>
               </template>
               <template v-else-if="item.kind==='question'">
-                {{ item.body }}
+                <button class="iconbtn ghost" @click="item._replying = !item._replying" title="Reply">Reply</button>
               </template>
               <template v-else>
-                {{ item.title }}
+                <button class="iconbtn ghost" @click="tab='groups'" title="View group">View</button>
               </template>
             </div>
-            <div class="small muted">
-              {{ prettyDate(item.created_at) }}
-              <template v-if="item.kind==='question' && item.display_name"> — {{ item.display_name }}</template>
-              <template v-if="item.kind==='group' && (item.place || item.time)"> — {{ item.place || '—' }} {{ item.time ? ' · ' + item.time : '' }}</template>
-            </div>
           </div>
-          <div class="spacer"></div>
-          <template v-if="item.kind==='file'">
-            <a class="button" :href="item.public_url" target="_blank" rel="noopener">Open</a>
-          </template>
-          <template v-else-if="item.kind==='question'">
-            <button class="button" @click="tab='questions'">View</button>
-          </template>
-          <template v-else>
-            <button class="button" @click="tab='groups'">View</button>
-          </template>
+          <div v-if="item.kind==='question' && item._replying" class="reply under">
+            <textarea class="input" rows="2" v-model="item._reply" placeholder="Write a reply..." />
+            <button class="button primary" style="min-width:100px" @click.stop="replyTo(item)">Send</button>
+          </div>
         </div>
+      </div>
+      <div v-if="hasMore" style="margin-top:10px; display:flex; justify-content:center;">
+        <button class="button" @click="loadMore" :disabled="loadingFeed">{{ loadingFeed ? 'Loading…' : 'Load more' }}</button>
       </div>
     </section>
 
@@ -85,49 +129,6 @@
       </div>
     </section>
 
-    <!-- QUESTIONS -->
-    <section v-if="tab==='questions'" class="card">
-      <h2>Ask a question</h2>
-      <textarea
-        class="input"
-        rows="3"
-        v-model="questionBody"
-        :placeholder="`Ask about ${code}…`"
-      />
-      <button class="button primary" :disabled="asking" @click="askQuestion">
-        {{ asking ? 'Posting…' : 'Ask' }}
-      </button>
-      <div class="hint" v-if="askErr">{{ askErr }}</div>
-
-      <h3 style="margin-top:18px;">Recent questions</h3>
-      <div v-if="questions.length===0" class="muted">No questions yet.</div>
-      <div v-else class="q-list">
-        <div v-for="q in questions" :key="q.id" class="q-row">
-          <div class="avatar small">{{ (q.display_name || 'U').slice(0,1).toUpperCase() }}</div>
-          <div class="col">
-            <div class="strong">{{ q.body }}</div>
-            <div class="small muted">{{ prettyDate(q.created_at) }} — {{ q.display_name || 'Anonymous' }}</div>
-            <!-- answers -->
-            <div class="answers">
-              <div v-if="!q.answers?.length" class="small muted">No answers yet.</div>
-              <div v-else>
-                <div v-for="a in q.answers" :key="a.id" class="ans-row">
-                  <div class="avatar xsmall">{{ (a.display_name || 'U').slice(0,1).toUpperCase() }}</div>
-                  <div class="col">
-                    <div>{{ a.body }}</div>
-                    <div class="small muted">{{ prettyDate(a.created_at) }} — {{ a.display_name || 'Anonymous' }}</div>
-                  </div>
-                </div>
-              </div>
-              <div class="reply">
-                <input class="input" v-model="q._reply" placeholder="Write an answer…" />
-                <button class="button" @click="replyTo(q)">Reply</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- STUDY GROUPS -->
     <section v-if="tab==='groups'" class="card">
@@ -145,7 +146,7 @@
       <h3 style="margin-top:18px;">Groups for {{ code }}</h3>
       <div v-if="groups.length===0" class="muted">No groups yet.</div>
       <div v-else class="group-list">
-        <div v-for="g in groups" :key="g.id" class="group-row">
+        <div v-for="g in groups" :key="g.id" :id="'g-' + g.id" class="group-row">
           <div class="col">
             <div class="strong">{{ g.title }}</div>
             <div class="small muted">{{ g.place || '—' }} — {{ g.time || '—' }}</div>
@@ -193,34 +194,74 @@ const groupErr = ref('')
 const groups = ref([])
 
 const feed = ref([])
+const FEED_PAGE = 30
+const feedLimit = ref(FEED_PAGE)
+const hasMore = ref(false)
+const loadingFeed = ref(false)
+// post composer (uses questions table as generic posts)
+const postBody = ref('')
+const posting = ref(false)
+const postErr = ref('')
+const displayName = computed(() => {
+  const u = currentUser.value
+  return u?.user_metadata?.full_name || u?.email || ''
+})
+
+// active kinds filter
+const feedKinds = ref(new Set(['file','question','group']))
+function isKindOn(k){ return feedKinds.value.has(k) }
+function toggleKind(k){
+  const s = new Set(feedKinds.value)
+  if (s.has(k)) s.delete(k); else s.add(k)
+  // never allow empty set -> toggle back on all
+  if (s.size === 0) { s.add('file'); s.add('question'); s.add('group') }
+  feedKinds.value = s
+}
+
+const filteredFeed = computed(() => feed.value.filter(i => feedKinds.value.has(i.kind)))
+
+function loadMore(){ feedLimit.value += FEED_PAGE; loadFeed() }
+
+// NOTE: This feed expects integer column `upvotes` default 0 and boolean column `pinned` default false
+// in tables: resources, questions, study_groups. Example SQL to add:
+// alter table public.resources add column if not exists upvotes int default 0, add column if not exists pinned boolean default false;
+// alter table public.questions add column if not exists upvotes int default 0, add column if not exists pinned boolean default false;
+// alter table public.study_groups add column if not exists upvotes int default 0, add column if not exists pinned boolean default false;
 
 async function loadFeed() {
-  // Fetch latest resources, questions, and groups for this course, then merge & sort
-  const [resR, qR, gR] = await Promise.all([
-    supabase.from('resources')
-      .select('id, title, type, public_url, created_at')
-      .eq('course', code.value)
-      .order('created_at', { ascending: false })
-      .limit(50),
-    supabase.from('questions')
-      .select('id, body, display_name, created_at')
-      .eq('course', code.value)
-      .order('created_at', { ascending: false })
-      .limit(50),
-    supabase.from('study_groups')
-      .select('id, title, place, time, created_at')
-      .eq('course', code.value)
-      .order('created_at', { ascending: false })
-      .limit(50)
-  ])
+  loadingFeed.value = true
+  try {
+    const lim = feedLimit.value + 1
+    const [resR, qR, gR] = await Promise.all([
+      supabase.from('resources')
+        .select('id, title, type, public_url, created_at, course, upvotes, pinned')
+        .eq('course', code.value)
+        .order('created_at', { ascending: false })
+        .limit(lim),
+      supabase.from('questions')
+        .select('id, body, display_name, created_at, course, upvotes, pinned')
+        .eq('course', code.value)
+        .order('created_at', { ascending: false })
+        .limit(lim),
+      supabase.from('study_groups')
+        .select('id, title, place, time, created_at, course, upvotes, pinned')
+        .eq('course', code.value)
+        .order('created_at', { ascending: false })
+        .limit(lim)
+    ])
 
-  const files = (resR.data || []).map(r => ({ kind: 'file', ...r }))
-  const qs    = (qR.data   || []).map(r => ({ kind: 'question', ...r }))
-  const grps  = (gR.data   || []).map(r => ({ kind: 'group', ...r }))
+    const files = (resR.data || []).map(r => ({ kind: 'file', ...r }))
+    const qs    = (qR.data   || []).map(r => ({ kind: 'question', ...r }))
+    const grps  = (gR.data   || []).map(r => ({ kind: 'group', ...r }))
 
-  const merged = [...files, ...qs, ...grps]
-  merged.sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
-  feed.value = merged
+    const merged = [...files, ...qs, ...grps]
+    merged.sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+
+    hasMore.value = merged.length > feedLimit.value
+    feed.value = hasMore.value ? merged.slice(0, feedLimit.value) : merged
+  } finally {
+    loadingFeed.value = false
+  }
 }
 
 async function loadAll() {
@@ -229,6 +270,122 @@ async function loadAll() {
 
 function prettyDate(d) {
   try { return new Date(d).toLocaleString() } catch { return '' }
+}
+
+let feedChannel = null
+async function subscribeFeed(){
+  if (!supabase) return
+  if (feedChannel) { try { await supabase.removeChannel(feedChannel) } catch {} }
+  const ch = supabase.channel(`course-feed-${code.value}`)
+  ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'resources', filter: `course=eq.${code.value}` }, (payload) => {
+    const r = payload.new
+    feed.value = [{ kind: 'file', ...r }, ...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+  })
+  ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'questions', filter: `course=eq.${code.value}` }, (payload) => {
+    const r = payload.new
+    feed.value = [{ kind: 'question', ...r }, ...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+  })
+  ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_groups', filter: `course=eq.${code.value}` }, (payload) => {
+    const r = payload.new
+    feed.value = [{ kind: 'group', ...r }, ...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+  })
+  feedChannel = ch.subscribe()
+}
+
+function tableFor(kind){
+  if (kind==='file') return 'resources'
+  if (kind==='question') return 'questions'
+  if (kind==='group') return 'study_groups'
+  return null
+}
+
+async function openItem(item){
+  if (!item) return
+  if (item.kind === 'file') {
+    if (item.public_url) window.open(item.public_url, '_blank', 'noopener')
+    return
+  }
+  if (item.kind === 'question') {
+    // Questions live in the feed; no tab switch.
+    return
+  }
+  if (item.kind === 'group') {
+    tab.value = 'groups'
+    await Promise.resolve()
+    const el = document.getElementById('g-' + item.id)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    return
+  }
+}
+
+async function toggleVote(item){
+  const table = tableFor(item.kind)
+  if (!table) return
+  const u = currentUser.value
+  if (!u?.id) { alert('Please log in to vote.'); return }
+
+  const votesTable = 'course_votes'
+  const key = { user_id: u.id, kind: item.kind, item_id: item.id }
+
+  try {
+    // Check if user already voted
+    const { data: existing, error: selErr } = await supabase
+      .from(votesTable)
+      .select('user_id')
+      .match(key)
+      .maybeSingle()
+
+    if (selErr) throw selErr
+
+    if (existing) {
+      // User has a vote -> unvote (delete)
+      const { error: delErr } = await supabase.from(votesTable).delete().match(key)
+      if (delErr) throw delErr
+    } else {
+      // Add vote (one per user enforced by PK/unique at DB)
+      const { error: insErr } = await supabase.from(votesTable).insert({ ...key, course: code.value })
+      if (insErr) throw insErr
+    }
+
+    // Re-count votes (authoritative)
+    const { count, error: cntErr } = await supabase
+      .from(votesTable)
+      .select('*', { count: 'exact', head: true })
+      .eq('kind', item.kind)
+      .eq('item_id', item.id)
+
+    if (cntErr) throw cntErr
+
+    const newCount = count ?? 0
+    item.upvotes = newCount
+    item._voted = !existing
+
+    // Persist denormalized counter for fast listing
+    await supabase.from(table).update({ upvotes: newCount }).eq('id', item.id)
+  } catch (e) {
+    console.error('[toggleVote] failed', e)
+    alert('Could not update vote. Please try again.')
+  }
+}
+
+async function togglePin(item){
+  const table = tableFor(item.kind)
+  if (!table) return
+  const next = !item.pinned
+  // optimistic
+  item.pinned = next
+  try {
+    const { error } = await supabase
+      .from(table)
+      .update({ pinned: next })
+      .eq('id', item.id)
+    if (error) throw error
+    // resort feed to put pinned on top
+    feed.value = [...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+  } catch (e) {
+    item.pinned = !next
+    console.error('[pin] failed', e)
+  }
 }
 
 // ===== Files =====
@@ -258,7 +415,7 @@ async function doUpload() {
     })
 
     uploadTitle.value = ''
-    uploadType.value = 'Exam'
+    uploadType.value = 'Notes'
     upFile.value = null
     await loadFiles()
     await loadFeed()
@@ -297,6 +454,30 @@ async function askQuestion() {
     askErr.value = String(e?.message || e)
   } finally {
     asking.value = false
+  }
+}
+
+async function createPost(){
+  const body = postBody.value.trim()
+  if (!body) return
+  postErr.value = ''
+  posting.value = true
+  try {
+    const u = currentUser.value
+    const name = (u?.user_metadata?.full_name || u?.email || 'Anonymous')
+    await supabase.from('questions').insert({
+      body,
+      course: code.value,
+      display_name: name
+    })
+    postBody.value = ''
+    // feed will update via realtime; also refresh lists
+    await loadQuestions()
+    await loadFeed()
+  } catch (e) {
+    postErr.value = String(e?.message || e)
+  } finally {
+    posting.value = false
   }
 }
 
@@ -399,9 +580,15 @@ async function loadTitle() {
 }
 
 onMounted(loadAll)
+onMounted(() => { subscribeFeed() })
 
 // react to param change (no full reload)
-watch(() => route.params.code, () => { loadAll() })
+watch(() => route.params.code, () => {
+  feedLimit.value = FEED_PAGE
+  hasMore.value = false
+  loadAll()
+  subscribeFeed()
+})
 </script>
 
 <style scoped>
@@ -437,4 +624,49 @@ watch(() => route.params.code, () => { loadAll() })
 .badge.k-file { background: rgba(129, 199, 132, 0.25); }
 .badge.k-question { background: rgba(100, 149, 255, 0.25); }
 .badge.k-group { background: rgba(255, 193, 7, 0.25); }
+.chips { display: flex; gap: 6px; }
+.chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; padding: 5px 10px; cursor: pointer; color: #fff; font-size: 12px; }
+.chip.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.24); }
+
+.actions { display: flex; gap: 6px; align-items: center; }
+.button.icon { padding: 4px 8px; font-size: 12px; }
+.button.icon.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
+.pin-badge { margin-left: 8px; font-size: 12px; opacity: .85; }
+
+.feed-row { position: relative; transition: background .15s, border-color .15s; }
+.feed-row:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+.feed-row .strong { font-weight: 650; letter-spacing: .1px; }
+.feed-row .small { opacity: .75; }
+
+.actions { display: flex; gap: 8px; align-items: center; margin-left: 6px; }
+.iconbtn { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; font-size:12px; text-decoration:none; }
+.iconbtn:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.24); }
+.iconbtn.ghost { background: transparent; border-color: rgba(255,255,255,0.14); }
+.iconbtn.vote { padding:6px 8px; }
+.iconbtn.vote .tri { font-size:11px; opacity:.95; }
+.iconbtn.vote .count { font-variant-numeric: tabular-nums; min-width: 1.5ch; text-align:right; }
+.iconbtn.pin.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.28); }
+
+/* badge refinement */
+.badge { text-transform: none; font-weight: 600; }
+
+.col.clickable { cursor: pointer; }
+.feed-row .col.clickable:hover .strong { text-decoration: underline; }
+
+/* --- Composer --- */
+.composer { display:flex; gap:10px; align-items:flex-start; background: rgba(0,0,0,0.10); border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:10px; margin:8px 0 12px; }
+.avatar.large { width:40px; height:40px; border-radius:50%; background: rgba(255,255,255,0.14); display:grid; place-items:center; font-weight:800; }
+.composer-col { flex:1; }
+.composer-input { border-radius:14px; resize: vertical; }
+.composer-actions { display:flex; align-items:center; gap:10px; margin-top:6px; }
+
+.reply.under { margin: 6px 0 4px 44px; display:flex; gap:8px; }
+.reply.under .input { flex:1; }
+
 </style>
+
+
+
+
+
+

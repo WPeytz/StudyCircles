@@ -5,6 +5,27 @@
       <p class="muted">Find classmates, manage requests, and see your study buddies.</p>
     </header>
 
+    <!-- Invite link -->
+    <section class="card">
+      <h2>Invite a friend</h2>
+      <div class="row">
+        <button class="button" :disabled="inviteBusy || !isLoggedIn" @click="createInvite">
+          {{ inviteBusy ? 'Creating…' : 'Create invite link' }}
+        </button>
+        <input
+          v-if="inviteLink"
+          class="input"
+          :value="inviteLink"
+          readonly
+          @focus="$event.target.select()"
+          @click="$event.target.select()"
+        />
+        <button v-if="inviteLink" class="button" @click="copyInvite">Copy</button>
+      </div>
+      <div v-if="!isLoggedIn" class="hint">Log in to create an invite link.</div>
+      <div v-if="inviteErr" class="hint">{{ inviteErr }}</div>
+    </section>
+
     <!-- Add friend -->
     <section class="card">
       <h2>Add a friend</h2>
@@ -87,10 +108,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { supabase, currentUser } from '../services/supabase'
 
 const me = currentUser
+const isLoggedIn = computed(() => !!me.value)
 
 const query = ref('')
 const notice = ref('')
@@ -100,7 +123,43 @@ const incoming = ref([])  // {id, sender_id, username, email}
 const outgoing = ref([])  // {id, receiver_id, username, email}
 const friends  = ref([])  // {id: friend_id, username, email}
 
+const route = useRoute()
+const router = useRouter()
+
+const inviteBusy = ref(false)
+const inviteLink = ref('')
+const inviteErr  = ref('')
+
 function clearNoticeSoon() { setTimeout(() => notice.value = '', 1500) }
+
+async function createInvite() {
+  inviteErr.value = ''
+  inviteLink.value = ''
+  if (!me.value) { inviteErr.value = 'Please log in first.'; return }
+  inviteBusy.value = true
+  try {
+    const { data, error } = await supabase
+      .from('friend_invites')
+      .insert({ sender_id: me.value.id })
+      .select('id')
+      .single()
+    if (error) { inviteErr.value = error.message; return }
+    const url = `${window.location.origin}/friends?invite=${data.id}`
+    inviteLink.value = url
+    try { await navigator.clipboard.writeText(url); notice.value = 'Invite link copied!'; clearNoticeSoon() } catch {}
+  } catch (e) {
+    inviteErr.value = String(e?.message || e)
+  } finally {
+    inviteBusy.value = false
+  }
+}
+
+function copyInvite() {
+  if (!inviteLink.value) return
+  navigator.clipboard.writeText(inviteLink.value)
+  notice.value = 'Copied to clipboard'
+  clearNoticeSoon()
+}
 
 async function addFriend() {
   if (!me.value) { notice.value = 'Please log in first.'; clearNoticeSoon(); return }
@@ -266,18 +325,95 @@ async function hydratePeople(rows, key) {
   }))
 }
 
+async function acceptInviteToken(token) {
+  inviteErr.value = ''
+  if (!token) return
+  try {
+    // Fetch invite
+    const { data: inv, error } = await supabase
+      .from('friend_invites')
+      .select('id, sender_id, used, used_at')
+      .eq('id', token)
+      .maybeSingle()
+    if (error) { inviteErr.value = error.message; return }
+    if (!inv) { inviteErr.value = 'Invalid invite.'; return }
+    if (inv.used) { inviteErr.value = 'This invite link has already been used.'; return }
+
+    if (!me.value) {
+      // store for after login
+      localStorage.setItem('pendingInviteToken', token)
+      notice.value = 'Please log in to accept the invite.'
+      clearNoticeSoon()
+      return
+    }
+
+    // Make mutual friendships and mark invite used
+    await supabase.from('friends').upsert([
+      { user_id: me.value.id,        friend_id: inv.sender_id },
+      { user_id: inv.sender_id,      friend_id: me.value.id }
+    ], { onConflict: 'user_id,friend_id' })
+
+    await supabase
+      .from('friend_invites')
+      .update({ used: true, used_at: new Date().toISOString(), used_by: me.value.id })
+      .eq('id', inv.id)
+
+    notice.value = 'Friend added!'
+    await fetchFriends()
+    clearNoticeSoon()
+
+    // Clean URL (remove invite query param)
+    const q = { ...route.query }
+    delete q.invite
+    router.replace({ query: q })
+  } catch (e) {
+    inviteErr.value = String(e?.message || e)
+  }
+}
+
 async function bootstrap() {
   if (!supabase) return
   const { data: { session } } = await supabase.auth.getSession()
   if (session?.user) {
+    const token = route.query?.invite
+    if (token) await acceptInviteToken(String(token))
     await Promise.all([fetchRequests(), fetchFriends()])
   }
 }
 
 onMounted(bootstrap)
-watch(me, (u) => {
-  if (u?.id) bootstrap(); else { incoming.value = []; outgoing.value = []; friends.value = [] }
+watch(me, async (u) => {
+  if (u?.id) {
+    // process pending invite if present
+    const pending = localStorage.getItem('pendingInviteToken')
+    if (pending) {
+      await acceptInviteToken(pending)
+      localStorage.removeItem('pendingInviteToken')
+    }
+    await bootstrap()
+  } else {
+    incoming.value = []; outgoing.value = []; friends.value = []
+  }
 })
+
+/*
+-- SQL to create friend_invites (run in Supabase SQL editor):
+create table if not exists public.friend_invites (
+  id uuid primary key default gen_random_uuid(),
+  sender_id uuid not null references auth.users(id) on delete cascade,
+  used boolean not null default false,
+  used_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  used_at timestamptz
+);
+alter table public.friend_invites enable row level security;
+drop policy if exists "friend_invites: select" on public.friend_invites;
+create policy "friend_invites: select" on public.friend_invites for select using (true);
+drop policy if exists "friend_invites: insert" on public.friend_invites;
+create policy "friend_invites: insert" on public.friend_invites for insert to authenticated with check (auth.uid() = sender_id);
+drop policy if exists "friend_invites: update" on public.friend_invites;
+create policy "friend_invites: update" on public.friend_invites for update using (auth.uid() = sender_id or auth.uid() = used_by);
+*/
 </script>
 
 <style scoped>

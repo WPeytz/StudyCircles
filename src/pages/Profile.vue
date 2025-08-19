@@ -2,7 +2,11 @@
   <div class="container profile-page">
     <!-- Header -->
     <div class="card header">
-      <div class="avatar" v-if="user">{{ (username || user.email || 'U').substring(0,1).toUpperCase() }}</div>
+      <div class="avatar clickable" v-if="user" @click="avatarFileEl && avatarFileEl.click()">
+        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" />
+        <span v-else>{{ (username || user.email || 'U').substring(0,1).toUpperCase() }}</span>
+      </div>
+      <input ref="avatarFileEl" type="file" accept="image/*" @change="onPickAvatar" style="display:none" />
       <div class="title-area">
         <h1>Profile</h1>
         <p class="subtitle">Choose a username and manage your account.</p>
@@ -14,6 +18,8 @@
         </div>
       </div>
     </div>
+      <p v-if="uploadingAvatar" class="small muted" style="margin-left:auto;">Uploading photo…</p>
+      <p v-if="avatarErr" class="small" style="margin-left:auto;color:#ff9a9a;">{{ avatarErr }}</p>
 
     <!-- Auth panel when logged out -->
     <div v-if="!user" class="grid auth-grid">
@@ -101,77 +107,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Contributions -->
-      <div class="card contrib">
-        <h2>Top Contributions</h2>
-        <ul class="small">
-          <li>02465 Exam 2023 (Exam)</li>
-          <li>DP Notes</li>
-        </ul>
-      </div>
-
-      <!-- Friends -->
-      <div class="card friends">
-        <div class="section-head">
-          <h2>Friends</h2>
-          <span class="muted">Add friends by username or email</span>
-        </div>
-
-        <div class="field" style="margin-top:6px;">
-          <label>Find user</label>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <input class="input" v-model="friendQuery" placeholder="username or email…" />
-            <button class="button" :disabled="!friendQuery || isAddingFriend" @click="addFriend">
-              {{ isAddingFriend ? 'Adding…' : 'Add friend' }}
-            </button>
-          </div>
-          <div v-if="friendNotice" class="small" style="margin-top:6px;">{{ friendNotice }}</div>
-        </div>
-
-        <h3 style="margin:12px 0 6px;">Your friends</h3>
-        <div v-if="!friends.length" class="small muted">No friends yet.</div>
-        <div v-else class="friend-list">
-          <div v-for="f in friends" :key="f.friend_id" class="friend-row">
-            <div class="avatar small">{{ (f.friend_username || f.friend_email || 'U').substring(0,1).toUpperCase() }}</div>
-            <div class="col">
-              <div class="strong">{{ f.friend_username || f.friend_email }}</div>
-              <div class="small muted">{{ f.friend_email }}</div>
-            </div>
-            <div class="spacer"></div>
-            <button class="button" @click="removeFriend(f.friend_id)">Remove</button>
-          </div>
-        </div>
-
-        <h3 style="margin:12px 0 6px;">Incoming requests</h3>
-        <div v-if="!incomingRequests.length" class="small muted">No incoming requests.</div>
-        <div v-else class="friend-list">
-          <div v-for="r in incomingRequests" :key="r.id" class="friend-row">
-            <div class="avatar small">{{ (r.sender_username || r.sender_email || 'U').substring(0,1).toUpperCase() }}</div>
-            <div class="col">
-              <div class="strong">{{ r.sender_username || r.sender_email }}</div>
-              <div class="small muted">wants to be friends</div>
-            </div>
-            <div class="spacer"></div>
-            <button class="button" @click="acceptRequest(r)">Accept</button>
-            <button class="button" @click="declineRequest(r)">Decline</button>
-          </div>
-        </div>
-
-        <h3 style="margin:12px 0 6px;">Outgoing requests</h3>
-        <div v-if="!outgoingRequests.length" class="small muted">No outgoing requests.</div>
-        <div v-else class="friend-list">
-          <div v-for="r in outgoingRequests" :key="r.id" class="friend-row">
-            <div class="avatar small">{{ (r.receiver_username || r.receiver_email || 'U').substring(0,1).toUpperCase() }}</div>
-            <div class="col">
-              <div class="strong">{{ r.receiver_username || r.receiver_email }}</div>
-              <div class="small muted">pending…</div>
-            </div>
-            <div class="spacer"></div>
-            <button class="button" @click="cancelRequest(r)">Cancel</button>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -207,13 +142,47 @@ const isProcessingRequest = ref(false)
 const router = useRouter()
 const isAuthing = ref(false)
 
+const avatarUrl = ref('')
+const uploadingAvatar = ref(false)
+const avatarErr = ref('')
+const avatarFileEl = ref(null)
+
+async function onPickAvatar(e) {
+  const file = e?.target?.files?.[0]
+  if (!file || !supabase || !user.value) return
+  uploadingAvatar.value = true
+  avatarErr.value = ''
+  try {
+    const path = `${user.value.id}/${Date.now()}_${file.name}`
+    const { error: upErr } = await supabase.storage.from('resources').upload(path, file)
+    if (upErr) { avatarErr.value = upErr.message; return }
+
+    const { data: pub } = supabase.storage.from('resources').getPublicUrl(path)
+    const url = pub?.publicUrl
+
+    if (url) {
+      const { error: updErr } = await supabase
+        .from('profiles')
+        .update({ avatar_url: url })
+        .eq('id', user.value.id)
+      if (updErr) { avatarErr.value = updErr.message; return }
+      avatarUrl.value = url
+    }
+  } catch (err) {
+    avatarErr.value = String(err?.message || err)
+  } finally {
+    uploadingAvatar.value = false
+    if (avatarFileEl?.value) avatarFileEl.value.value = ''
+  }
+}
+
 async function hydrateFromUser(u) {
   if (!u) return
   username.value = u.user_metadata?.full_name || u.email
   uni.value = u.user_metadata?.university || ''
   const { data: profile } = await supabase
     .from('profiles')
-    .select('points, university, courses, username, study_line')
+    .select('points, university, courses, username, study_line, avatar_url')
     .eq('id', u.id)
     .single()
   points.value = profile?.points || 0
@@ -222,6 +191,7 @@ async function hydrateFromUser(u) {
   studyLine.value = profile?.study_line || ''
   username.value = profile?.username || u.user_metadata?.full_name || u.email
   courses.value = Array.isArray(profile?.courses) ? profile.courses : []
+  avatarUrl.value = profile?.avatar_url || ''
   await ensureAllCourseTitles()
   await fetchFriends()
   await fetchRequests()
@@ -579,12 +549,21 @@ async function ensureAllCourseTitles() {
   } catch (_) { /* silent */ }
 }
 
+/*
+NOTE:
+- Create a public storage bucket named "avatars" in Supabase Storage.
+- Ensure profiles table has column: avatar_url text.
+- (RLS) profiles already allows users to update their own row per existing policy.
+*/
 </script>
 <style scoped>
 .profile-page { max-width: 980px; }
 .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; }
 .header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-.avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
+.avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar.clickable { cursor: pointer; }
+.avatar.clickable:hover { outline: 2px solid rgba(100,149,255,0.45); outline-offset: 2px; }
 .title-area h1 { margin: 0 0 4px; }
 .subtitle { margin: 0; opacity: 0.8; }
 .login-row { margin-top: 6px; display: flex; gap: 8px; align-items: center; }
