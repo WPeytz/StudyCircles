@@ -77,6 +77,9 @@
                 <a class="iconbtn ghost" :href="item.public_url" target="_blank" rel="noopener" title="Open file">Open</a>
               </template>
               <template v-else-if="item.kind==='question'">
+                <button class="iconbtn ghost" @click="toggleReplies(item)" :title="(item._showReplies ? 'Hide replies' : 'Show replies') + (item.answers?.length ? ' ('+item.answers.length+')' : '')">
+                  {{ item._showReplies ? 'Hide' : 'Show' }} replies<span v-if="item.answers?.length"> ({{ item.answers.length }})</span>
+                </button>
                 <button class="iconbtn ghost" @click="item._replying = !item._replying" title="Reply">Reply</button>
               </template>
               <template v-else>
@@ -84,9 +87,18 @@
               </template>
             </div>
           </div>
+          <div v-if="item.kind==='question' && item.answers?.length && item._showReplies" class="answers under">
+            <div v-for="ans in item.answers" :key="ans.id" class="answer-row">
+              <div class="avatar xsmall">{{ (ans.display_name || 'U').slice(0,1).toUpperCase() }}</div>
+              <div class="col">
+                <div>{{ ans.body }}</div>
+                <div class="small muted">{{ prettyDate(ans.created_at) }} — {{ ans.display_name || 'Anonymous' }}</div>
+              </div>
+            </div>
+          </div>
           <div v-if="item.kind==='question' && item._replying" class="reply under">
-            <textarea class="input" rows="2" v-model="item._reply" placeholder="Write a reply..." />
-            <button class="button primary" style="min-width:100px" @click.stop="replyTo(item)">Send</button>
+            <textarea class="input" rows="2" v-model="item._reply" placeholder="Write a reply..."></textarea>
+            <button class="button primary" @click.stop="replyTo(item)">Send</button>
           </div>
         </div>
       </div>
@@ -136,7 +148,7 @@
       <div class="grid">
         <input class="input" v-model="groupTitle" placeholder="Group name (e.g., Project team A)" />
         <input class="input" v-model="groupWhere" placeholder="Where/Link (e.g., Library / Zoom)" />
-        <input class="input" v-model="groupWhen" placeholder="When (e.g., Thursdays 15-17)" />
+        <input class="input" v-model="groupDescription" placeholder="Description of Study Group" />
       </div>
       <button class="button primary" :disabled="creatingGroup" @click="createGroup">
         {{ creatingGroup ? 'Creating…' : 'Create group' }}
@@ -173,7 +185,7 @@ const tab = ref('feed')
 
 // files
 const uploadTitle = ref('')
-const uploadType = ref('Exam')
+const uploadType = ref('Notes')
 const upFile = ref(null)
 const upLoading = ref(false)
 const upErr = ref('')
@@ -188,7 +200,7 @@ const questions = ref([])
 // groups
 const groupTitle = ref('')
 const groupWhere = ref('')
-const groupWhen = ref('')
+const groupDescription = ref('')
 const creatingGroup = ref(false)
 const groupErr = ref('')
 const groups = ref([])
@@ -254,6 +266,22 @@ async function loadFeed() {
     const qs    = (qR.data   || []).map(r => ({ kind: 'question', ...r }))
     const grps  = (gR.data   || []).map(r => ({ kind: 'group', ...r }))
 
+    // Attach answers to each question
+    if (qs.length) {
+      const ids = qs.map(q => q.id)
+      const { data: ans } = await supabase
+        .from('answers')
+        .select('id, question_id, body, display_name, created_at')
+        .in('question_id', ids)
+        .order('created_at', { ascending: true })
+      const byQ = {}
+      ;(ans || []).forEach(a => {
+        byQ[a.question_id] = byQ[a.question_id] || []
+        byQ[a.question_id].push(a)
+      })
+      qs.forEach(q => { q.answers = byQ[q.id] || []; if (q._showReplies === undefined) q._showReplies = false })
+    }
+
     const merged = [...files, ...qs, ...grps]
     merged.sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
 
@@ -288,6 +316,16 @@ async function subscribeFeed(){
   ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_groups', filter: `course=eq.${code.value}` }, (payload) => {
     const r = payload.new
     feed.value = [{ kind: 'group', ...r }, ...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+  })
+  ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'answers' }, (payload) => {
+    const a = payload.new
+    const idx = feed.value.findIndex(x => x.kind === 'question' && x.id === a.question_id)
+    if (idx !== -1) {
+      const item = feed.value[idx]
+      item.answers = item.answers || []
+      item.answers.push(a)
+      feed.value = [...feed.value]
+    }
   })
   feedChannel = ch.subscribe()
 }
@@ -485,13 +523,23 @@ async function replyTo(q) {
   const text = (q._reply || '').trim()
   if (!text) return
   const u = currentUser.value
-  await supabase.from('answers').insert({
+  const name = (u?.user_metadata?.full_name || u?.email || 'Anonymous')
+  const { data, error } = await supabase.from('answers').insert({
     question_id: q.id,
     body: text,
-    display_name: (u?.user_metadata?.full_name || u?.email || 'Anonymous')
-  })
+    display_name: name
+  }).select('id, question_id, body, display_name, created_at').single()
+  if (!error) {
+    // attach to feed item if present
+    const idx = feed.value.findIndex(x => x.kind==='question' && x.id===q.id)
+    if (idx !== -1) {
+      feed.value[idx].answers = feed.value[idx].answers || []
+      feed.value[idx].answers.push(data)
+      feed.value = [...feed.value]
+    }
+  }
+  q._showReplies = true
   q._reply = ''
-  await loadQuestions()
 }
 
 async function loadQuestions() {
@@ -514,9 +562,12 @@ async function loadQuestions() {
       byQ[a.question_id] = byQ[a.question_id] || []
       byQ[a.question_id].push(a)
     })
-    rows.forEach(r => r.answers = byQ[r.id] || [])
+    rows.forEach(r => { r.answers = byQ[r.id] || []; if (r._showReplies === undefined) r._showReplies = false })
   }
   questions.value = rows
+}
+function toggleReplies(item){
+  item._showReplies = !item._showReplies
 }
 
 // ===== Groups =====
@@ -524,7 +575,7 @@ async function createGroup() {
   groupErr.value = ''
   const titleVal = groupTitle.value.trim()
   const placeVal = (groupWhere.value || '').trim() || null
-  const whenVal  = (groupWhen.value || '').trim() || null
+  const whenVal  = (groupDescription.value || '').trim() || null
   if (!titleVal) { groupErr.value = 'Please enter a group name.'; return }
   creatingGroup.value = true
   try {
@@ -546,7 +597,7 @@ async function createGroup() {
     // reset form
     groupTitle.value = ''
     groupWhere.value = ''
-    groupWhen.value = ''
+    groupDescription.value = ''
   } catch (e) {
     groupErr.value = String(e?.message || e)
     console.error('[study_groups.insert] error:', e)
@@ -642,6 +693,7 @@ watch(() => route.params.code, () => {
 .iconbtn { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; font-size:12px; text-decoration:none; }
 .iconbtn:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.24); }
 .iconbtn.ghost { background: transparent; border-color: rgba(255,255,255,0.14); }
+.iconbtn.ghost { white-space: nowrap; }
 .iconbtn.vote { padding:6px 8px; }
 .iconbtn.vote .tri { font-size:11px; opacity:.95; }
 .iconbtn.vote .count { font-variant-numeric: tabular-nums; min-width: 1.5ch; text-align:right; }
@@ -660,8 +712,13 @@ watch(() => route.params.code, () => {
 .composer-input { border-radius:14px; resize: vertical; }
 .composer-actions { display:flex; align-items:center; gap:10px; margin-top:6px; }
 
-.reply.under { margin: 6px 0 4px 44px; display:flex; gap:8px; }
-.reply.under .input { flex:1; }
+.reply.under { margin: 6px 0 4px 44px; display:flex; gap:8px; align-items:flex-start; }
+.reply.under textarea.input { flex: 1 1 0; width: auto !important; min-height: 64px; }
+.reply.under .button { flex: 0 0 auto; width: auto; min-width: 96px; white-space: nowrap; }
+
+
+.answers.under { margin: 6px 0 0 44px; display: grid; gap: 8px; }
+.answer-row { display:flex; gap:8px; align-items:flex-start; background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10); border-radius:8px; padding:8px; }
 
 </style>
 

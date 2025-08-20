@@ -7,6 +7,7 @@ import Profile from './pages/Profile.vue'
 import Friends from './pages/Friends.vue'
 import AddCourse from './pages/AddCourse.vue'
 import Settings from './pages/Settings.vue'
+import Messages from './pages/Messages.vue'
 
 const routes = [
   { path: '/', name: 'home', component: Home },
@@ -17,7 +18,8 @@ const routes = [
   { path: '/course/:code', name: 'course', component: () => import('./pages/CoursePage.vue'), props: true },
   { path: '/friends', name: 'friends', component: Friends },
   { path: '/add-course', name: 'add-course', component: AddCourse },
-  { path: '/settings', name: 'settings', component: Settings }
+  { path: '/settings', name: 'settings', component: Settings },
+  { path: '/messages', name: 'messages', component: Messages }
 ]
 
 const router = createRouter({

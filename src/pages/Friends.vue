@@ -78,27 +78,23 @@
       <h2>Your friends</h2>
       <div v-if="friends.length === 0" class="muted">No friends yet.</div>
       <div v-else class="list">
-        <div v-for="f in friends" :key="f.id" class="row item friend">
+        <div v-for="f in friends" :key="f.id" class="item friend">
           <div class="avatar">{{ (f.username || f.email || 'U').slice(0,1).toUpperCase() }}</div>
-          <div class="col info">
-            <div class="name strong">{{ f.username || f.email }}</div>
-            <div class="meta small muted">
-              <span v-if="f.university">{{ f.university }}</span>
-              <span v-if="f.university && f.study_line"> · </span>
-              <span v-if="f.study_line">{{ f.study_line }}</span>
-            </div>
-            <div class="courses" v-if="Array.isArray(f.courses) && f.courses.length">
-              <router-link
-                v-for="c in f.courses"
-                :key="c"
-                :to="`/course/${c}`"
-                class="badge"
-              >
-                {{ c }}
-              </router-link>
-            </div>
+          <div class="name strong">{{ f.username || f.email }}</div>
+          <div class="university small muted">{{ f.university || '—' }}</div>
+          <div class="study small muted">{{ f.study_line || '—' }}</div>
+          <div class="courses" v-if="Array.isArray(f.courses) && f.courses.length">
+            <router-link
+              v-for="c in f.courses"
+              :key="c"
+              :to="`/course/${c}`"
+              class="badge"
+            >
+              {{ c }}
+            </router-link>
           </div>
           <div class="actions">
+            <button class="button small" @click="$router.push({ path: '/messages', query: { to: f.id } })">Message</button>
             <button class="button small danger" @click="removeFriend(f)">Remove</button>
           </div>
         </div>
@@ -286,13 +282,30 @@ async function fetchRequests() {
 
 async function fetchFriends() {
   if (!me.value) return
-  const { data } = await supabase
-    .from('friends')
-    .select('friend_id')
-    .eq('user_id', me.value.id)
 
-  const ids = (data || []).map(r => r.friend_id)
-  friends.value = await lookupProfiles(ids)
+  // Read rows where I'm either user_id or friend_id (robust to one-sided inserts)
+  const { data, error } = await supabase
+    .from('friends')
+    .select('user_id, friend_id')
+    .or(`user_id.eq.${me.value.id},friend_id.eq.${me.value.id}`)
+
+  if (error) {
+    // Surface any RLS/permission issues briefly in the UI
+    notice.value = error.message
+    clearNoticeSoon()
+    return
+  }
+
+  // Convert each row to "the other person's id"
+  const ids = (data || [])
+    .map(r => (r.user_id === me.value.id ? r.friend_id : r.user_id))
+    .filter(Boolean)
+
+  // De-duplicate while preserving order
+  const seen = new Set()
+  const orderedUniqueIds = ids.filter(id => (seen.has(id) ? false : (seen.add(id), true)))
+
+  friends.value = await lookupProfiles(orderedUniqueIds)
 }
 
 async function lookupProfiles(ids) {
@@ -417,7 +430,7 @@ create policy "friend_invites: update" on public.friend_invites for update using
 </script>
 
 <style scoped>
-.friends-page { max-width: 980px; margin: 28px auto; padding: 0 12px; }
+.friends-page { max-width: 1200px; margin: 28px auto; padding: 0 12px; }
 .head h1 { margin: 0 0 4px; }
 .muted { opacity: .75; }
 .small { font-size: 12px; }
@@ -458,4 +471,37 @@ create policy "friend_invites: update" on public.friend_invites for update using
 /* Badges for courses already exist; keep them tidy */
 .courses { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .badge { background: rgba(255,255,255,0.07); padding: 3px 8px; border-radius: 999px; font-size: 12px; border: 1px solid rgba(255,255,255,0.12); }
+
+
+/* Friend row uses full width with columns: avatar | username | university | study_line | courses | actions */
+.item.friend {
+  display: grid;
+  grid-template-columns: 40px minmax(120px, 1fr) minmax(140px, 220px) minmax(160px, 260px) minmax(220px, 1.5fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+}
+
+.item.friend .name { font-size: 16px; }
+.item.friend .university, .item.friend .study { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item.friend .courses { display: flex; flex-wrap: wrap; gap: 6px; }
+.item.friend .actions { display: flex; justify-content: flex-end; }
+
+@media (max-width: 900px) {
+  .item.friend {
+    grid-template-columns: 36px 1fr auto;
+    grid-template-areas:
+      'avatar name actions'
+      'avatar university actions'
+      'avatar study actions'
+      'avatar courses courses';
+  }
+  .item.friend .avatar { grid-area: avatar; }
+  .item.friend .name { grid-area: name; }
+  .item.friend .university { grid-area: university; }
+  .item.friend .study { grid-area: study; }
+  .item.friend .courses { grid-area: courses; }
+  .item.friend .actions { grid-area: actions; }
+}
+
 </style>

@@ -19,6 +19,11 @@
     <div class="spacer"></div>
     <RouterLink class="nav-link" to="/add-course">Add Course</RouterLink>
     <RouterLink class="nav-link" to="/friends">Friends</RouterLink>
+    <RouterLink class="icon-link" to="/messages" aria-label="Messages">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M4 6.5C4 5.12 5.12 4 6.5 4h11c1.38 0 2.5 1.12 2.5 2.5v7c0 1.38-1.12 2.5-2.5 2.5H9.8l-3.9 3.12c-.74.59-1.9.07-1.9-.88V16H6.5C5.12 16 4 14.88 4 13.5v-7z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </RouterLink>
     <div class="profile-wrap">
       <button class="profile-btn" @click="menuOpen = !menuOpen" aria-label="Profile menu">
         <img :src="avatarSrc" alt="Profile" class="avatar" @error="onAvatarError" />
@@ -213,6 +218,7 @@ onMounted(async () => {
   display: flex;
   gap: 8px;
   overflow-x: auto;
+  overflow-y: visible;
   padding: 4px 6px;
   max-width: 60vw;
 }
@@ -236,7 +242,8 @@ onMounted(async () => {
 .course-tab .code:hover::after {
   content: attr(title);
   position: absolute;
-  bottom: 120%;   /* show ABOVE the tab */
+  top: 140%;
+  bottom: auto;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0,0,0,0.92);
@@ -249,4 +256,21 @@ onMounted(async () => {
   pointer-events: none; /* prevent flicker */
   box-shadow: 0 6px 18px rgba(0,0,0,0.35);
 }
+
+.icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+}
+.icon-link:hover { background: rgba(255,255,255,0.10); }
+.icon-link .icon { width: 18px; height: 18px; }
+
 </style>
+

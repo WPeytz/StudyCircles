@@ -32,12 +32,13 @@
       <h2>Your courses</h2>
       <div v-if="!myCourses.length" class="muted">No courses yet. Add some above.</div>
       <div v-else class="list">
-        <div v-for="c in myCourses" :key="c" class="row item">
-          <div class="code strong">{{ c }}</div>
-          <div class="title small muted" v-if="titles[c]">{{ titles[c] }}</div>
+        <div v-for="c in myCourses" :key="c" class="item">
+          <RouterLink :to="`/course/${c}`" class="course-link inline">
+            <span class="code strong">{{ c }}</span>
+            <span class="title small muted" v-if="titles[c]">{{ titles[c] }}</span>
+          </RouterLink>
           <div class="spacer"></div>
-          <RouterLink :to="`/course/${c}`" class="button">Open</RouterLink>
-          <button class="button danger" :disabled="saving" @click="removeCourse(c)">Remove</button>
+          <button class="remove-x" :disabled="saving" @click="removeCourse(c)">×</button>
         </div>
       </div>
     </section>
@@ -185,9 +186,29 @@ onMounted(async () => {
 .result-row .code { font-weight: 700; min-width: 80px; }
 .result-row .title { opacity: .95; }
 .list { display: grid; gap: 8px; margin-top: 8px; }
-.item { background: rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px; }
+.item { background: rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 12px; }
+.item .button { flex: 0 0 auto; }
 .spacer { flex: 1; }
 .hint { margin-top: 8px; color: #ffb3b3; }
 .strong { font-weight: 600; }
 .small { font-size: 12px; }
+.course-link { color: inherit; text-decoration: none; cursor: pointer; }
+.course-link.inline { display: inline-flex; gap: 12px; align-items: baseline; }
+.course-link .code { white-space: nowrap; }
+.course-link .title { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 70vw; }
+.button.danger { padding: 2px 8px; font-size: 12px; }
+.button.danger.slim { padding: 2px 8px; }
+.remove-x {
+  background: transparent;
+  border: none;
+  color: #ff6b6b;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 6px;
+}
+.remove-x:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 </style>
