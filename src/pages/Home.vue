@@ -1,163 +1,622 @@
 <template>
   <div class="container">
     <div class="card" style="display:grid; gap:12px;">
-      <h1>Welcome 👋</h1>
-      <p class="small">
-        Pick your university and courses to personalize your feed. This will be saved to your profile.
-      </p>
-
-      <div v-if="!user" class="card small">
-        You are not logged in. Go to <RouterLink to="/profile">Profile</RouterLink> to create an account (email/password), then come back here to save your university & courses.
-      </div>
-
-      <div class="grid">
-        <div class="card" style="display:grid; gap:10px;">
-          <h2>University</h2>
-          <select class="select" v-model="university">
-            <option disabled value="">Choose your university</option>
-            <option value="DTU">DTU (Technical University of Denmark)</option>
-          </select>
+      <div v-if="!user" class="auth-shell">
+        <h1>Welcome to StudyCircles👋</h1>
+        <p class="small">Create an account or log in to see your personalized course feed.</p>
+        <div class="card auth-card">
+          <input v-model="email" class="input" placeholder="Email" type="email" />
+          <input v-model="password" class="input" placeholder="Password" type="password" />
+          <div style="display:flex; gap:8px;">
+            <button class="button" @click="doSignUp" :disabled="authBusy">Sign up</button>
+            <button class="button" @click="doSignIn" :disabled="authBusy">Log in</button>
+          </div>
+          <div class="small" style="opacity:.85">
+            <a href="#" @click.prevent="doReset">Forgot your password?</a>
+          </div>
+          <div v-if="authErr" class="small">{{ authErr }}</div>
         </div>
+        <div class="small">
+          Already have an account? Enter your email &amp; password and press <strong>Log in</strong>.
+        </div>
+      </div>
+      <div v-else>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;">
+          <h1 style="margin:0; text-align:center;">StudyCircles feed</h1>
+          <div class="feed-filter" style="display:flex; gap:8px; margin:4px 0 8px; justify-content:center;">
+            <button class="badge" :class="{active: scope==='all'}" @click="scope='all'">All</button>
+            <button class="badge" :class="{active: scope==='files'}" @click="scope='files'">Files</button>
+            <button class="badge" :class="{active: scope==='questions'}" @click="scope='questions'">Posts</button>
+            <button class="badge" :class="{active: scope==='groups'}" @click="scope='groups'">Groups</button>
+          </div>
+        </div>
+        <p class="small" v-if="!courses.length">Add some courses to your profile to populate your feed.</p>
 
-        <div class="card" style="display:grid; gap:10px;">
-          <h2>Courses at {{ university || 'your university' }}</h2>
-          <div class="small">Search by code or title (e.g. 02465 or reinforcement). Click a result to add it.</div>
+        <div v-if="loading" class="small">Loading feed…</div>
+        <div v-else-if="!feed.length" class="small">No activity yet.</div>
 
-          <input
-            v-model="searchQuery"
-            class="input"
-            placeholder="Type at least 2 characters to search…"
-          />
-          <div v-if="loading" class="small">Searching…</div>
-
-          <div v-if="matches.length" class="card" style="max-height: 280px; overflow:auto; display:grid; gap:6px;">
-            <div
-              v-for="c in matches"
-              :key="c.code"
-              class="card"
-              style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
-              @click="addCourse(c)"
-            >
-              <div>
-                <div style="font-weight:600;">{{ c.code }}</div>
-                <div class="small">{{ c.title }}</div>
+        <div v-else class="card feed-grid">
+          <div v-for="item in filteredFeed" :key="item.kind + ':' + item.id" class="card feed-item" :class="courseClass(item.course)">
+            <div style="display:grid; gap:4px;">
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <span class="badge" :class="item.kind">{{ label(item.kind) }}</span>
+                <RouterLink class="badge" :class="'course-'+item.course" :to="{ path: '/course/'+item.course }">{{ item.course }}</RouterLink>
+                <span v-if="courseTitles[item.course]" class="course-title">— {{ courseTitles[item.course] }}</span>
               </div>
-              <div class="badge" v-if="selectedCourses.includes(c.code)">Added</div>
+              <div style="font-weight:600;">
+                <RouterLink v-if="item.kind!=='files'" :to="item.action.to">{{ item.title }}</RouterLink>
+                <a v-else :href="item.action.href" target="_blank" rel="noopener">{{ item.title }}</a>
+              </div>
+              <div class="small" style="opacity:0.8;">{{ pretty(item.created_at) }} — {{ item.by || 'Anonymous' }}</div>
+            </div>
+            <div class="feed-actions">
+              <div class="left-actions">
+                <a v-if="item.kind==='files' && item.action.href" :href="item.action.href" class="button" target="_blank" rel="noopener">Open</a>
+                <RouterLink v-else-if="item.kind==='files'" :to="{ path: '/course/'+item.course, query: { tab: 'files' } }" class="button">Open</RouterLink>
+                <button v-else-if="item.kind==='groups'" class="button" @click="openApply(item)">Apply</button>
+                <RouterLink v-else-if="item.kind!=='questions'" :to="{ path: '/course/'+item.course }" class="button">Open</RouterLink>
+              </div>
+              <div class="right-actions">
+                <button v-if="item.kind==='questions'" class="button subtle" @click="doUpvote(item)">▲ {{ item.upvotes || 0 }}</button>
+                <button v-if="item.kind==='questions'" class="button subtle" @click="toggleReplies(item)">
+                  💬 {{ expanded[item.id] ? 'Hide' : 'Comment' }}
+                </button>
+              </div>
+            </div>
+            <div v-if="item.kind==='questions' && expanded[item.id]" class="replies">
+              <div v-if="!replies[item.id]" class="small muted">Loading replies…</div>
+              <div v-else>
+                <div v-if="(replies[item.id]||[]).length === 0" class="small muted">No replies yet.</div>
+                <div v-else class="reply-list">
+                  <div v-for="r in replies[item.id]" :key="r.id" class="reply">
+                    <div class="small" style="opacity:.85">{{ new Date(r.created_at).toLocaleString() }} — {{ r.display_name || 'Anonymous' }}</div>
+                    <div>{{ r.body }}</div>
+                  </div>
+                </div>
+                <div class="reply-composer">
+                  <textarea class="input" rows="3" v-model="replyDrafts[item.id]" placeholder="Write a reply…"></textarea>
+                  <div style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button class="button" @click="sendReply(item)" :disabled="!(replyDrafts[item.id]||'').trim()">Send</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div v-else-if="searchQuery && searchQuery.length >= 2 && !loading" class="small">No matches.</div>
-
-          <h3 style="margin:8px 0 0;">Your selected courses</h3>
-          <div v-if="!selectedCourses.length" class="small">No courses selected yet.</div>
-          <div v-else style="display:flex; flex-wrap:wrap; gap:6px;">
-            <span
-              v-for="code in selectedCourses"
-              :key="code"
-              class="badge"
-              style="display:inline-flex; align-items:center; gap:6px;"
-            >
-              {{ code }}
-              <a href="#" class="small" @click.prevent="removeCourse(code)">×</a>
-            </span>
-          </div>
-
-          <button class="button" :disabled="!user" @click="saveProfile">Save to Profile</button>
-          <div v-if="notice" class="small">{{ notice }}</div>
         </div>
-      </div>
 
-      <div class="card">
-        <h2>Quick Links</h2>
-        <ol class="small">
-          <li>Upload exam sets & notes in <RouterLink to='/resources'>Resources</RouterLink>.</li>
-          <li>Create or join a <RouterLink to='/groups'>Study Group</RouterLink>.</li>
-          <li>Ask a question in <RouterLink to='/ask'>Ask</RouterLink>.</li>
-        </ol>
+        <div v-if="showApply" class="modal-backdrop" @click.self="closeApply">
+          <div class="modal">
+            <h3 style="margin:0 0 8px;">Apply to study group</h3>
+            <div class="small" style="opacity:0.8; margin-bottom:10px;">
+              Course <strong>#{{ applying?.course }}</strong>
+              <span v-if="applying?.title"> · {{ applying.title }}</span>
+            </div>
+
+            <label class="small" for="apply-message">Your message</label>
+            <textarea id="apply-message" v-model="applyMessage" class="input" rows="4" placeholder="Say hi, share availability, goals, and why you’d be a good fit…"></textarea>
+
+            <div class="small" v-if="applyErr" style="color:#f18; margin-top:6px;">{{ applyErr }}</div>
+            <div class="small" v-if="applySuccess" style="color:#7fda89; margin-top:6px;">Application sent!</div>
+
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+              <button class="button" @click="closeApply" :disabled="applyBusy">Cancel</button>
+              <button class="button" @click="submitApplication" :disabled="applyBusy || !applyMessage.trim()">
+                {{ applyBusy ? 'Sending…' : 'Send application' }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
-import NavStat from '../components/NavStat.vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { RouterLink } from 'vue-router'
 import { supabase } from '../services/supabase'
 
 const user = ref(null)
-const university = ref('')
-const selectedCourses = ref([])
-const notice = ref('')
-
-const searchQuery = ref('')
-const matches = ref([])
+const courses = ref([])          // array of course codes from profile
 const loading = ref(false)
+const feed = ref([])
+const scope = ref('all')
+const courseTitles = ref({})
+
+// Auth state
+const email = ref('')
+const password = ref('')
+const authErr = ref('')
+const authBusy = ref(false)
+
+const showApply = ref(false)
+const applying = ref(null) // the feed item for the group
+const applyMessage = ref('')
+const applyBusy = ref(false)
+const applyErr = ref('')
+const applySuccess = ref(false)
+
+// Replies / upvotes state
+const expanded = ref({})         // { [questionId]: true }
+const replies = ref({})          // { [questionId]: Array }
+const replyDrafts = ref({})      // { [questionId]: string }
+
+let authSub;
+
+function openApply(item) {
+  applying.value = item
+  applyMessage.value = ''
+  applyErr.value = ''
+  applySuccess.value = false
+  showApply.value = true
+}
+function closeApply() {
+  showApply.value = false
+}
+
+async function submitApplication() {
+  if (!user.value || !applying.value) return
+  applyErr.value = ''
+  applySuccess.value = false
+  applyBusy.value = true
+  try {
+    // group_applications: id, group_id, course, applicant_id, message, created_at, status, notify_user_id
+    const payload = {
+      group_id: applying.value.id,
+      course: applying.value.course,
+      applicant_id: user.value.id,
+      message: applyMessage.value.trim(),
+      status: 'pending',
+      notify_user_id: applying.value.by || null
+    }
+    const { error } = await supabase.from('group_applications').insert(payload)
+    if (error) throw error
+    applySuccess.value = true
+    // Optional: auto-close after a short delay
+    setTimeout(() => { showApply.value = false }, 900)
+  } catch (e) {
+    applyErr.value = e.message || 'Could not send application.'
+  } finally {
+    applyBusy.value = false
+  }
+}
+
+function themeIndexFor(course) {
+  if (!course) return 0
+  const i = courses.value ? courses.value.indexOf(course) : -1
+  if (i >= 0) return i % 6
+  // fallback hash if course not in profile list
+  let h = 0
+  for (let c of String(course)) h = (h * 31 + c.charCodeAt(0)) >>> 0
+  return h % 6
+}
+function courseClass(course) {
+  return 'course-theme-' + themeIndexFor(course)
+}
 
 onMounted(async () => {
-  if (!supabase) return
+  // Keep Home in sync with auth changes (logout elsewhere, token expiry, etc.)
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const u = session?.user || null
+    user.value = u
+    if (u) {
+      // Re-load profile + feed when logging in
+      loadProfileAndFeed()
+    } else {
+      // Immediately clear UI when logged out
+      loading.value = false
+      feed.value = []
+      courses.value = []
+    }
+  })
+  authSub = subscription
+
+  // Initial load on page open
+  await bootstrap()
+})
+
+onBeforeUnmount(() => {
+  authSub?.unsubscribe?.()
+})
+
+async function bootstrap() {
   const { data: { user: u } } = await supabase.auth.getUser()
   user.value = u
-  if (!u) return
-  // Load existing profile if present
+  if (u) {
+    await loadProfileAndFeed()
+  }
+}
+
+async function loadProfileAndFeed() {
+  // load profile courses
   const { data: profile } = await supabase.from('profiles')
-    .select('university, courses')
-    .eq('id', u.id)
+    .select('courses')
+    .eq('id', user.value.id)
     .single()
-  if (profile) {
-    university.value = profile.university || ''
-    selectedCourses.value = Array.isArray(profile.courses) ? profile.courses : []
-  }
-})
-
-function addCourse(c) {
-  const code = typeof c === 'string' ? c : c.code
-  if (!code) return
-  if (!selectedCourses.value.includes(code)) {
-    selectedCourses.value.push(code)
-  }
+  courses.value = Array.isArray(profile?.courses) ? profile.courses : []
+  await loadCourseTitles()
+  await loadFeed()
 }
 
-function removeCourse(code) {
-  selectedCourses.value = selectedCourses.value.filter(x => x !== code)
-}
-
-async function fetchMatches(q) {
-  matches.value = []
-  if (!supabase) return
-  if (!q || q.length < 2 || university.value !== 'DTU') return
-  loading.value = true
+async function loadCourseTitles() {
+  courseTitles.value = {}
+  if (!courses.value?.length) return
   const { data, error } = await supabase
     .from('courses')
-    .select('code,title')
-    .eq('university', 'DTU')
-    .or(`code.ilike.%${q}%,title.ilike.%${q}%`)
-    .limit(25)
-  loading.value = false
-  if (error) {
-    console.error(error)
-    return
+    .select('code, title')
+    .in('code', courses.value)
+  if (!error && Array.isArray(data)) {
+    const map = {}
+    for (const r of data) {
+      if (r?.code) map[r.code] = r.title || r.name || ''
+    }
+    courseTitles.value = map
   }
-  matches.value = data || []
 }
 
-watch(searchQuery, (q) => {
-  fetchMatches(q)
+async function loadFeed() {
+  feed.value = []
+  if (!courses.value.length) return
+  loading.value = true
+
+  // QUESTIONS
+  const { data: qs, error: qErr } = await supabase
+    .from('questions')
+    .select('id, body, display_name, course, created_at, upvotes')
+    .in('course', courses.value)
+    .order('created_at', { ascending: false })
+    .limit(200)
+
+  if (qErr) console.warn('[feed] questions error', qErr)
+
+  // FILES / RESOURCES (be flexible with columns)
+  const { data: rs, error: rErr } = await supabase
+    .from('resources')
+    .select('*')
+    .in('course', courses.value)
+    .order('created_at', { ascending: false })
+    .limit(200)
+
+  if (rErr) console.warn('[feed] resources error', rErr)
+
+  // STUDY GROUPS (be flexible with columns)
+  const { data: gs, error: gErr } = await supabase
+    .from('study_groups')
+    .select('*')
+    .in('course', courses.value)
+    .order('created_at', { ascending: false })
+    .limit(200)
+
+  if (gErr) console.warn('[feed] study_groups error', gErr)
+
+  const qItems = (qs || []).map(q => ({
+    kind: 'questions',
+    id: q.id,
+    title: q.body?.slice(0, 140) || '(no text)',
+    by: q.display_name,
+    course: q.course,
+    created_at: q.created_at,
+    upvotes: q.upvotes || 0,
+    action: { to: { path: '/course/'+q.course, query: { scroll: 'feed', focus: `question:${q.id}` } } }
+  }))
+
+  const rItems = (rs || []).map(r => {
+    const title = r.title || r.name || r.filename || r.file_name || '(file)'
+    const url = r.public_url || r.url || r.file_url || r.download_url || null
+    const created = r.created_at || r.inserted_at || r.uploaded_at || r.createdat
+    const by = r.uploader || r.uploaded_by || r.display_name || r.owner
+    return {
+      kind: 'files',
+      id: r.id,
+      title,
+      by,
+      course: r.course,
+      created_at: created,
+      action: url ? { href: url } : { to: { path: '/course/'+r.course, query: { tab: 'files' } } }
+    }
+  })
+
+  const gItems = (gs || []).map(g => {
+    const title = g.name || g.title || '(study group)'
+    const link = g.link || g.url || g.invite_url || null
+    const created = g.created_at || g.inserted_at || g.createdat
+    const by = g.created_by || g.owner || g.host || g.display_name
+    return {
+      kind: 'groups',
+      id: g.id,
+      title,
+      by,
+      course: g.course,
+      created_at: created,
+      action: link ? { href: link } : { to: { path: '/course/'+g.course, query: { tab: 'groups' } } }
+    }
+  })
+
+  feed.value = [...qItems, ...rItems, ...gItems]
+    .filter(it => it.course) // keep only items with a course code
+    .sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+    .slice(0, 200)
+
+  // Helpful visibility while debugging
+  if (rErr || gErr) {
+    console.warn('[feed] summary', { courses: courses.value, q: qItems.length, r: rItems.length, g: gItems.length })
+  }
+
+  loading.value = false
+}
+
+const filteredFeed = computed(() => {
+  if (scope.value === 'all') return feed.value
+  return feed.value.filter(f => f.kind === scope.value)
 })
 
-async function saveProfile() {
-  if (!supabase || !user.value) return
-  notice.value = ''
-  const payload = {
-    id: user.value.id,                 // profiles.id == auth user id
-    university: university.value || null,
-    courses: selectedCourses.value     // stored as JSONB array
+function label(kind) {
+  if (kind === 'files') return 'file'
+  if (kind === 'groups') return 'group'
+  return 'question'
+}
+
+function pretty(iso) {
+  try { return new Date(iso).toLocaleString() } catch { return iso }
+}
+
+async function doUpvote(item) {
+  try {
+    if (item.kind !== 'questions') return
+    const { data, error } = await supabase
+      .from('questions')
+      .update({ upvotes: (item.upvotes || 0) + 1 })
+      .eq('id', item.id)
+      .select('upvotes')
+      .single()
+    if (!error) item.upvotes = data?.upvotes ?? (item.upvotes || 0) + 1
+  } catch (e) { console.warn('upvote failed', e) }
+}
+
+async function toggleReplies(item) {
+  if (item.kind !== 'questions') return
+  expanded.value[item.id] = !expanded.value[item.id]
+
+  // If opening for the first time, load replies
+  if (expanded.value[item.id] && !replies.value[item.id]) {
+    try {
+      const { data, error } = await supabase
+        .from('answers')
+        .select('id, body, display_name, created_at')
+        .eq('question_id', item.id)
+        .order('created_at', { ascending: true })
+
+      if (!error) replies.value[item.id] = data || []
+    } catch (e) {
+      console.warn('load replies failed', e)
+    }
   }
-  const { error } = await supabase.from('profiles').upsert(payload)
-  if (error) {
-    console.error(error)
-    notice.value = `Could not save: ${error.message}`
-  } else {
-    notice.value = 'Saved!'
-    setTimeout(() => (notice.value = ''), 2000)
+
+  // Always ensure reply box is ready when expanded
+  if (expanded.value[item.id] && !replyDrafts.value[item.id]) {
+    replyDrafts.value[item.id] = ''
   }
 }
+
+function ensureReplyArea(item) {
+  if (item.kind !== 'questions') return
+  if (!expanded.value[item.id]) toggleReplies(item)
+  if (!replyDrafts.value[item.id]) replyDrafts.value[item.id] = ''
+}
+
+async function sendReply(item) {
+  if (item.kind !== 'questions') return
+  const text = (replyDrafts.value[item.id] || '').trim()
+  if (!text || !user.value) return
+  try {
+    const payload = { question_id: item.id, body: text, display_name: user.value.email || 'Me' }
+    const { data, error } = await supabase
+      .from('answers')
+      .insert(payload)
+      .select('id, body, display_name, created_at')
+      .single()
+    if (!error) {
+      replies.value[item.id] = (replies.value[item.id] || []).concat(data)
+      replyDrafts.value[item.id] = ''
+    }
+  } catch (e) { console.warn('send reply failed', e) }
+}
+
+// Auth handlers
+async function doSignUp() {
+  authErr.value = ''
+  authBusy.value = true
+  const { error } = await supabase.auth.signUp({ email: email.value, password: password.value })
+  authBusy.value = false
+  if (error) { authErr.value = error.message; return }
+  await bootstrap()
+}
+
+async function doSignIn() {
+  authErr.value = ''
+  authBusy.value = true
+  const { error } = await supabase.auth.signInWithPassword({ email: email.value, password: password.value })
+  authBusy.value = false
+  if (error) { authErr.value = error.message; return }
+  await bootstrap()
+}
+
+async function doReset() {
+  authErr.value = ''
+  if (!email.value) { authErr.value = 'Enter your email first.'; return }
+  const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
+    redirectTo: window.location.origin + '/profile'
+  })
+  if (error) authErr.value = error.message
+}
+
+async function doSignOut() {
+  await supabase.auth.signOut()
+  user.value = null
+  feed.value = []
+  courses.value = []
+}
 </script>
+
+<style scoped>
+.badge.active { background: rgba(255,255,255,0.15); }
+.badge.questions { background: rgba(0,120,255,0.2); }
+.badge.files { background: rgba(0,200,140,0.2); }
+.badge.groups { background: rgba(255,160,0,0.2); }
+
+/* Six accessible course themes (dark-friendly, readable) */
+.feed-item { padding: 12px; border-radius: 10px; border: 1px solid transparent; }
+.feed-item a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Updated course themes for better contrast */
+.course-theme-0 { background: #223053; border-color: #314471; color: #edf2ff; }
+.course-theme-1 { background: #2d4228; border-color: #3e5c38; color: #eefdea; }
+.course-theme-2 { background: #412b41; border-color: #5a3b5a; color: #fff2fd; }
+.course-theme-3 { background: #2b3446; border-color: #3b4a61; color: #eef4ff; }
+.course-theme-4 { background: #433229; border-color: #5b453a; color: #fff2ec; }
+.course-theme-5 { background: #274343; border-color: #3a5f5f; color: #ecfeff; }
+
+/* Ensure nested meta/badges remain legible on themed cards */
+.feed-item .small { opacity: 0.9; }
+.feed-item .badge { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28); color: inherit; }
+.feed-item .button { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.28); color: inherit; }
+.feed-item .button:hover { background: rgba(255,255,255,0.18); }
+
+.feed-item, .feed-item * { text-shadow: none; }
+
+/* Center the auth box vertically & horizontally when logged out */
+.auth-shell {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  text-align: center;
+  padding-top: 64px;
+}
+.auth-shell > .auth-card {
+  margin-inline: auto; /* ensure the form card is centered */
+  max-width: 800px;
+}
+
+.auth-card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  width: clamp(360px, 44vw, 620px);
+  padding: 18px;
+}
+.auth-card::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(84vmin, 760px);
+  height: min(84vmin, 760px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgba(255,255,255,0.08), rgba(255,255,255,0.025) 70%, transparent),
+    radial-gradient(70% 70% at 50% 30%, rgba(120,160,255,0.08), transparent 60%);
+  border: 1px solid rgba(255,255,255,0.07);
+  z-index: 0;
+  pointer-events: none;
+}
+.auth-card > * { position: relative; z-index: 1; }
+
+.input:focus,
+.button:focus {
+  outline: 2px solid rgba(140,180,255,0.8);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(140,180,255,0.25) inset;
+}
+/* Add breathing room above the action buttons row */
+.auth-card > div[style*="display:flex"] {
+  margin-top: 6px;
+}
+@media (max-width: 520px) {
+  .auth-card { width: 92vw; }
+  .auth-card::before { width: 92vmin; height: 92vmin; }
+}
+
+.auth-shell h1 {
+  margin: 0;
+}
+
+
+
+/* Feed filters: clearer active state and hover */
+.feed-filter .badge {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  transition: background .15s ease, border-color .15s ease, transform .1s ease;
+}
+.feed-filter .badge:hover { background: rgba(255,255,255,0.14); }
+.feed-filter .badge.active {
+  background: rgba(120,160,255,0.22);
+  border-color: rgba(140,180,255,0.55);
+}
+
+/* Feed grid spacing */
+.feed-grid {
+  display: grid;
+  gap: 14px;
+}
+
+/* Card depth & hover polish */
+.feed-item {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.03);
+  transition: transform .08s ease, box-shadow .18s ease, border-color .15s ease, background .15s ease;
+}
+.feed-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.12);
+}
+
+/* Feed card button enhancements */
+.feed-item .button {
+  padding-inline: 14px;
+  height: 34px;
+  border-radius: 9px;
+}
+.feed-item .button:focus-visible {
+  outline: 2px solid rgba(140,180,255,0.8);
+  outline-offset: 2px;
+}
+
+/* Metadata subtlety and title legibility */
+.feed-item .course-title { opacity: .92; filter: saturate(110%); }
+.feed-item .small { opacity: .85; }
+.feed-item a { text-decoration-thickness: 1.25px; }
+
+.feed-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+}
+.feed-actions .left-actions { display:flex; gap:8px; }
+.feed-actions .right-actions { margin-left:auto; display:flex; gap:8px; }
+.button.subtle { background: rgba(255,255,255,0.10); }
+
+.replies { margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.18); display:grid; gap:8px; }
+.reply-list { display:grid; gap:8px; }
+.reply { padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.10); }
+.reply-composer { display:grid; gap:8px; }
+.muted { opacity:.75; }
+
+</style>
+
+.feed-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+

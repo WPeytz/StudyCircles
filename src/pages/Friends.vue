@@ -79,10 +79,21 @@
       <div v-if="friends.length === 0" class="muted">No friends yet.</div>
       <div v-else class="list">
         <div v-for="f in friends" :key="f.id" class="item friend">
-          <div class="avatar">{{ (f.username || f.email || 'U').slice(0,1).toUpperCase() }}</div>
+          <div class="avatar">
+            <img v-if="f.avatar_src" :src="f.avatar_src" alt="avatar" />
+            <span v-else>{{ (f.username || f.email || 'U').slice(0,1).toUpperCase() }}</span>
+          </div>
           <div class="name strong">{{ f.username || f.email }}</div>
           <div class="university small muted">{{ f.university || '—' }}</div>
-          <div class="study small muted">{{ f.study_line || '—' }}</div>
+          <router-link
+            v-if="f.study_line"
+            class="study small muted"
+            :to="{ path: '/studyline', query: { value: encodeURIComponent(f.study_line) } }"
+            title="See all students on this study line"
+          >
+            {{ f.study_line }}
+          </router-link>
+          <div v-else class="study small muted">—</div>
           <div class="courses" v-if="Array.isArray(f.courses) && f.courses.length">
             <router-link
               v-for="c in f.courses"
@@ -283,46 +294,86 @@ async function fetchRequests() {
 async function fetchFriends() {
   if (!me.value) return
 
-  // Read rows where I'm either user_id or friend_id (robust to one-sided inserts)
-  const { data, error } = await supabase
-    .from('friends')
-    .select('user_id, friend_id')
-    .or(`user_id.eq.${me.value.id},friend_id.eq.${me.value.id}`)
+  try {
+    // 1) Primary: read rows where I'm either user_id or friend_id
+    const { data, error } = await supabase
+      .from('friends')
+      .select('user_id, friend_id')
+      .or(`user_id.eq.${me.value.id},friend_id.eq.${me.value.id}`)
 
-  if (error) {
-    // Surface any RLS/permission issues briefly in the UI
-    notice.value = error.message
+    if (error) {
+      // Surface RLS/permission issues briefly
+      notice.value = `friends SELECT: ${error.message}`
+      clearNoticeSoon()
+    }
+
+    let ids = []
+    if (Array.isArray(data) && data.length) {
+      ids = data
+        .map(r => (r.user_id === me.value.id ? r.friend_id : r.user_id))
+        .filter(Boolean)
+    }
+
+    // 2) Fallback: derive from accepted friend_requests
+    if (!ids.length) {
+      const { data: reqs, error: err2 } = await supabase
+        .from('friend_requests')
+        .select('sender_id, receiver_id, status')
+        .or(`sender_id.eq.${me.value.id},receiver_id.eq.${me.value.id}`)
+        .eq('status', 'accepted')
+
+      if (err2) {
+        notice.value = `friend_requests fallback: ${err2.message}`
+        clearNoticeSoon()
+      }
+
+      ids = (reqs || [])
+        .map(r => (r.sender_id === me.value.id ? r.receiver_id : r.sender_id))
+        .filter(Boolean)
+    }
+
+    // De-duplicate while preserving order
+    const seen = new Set()
+    const orderedUniqueIds = ids.filter(id => (seen.has(id) ? false : (seen.add(id), true)))
+
+    friends.value = await lookupProfiles(orderedUniqueIds)
+  } catch (e) {
+    console.error('fetchFriends failed', e)
+    notice.value = 'Could not load friends.'
     clearNoticeSoon()
-    return
   }
+}
 
-  // Convert each row to "the other person's id"
-  const ids = (data || [])
-    .map(r => (r.user_id === me.value.id ? r.friend_id : r.user_id))
-    .filter(Boolean)
-
-  // De-duplicate while preserving order
-  const seen = new Set()
-  const orderedUniqueIds = ids.filter(id => (seen.has(id) ? false : (seen.add(id), true)))
-
-  friends.value = await lookupProfiles(orderedUniqueIds)
+function resolveAvatar(url) {
+  if (!url) return null;
+  if (/^https?:\/\//i.test(url)) return url;
+  // Normalize possible leading folder
+  const key = url.replace(/^avatars\//, '');
+  const { data } = supabase.storage.from('avatars').getPublicUrl(key);
+  return data?.publicUrl || null;
 }
 
 async function lookupProfiles(ids) {
-  if (!ids.length) return []
+  if (!ids.length) return [];
   const { data: profs } = await supabase
     .from('profiles')
-    .select('id, username, email, university, study_line, courses')
-    .in('id', ids)
-  const byId = Object.fromEntries((profs || []).map(p => [p.id, p]))
+    .select('id, username, email, university, study_line, courses, avatar_url')
+    .in('id', ids);
+
+  const byId = Object.fromEntries((profs || []).map(p => [p.id, {
+    ...p,
+    avatar_src: resolveAvatar(p.avatar_url)
+  }]));
+
   return ids.map(id => ({
     id,
     username: byId[id]?.username || null,
     email: byId[id]?.email || null,
     university: byId[id]?.university || null,
     study_line: byId[id]?.study_line || null,
-    courses: Array.isArray(byId[id]?.courses) ? byId[id].courses : []
-  }))
+    courses: Array.isArray(byId[id]?.courses) ? byId[id].courses : [],
+    avatar_src: byId[id]?.avatar_src || null
+  }));
 }
 
 async function hydratePeople(rows, key) {
@@ -445,7 +496,14 @@ create policy "friend_invites: update" on public.friend_invites for update using
 .spacer { flex: 1; }
 .input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px; color: #fff; }
 .button { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; color: #fff; cursor: pointer; }
-.avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.18); display: grid; place-items: center; font-weight: 700; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  display: grid; place-items: center; font-weight: 700;
+  overflow: hidden;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar span { line-height: 32px; }
 .hint { margin-top: 6px; opacity: .9; }
 
 .courses { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }

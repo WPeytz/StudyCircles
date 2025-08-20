@@ -1,16 +1,14 @@
 <template>
   <div class="messages-page">
     <!-- render-hint --><span class="render-hint" aria-hidden="true" style="position:absolute;left:-9999px;">messages-mounted</span>
-    <div class="quick-compose">
-      <select v-model="quickTo" class="qc-select">
-        <option :value="null" disabled>Select friend…</option>
-        <option v-for="f in friends" :key="f.id" :value="f.id">{{ f.username || f.email }}</option>
-      </select>
-      <input class="qc-input" v-model="quickText" @keyup.enter="sendQuick" placeholder="New message…" />
-      <button class="qc-send" @click="sendQuick">Send</button>
-    </div>
     <aside class="friends-list">
       <div class="section-title">Direct Messages</div>
+      <div class="quick-dm">
+        <select v-model="quickTo" class="qc-select">
+          <option :value="null" disabled>Select friend…</option>
+          <option v-for="f in friends" :key="f.id" :value="f.id">{{ f.username || f.email }}</option>
+        </select>
+      </div>
       <div
         v-for="f in friends"
         :key="f.id"
@@ -31,7 +29,7 @@
         :class="{ active: activeCourse === c }"
         @click="openCourse(c)"
       >
-        <span class="name">#{{ c }}</span>
+        <span class="name">#{{ c }}<template v-if="courseTitles[c]"> — {{ courseTitles[c] }}</template></span>
       </div>
       <div v-if="!courseChats.length" class="empty-item">No course chats yet.</div>
     </aside>
@@ -40,7 +38,7 @@
       <div class="chat-head">
         <div class="pill" v-if="activeFriend">DM</div>
         <div class="pill" v-else>Course</div>
-        <div class="chat-title">{{ activeFriend ? (activeFriend.username || activeFriend.email) : `#${activeCourse}` }}</div>
+        <div class="chat-title">{{ activeFriend ? (activeFriend.username || activeFriend.email) : ('#' + activeCourse + (courseTitles[activeCourse] ? ' — ' + courseTitles[activeCourse] : '')) }}</div>
       </div>
 
       <div class="messages" ref="messagesEl">
@@ -57,6 +55,15 @@
           class="row"
           :class="m.sender_id === myId ? 'right' : 'left'"
         >
+          <RouterLink
+            v-if="m.sender_id !== myId"
+            class="avatar"
+            :to="{ path: '/profile', query: { user: m.sender_id } }"
+            :title="(profileFor(m.sender_id)?.username || profileFor(m.sender_id)?.email || 'View profile')"
+          >
+            <img v-if="avatarUrlFor(m.sender_id)" :src="avatarUrlFor(m.sender_id)" alt="avatar" />
+            <span v-else>{{ (profileFor(m.sender_id)?.username || profileFor(m.sender_id)?.email || 'U').slice(0,1).toUpperCase() }}</span>
+          </RouterLink>
           <div class="bubble">
             <div class="text">{{ m.content }}</div>
             <div class="meta">{{ new Date(m.created_at || Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) }}</div>
@@ -83,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase, currentUser } from '../services/supabase'
 import { useRouter } from 'vue-router'
@@ -101,6 +108,91 @@ const newMessage = ref('')
 const quickTo = ref(null)
 const quickText = ref('')
 const unread = ref({}) // { [friendId]: number }
+
+
+// Cache sender profiles for avatars/usernames
+const senderProfiles = ref({}) // { [userId]: { id, username, email, avatar_url, avatarPublicUrl } }
+
+function profileFor(id) {
+  return senderProfiles.value[id] || null
+}
+function avatarUrlFor(id) {
+  const p = profileFor(id)
+  return p?.avatarPublicUrl || null
+}
+
+async function loadSenderProfiles(msgs = []) {
+  const ids = Array.from(new Set((msgs || []).map(m => m.sender_id).filter(Boolean)))
+    .filter(id => !senderProfiles.value[id])
+  if (!ids.length) return
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, email, avatar_url')
+    .in('id', ids)
+  if (error) return
+  for (const r of (data || [])) {
+    let avatarPublicUrl = null
+    if (r.avatar_url) {
+      try {
+        if (typeof r.avatar_url === 'string' && /^https?:\/\//i.test(r.avatar_url)) {
+          avatarPublicUrl = r.avatar_url
+        } else {
+          // accept either `avatars/xyz.png` or just `xyz.png` as stored path
+          const rawPath = String(r.avatar_url)
+          const path = rawPath.startsWith('avatars/') ? rawPath.slice('avatars/'.length) : rawPath
+          const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path)
+          avatarPublicUrl = pub?.publicUrl || null
+        }
+      } catch {}
+    }
+    senderProfiles.value[r.id] = { ...r, avatarPublicUrl }
+  }
+}
+
+// Helper to ensure a friend by id is present in the friends list and senderProfiles cache
+async function ensureFriendById(id) {
+  if (!id) return null;
+  // already present?
+  const existing = friends.value.find(x => x.id === id)
+  if (existing) return existing
+  // fetch profile
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, university, study_line, email, avatar_url')
+    .eq('id', id)
+    .maybeSingle()
+  if (error || !data) return null
+  // push into friends list as an ad‑hoc entry so the DM UI can open
+  friends.value = [...friends.value, data]
+  // also warm avatar cache
+  senderProfiles.value[id] = {
+    id: data.id,
+    username: data.username,
+    email: data.email,
+    avatar_url: data.avatar_url,
+    avatarPublicUrl: (function () {
+      if (!data.avatar_url) return null
+      if (/^https?:\/\//i.test(data.avatar_url)) return data.avatar_url
+      const rawPath = String(data.avatar_url)
+      const path = rawPath.startsWith('avatars/') ? rawPath.slice('avatars/'.length) : rawPath
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path)
+      return pub?.publicUrl || null
+    })()
+  }
+  return data
+}
+
+// react to `?to=<friendId>` even if friends load slightly later or list is empty
+const toParam = computed(() => (route.query?.to ? String(route.query.to) : null))
+watch([toParam, friends], async ([to, list]) => {
+  if (!to) return
+  // If friend list hasn't loaded the target yet, fetch it so we can open the chat
+  let f = (Array.isArray(list) ? list : []).find(x => x.id === to)
+  if (!f) {
+    f = await ensureFriendById(to)
+  }
+  if (f) openChat(f)
+}, { immediate: true })
 
 // local last seen map stored in localStorage to compute unread counts client-side
 const LAST_SEEN_KEY = 'dm_last_seen'
@@ -146,25 +238,101 @@ supabase.auth.onAuthStateChange((_e, sess) => {
 })
 
 async function loadFriends() {
-  if (!myId.value) { friends.value = []; return }
-  const { data: rels, error: rerr } = await supabase
-    .from('friends')
-    .select('requester_id, addressee_id, status')
-    .or(`requester_id.eq.${myId.value},addressee_id.eq.${myId.value}`)
-    .eq('status', 'accepted')
-  if (rerr) { console.warn('friends err', rerr); friends.value = []; return }
-  const ids = [...new Set((rels || []).map(r => r.requester_id === myId.value ? r.addressee_id : r.requester_id))]
-  if (!ids.length) { friends.value = []; return }
-  const { data: profs, error: perr } = await supabase
-    .from('profiles')
-    .select('id, username, university, study_line')
-    .in('id', ids)
-  if (perr) { console.warn('profiles err', perr); friends.value = []; return }
-  friends.value = profs || []
+  friends.value = []
+  if (!myId.value) return
+
+  const idSet = new Set()
+
+  // Try 1: a mutual-rows table with requester/addressee
+  try {
+    const { data: rels, error } = await supabase
+      .from('friends')
+      .select('requester_id, addressee_id, status')
+      .or(`requester_id.eq.${myId.value},addressee_id.eq.${myId.value}`)
+      .eq('status', 'accepted')
+
+    if (!error && Array.isArray(rels)) {
+      for (const r of rels) idSet.add(r.requester_id === myId.value ? r.addressee_id : r.requester_id)
+    }
+  } catch (e) {
+    console.warn('[Friends] friends(requester/addressee) not available:', e?.message || e)
+  }
+
+  // Try 2: a simple edge table (user_id, friend_id)
+  if (!idSet.size) {
+    try {
+      const { data: edges, error } = await supabase
+        .from('friends')
+        .select('user_id, friend_id')
+        .or(`user_id.eq.${myId.value},friend_id.eq.${myId.value}`)
+
+      if (!error && Array.isArray(edges)) {
+        for (const r of edges) idSet.add(r.user_id === myId.value ? r.friend_id : r.user_id)
+      }
+    } catch (e) {
+      console.warn('[Friends] friends(user_id/friend_id) not available:', e?.message || e)
+    }
+  }
+
+  // Try 3: a table named `friendships` (user_id, friend_id)
+  if (!idSet.size) {
+    try {
+      const { data: edges, error } = await supabase
+        .from('friendships')
+        .select('user_id, friend_id, status')
+        .or(`user_id.eq.${myId.value},friend_id.eq.${myId.value}`)
+        .in('status', ['accepted', 'mutual'])
+
+      if (!error && Array.isArray(edges)) {
+        for (const r of edges) idSet.add(r.user_id === myId.value ? r.friend_id : r.user_id)
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Try 4: fallback to friend_requests where status='accepted'
+  if (!idSet.size) {
+    try {
+      const { data: reqs, error } = await supabase
+        .from('friend_requests')
+        .select('requester_id, addressee_id, status')
+        .or(`requester_id.eq.${myId.value},addressee_id.eq.${myId.value}`)
+        .eq('status', 'accepted')
+
+      if (!error && Array.isArray(reqs)) {
+        for (const r of reqs) idSet.add(r.requester_id === myId.value ? r.addressee_id : r.requester_id)
+      }
+    } catch (e) {
+      console.warn('[Friends] friend_requests fallback failed:', e?.message || e)
+    }
+  }
+
+  if (!idSet.size) { friends.value = []; return }
+
+  // Load the public profile rows for the resolved ids
+  try {
+    const ids = Array.from(idSet)
+    const { data: profs, error } = await supabase
+      .from('profiles')
+      .select('id, username, university, study_line, email')
+      .in('id', ids)
+
+    if (error) {
+      console.warn('[Friends] profiles error:', error)
+      friends.value = []
+    } else {
+      friends.value = profs || []
+    }
+  } catch (e) {
+    console.warn('[Friends] profiles query threw:', e)
+    friends.value = []
+  }
 }
 
 const courseChats = ref([]) // list of course codes the user is in
 const activeCourse = ref('') // current course code if in course chat mode
+const courseTitles = ref({})
 
 function coerceCourses(val) {
   if (!val) return []
@@ -185,6 +353,18 @@ function coerceCourses(val) {
   return []
 }
 
+async function fetchCourseTitles(codes = []) {
+  if (!codes.length) { courseTitles.value = {}; return }
+  const { data, error } = await supabase
+    .from('courses')
+    .select('code,title')
+    .in('code', codes)
+  if (error) { console.warn('fetchCourseTitles error', error); return }
+  const map = {}
+  for (const r of data || []) map[r.code] = r.title
+  courseTitles.value = map
+}
+
 async function loadCourseChats() {
   if (!myId.value) { courseChats.value = []; return }
   const { data, error } = await supabase
@@ -198,22 +378,27 @@ async function loadCourseChats() {
     return
   }
   courseChats.value = coerceCourses(data?.courses)
+  await fetchCourseTitles(courseChats.value)
 }
 
 let channel = null
 async function openChat(friend) {
   if (!myId.value) return
-  activeFriend.value = friend
+  // allow passing a string id
+  const f = typeof friend === 'string' ? (friends.value.find(x => x.id === friend) || await ensureFriendById(friend)) : friend
+  if (!f) return
+  activeFriend.value = f
   activeCourse.value = ''
   const { data } = await supabase
     .from('messages')
     .select('*')
-    .or(`and(sender_id.eq.${myId.value},receiver_id.eq.${friend.id}),and(sender_id.eq.${friend.id},receiver_id.eq.${myId.value})`)
+    .or(`and(sender_id.eq.${myId.value},receiver_id.eq.${f.id}),and(sender_id.eq.${f.id},receiver_id.eq.${myId.value})`)
     .order('created_at', { ascending: true })
   messages.value = data || []
+  await loadSenderProfiles(messages.value)
   scrollToBottom()
 
-  markSeen(friend.id)
+  markSeen(f.id)
   await refreshUnread()
 
   if (channel) supabase.removeChannel(channel)
@@ -221,8 +406,9 @@ async function openChat(friend) {
     .channel('messages')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
       const m = payload.new
-      if ((m.sender_id === myId.value && m.receiver_id === friend.id) || (m.receiver_id === myId.value && m.sender_id === friend.id)) {
+      if ((m.sender_id === myId.value && m.receiver_id === f.id) || (m.receiver_id === myId.value && m.sender_id === f.id)) {
         messages.value.push(m)
+        loadSenderProfiles([m])
         scrollToBottom()
       }
     })
@@ -241,6 +427,7 @@ async function openCourse(code) {
     .eq('course', code)
     .order('created_at', { ascending: true })
   messages.value = data || []
+  await loadSenderProfiles(messages.value)
   scrollToBottom()
 
   if (channel) supabase.removeChannel(channel)
@@ -249,6 +436,7 @@ async function openCourse(code) {
     .channel(`course-${code}`)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'course_messages', filter: `course=eq.${code}` }, payload => {
       messages.value.push(payload.new)
+      loadSenderProfiles([payload.new])
       scrollToBottom()
     })
     .subscribe()
@@ -258,22 +446,33 @@ async function sendMessage() {
   if (!myId.value) { router.push('/profile'); return }
   const text = (newMessage.value || '').trim()
   if (!text) return
-  if (activeCourse.value) {
-    await supabase.from('course_messages').insert({
-      course: activeCourse.value,
-      sender_id: myId.value,
-      content: text
-    })
-  } else if (activeFriend.value) {
-    await supabase.from('messages').insert({
-      sender_id: myId.value,
-      receiver_id: activeFriend.value.id,
-      content: text
-    })
-  } else {
-    return
+  try {
+    if (activeCourse.value) {
+      const { data, error } = await supabase
+        .from('course_messages')
+        .insert({ course: activeCourse.value, sender_id: myId.value, content: text })
+        .select('*')
+        .single()
+      if (error) throw error
+      messages.value.push(data)
+      scrollToBottom()
+    } else if (activeFriend.value) {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert({ sender_id: myId.value, receiver_id: activeFriend.value.id, content: text })
+        .select('*')
+        .single()
+      if (error) throw error
+      messages.value.push(data)
+      loadSenderProfiles([data])
+      scrollToBottom()
+    } else {
+      return
+    }
+    newMessage.value = ''
+  } catch (e) {
+    console.warn('sendMessage failed', e?.message || e)
   }
-  newMessage.value = ''
 }
 
 function markSeen(friendId) {
@@ -298,7 +497,7 @@ async function refreshUnread() {
 
 async function sendQuick() {
   if (!myId.value) { router.push('/profile'); return }
-  const toId = quickTo.value || (friends.value[0] && friends.value[0].id)
+  const toId = quickTo.value || (friends.value[0] && friends.value[0].id) || (route.query.to && String(route.query.to))
   if (!toId || !quickText.value.trim()) return
   await supabase.from('messages').insert({ sender_id: myId.value, receiver_id: toId, content: quickText.value })
   quickText.value = ''
@@ -310,7 +509,7 @@ function startGlobalSub() {
   if (globalChannel) supabase.removeChannel(globalChannel)
   globalChannel = supabase
     .channel('messages-global')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${myId.value}` }, payload => {
       const m = payload.new
       if (m.receiver_id === myId.value) {
         // if it's not the currently open chat, bump unread
@@ -336,8 +535,8 @@ onMounted(async () => {
   if (!quickTo.value && friends.value.length) quickTo.value = friends.value[0].id
   startGlobalSub()
   const to = route.query.to
-  if (to && friends.value.length) {
-    const f = friends.value.find(x => x.id === to)
+  if (to) {
+    const f = friends.value.find(x => x.id === to) || await ensureFriendById(String(to))
     if (f) openChat(f)
   }
   loading.value = false
@@ -346,10 +545,14 @@ onMounted(async () => {
 
 <style scoped>
 .messages-page { display:flex; min-height:calc(100vh - 80px); background: transparent; }
-.quick-compose { position: sticky; top: 0; z-index: 2; display:flex; gap:8px; padding:10px; border-bottom:1px solid #333; align-items:center; background: rgba(16,17,24,0.8); backdrop-filter: blur(6px); }
 .qc-select { min-width: 180px; background:#1e1f27; color:#e6e9f0; border:1px solid #323542; border-radius:8px; padding:6px 8px; }
 .qc-input { flex:1; background:#1e1f27; color:#e6e9f0; border:1px solid #323542; border-radius:8px; padding:8px 10px; }
 .qc-send { background:#3d6df3; border:none; color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; }
+
+.quick-dm { display:flex; flex-direction:column; gap:6px; margin:6px 4px 10px; }
+.quick-dm .qc-select,
+.quick-dm .qc-input { width:100%; background:#1e1f27; color:#e6e9f0; border:1px solid #323542; border-radius:8px; padding:8px 10px; }
+.quick-dm .qc-send { align-self:flex-end; background:#3d6df3; border:none; color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; }
 
 .friends-list { width: 280px; border-right:1px solid #2b2e3a; padding:8px; overflow-y:auto; background: rgba(255,255,255,0.02); }
 .section-title { font-size:12px; text-transform:uppercase; letter-spacing:.08em; opacity:.7; margin:6px 4px; }
@@ -370,6 +573,8 @@ onMounted(async () => {
 .row.right { justify-content:flex-end; }
 .bubble { max-width: 70%; background:#232633; border:1px solid #2f3444; padding:10px 12px; border-radius:12px; line-height:1.4; color:#e7e9f3; }
 .row.right .bubble { background:#2b3566; border-color:#3a4aa3; }
+.row.left .bubble { margin-left: 6px; }
+.row.right .bubble { margin-right: 6px; }
 .bubble .meta { margin-top:6px; font-size:11px; opacity:.65; }
 .empty-thread { opacity:.7; font-size:14px; text-align:center; margin-top:18px; }
 
@@ -379,4 +584,20 @@ onMounted(async () => {
 
 .chat.empty { display:grid; place-items:center; color:#aab; }
 .empty-state { opacity:.8; }
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  text-decoration: none;
+  color: #e7e9f3;
+  flex: 0 0 auto;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 </style>

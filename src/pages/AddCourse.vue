@@ -49,6 +49,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { supabase, currentUser } from '../services/supabase'
+import { watch } from 'vue'
 
 const me = currentUser
 
@@ -161,9 +162,20 @@ async function removeCourse(code) {
   }
 }
 
+// ...
+
 onMounted(async () => {
   await hydrateMyCourses()
   if (!shortQuery.value && q.value) { doSearch() }
+})
+
+// 👇 Watch for login changes
+watch(me, async (val) => {
+  if (val) {
+    await hydrateMyCourses()
+  } else {
+    myCourses.value = []
+  }
 })
 </script>
 

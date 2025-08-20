@@ -54,31 +54,6 @@
 
     <!-- Main content when logged in -->
     <div v-else class="grid main-grid">
-      <!-- Basics -->
-      <div class="card form-card">
-        <div class="section-head">
-          <h2>Basics</h2>
-          <span class="muted">Stats: {{ points }} points</span>
-        </div>
-        <div class="field">
-          <label>Username</label>
-          <input class="input" placeholder="Choose a public name" v-model="username" />
-        </div>
-        <div class="field">
-          <label>University</label>
-          <input class="input" placeholder="e.g. DTU" v-model="uni" />
-        </div>
-        <div class="field">
-          <label>Study line</label>
-          <input class="input" placeholder="e.g. AI and Data" v-model="studyLine" />
-        </div>
-        <div class="actions">
-          <button class="button primary" :disabled="isSaving" @click="saveBasics">
-            {{ isSaving ? 'Saving…' : 'Save Basics' }}
-          </button>
-          <span v-if="notice" class="notice">{{ notice }}</span>
-        </div>
-      </div>
 
       <!-- Snapshot -->
       <div class="card snapshot">

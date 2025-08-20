@@ -35,13 +35,6 @@
         </div>
       </div>
 
-      <!-- Filters -->
-      <div class="chips" style="margin:8px 0 6px;">
-        <button class="chip" :class="{active: isKindOn('file')}" @click="toggleKind('file')">Files</button>
-        <button class="chip" :class="{active: isKindOn('question')}" @click="toggleKind('question')">Questions</button>
-        <button class="chip" :class="{active: isKindOn('group')}" @click="toggleKind('group')">Groups</button>
-      </div>
-
       <div v-if="!filteredFeed.length" class="muted">No activity yet.</div>
       <div v-else class="feed-list">
         <div v-for="item in filteredFeed" :key="item.kind + ':' + item.id">
@@ -58,7 +51,6 @@
                 <template v-else>
                   {{ item.title }}
                 </template>
-                <span v-if="item.pinned" class="pin-badge">📌 pinned</span>
               </div>
               <div class="small muted">
                 {{ prettyDate(item.created_at) }}
@@ -72,7 +64,6 @@
                 <span class="tri">▲</span>
                 <span class="count">{{ item.upvotes ?? 0 }}</span>
               </button>
-              <button class="iconbtn pin" :class="{active: !!item.pinned}" @click="togglePin(item)" :title="item.pinned ? 'Unpin' : 'Pin'">📌</button>
               <template v-if="item.kind==='file'">
                 <a class="iconbtn ghost" :href="item.public_url" target="_blank" rel="noopener" title="Open file">Open</a>
               </template>
@@ -234,11 +225,11 @@ const filteredFeed = computed(() => feed.value.filter(i => feedKinds.value.has(i
 
 function loadMore(){ feedLimit.value += FEED_PAGE; loadFeed() }
 
-// NOTE: This feed expects integer column `upvotes` default 0 and boolean column `pinned` default false
+// NOTE: This feed expects integer column `upvotes` default 0
 // in tables: resources, questions, study_groups. Example SQL to add:
-// alter table public.resources add column if not exists upvotes int default 0, add column if not exists pinned boolean default false;
-// alter table public.questions add column if not exists upvotes int default 0, add column if not exists pinned boolean default false;
-// alter table public.study_groups add column if not exists upvotes int default 0, add column if not exists pinned boolean default false;
+// alter table public.resources add column if not exists upvotes int default 0;
+// alter table public.questions add column if not exists upvotes int default 0;
+// alter table public.study_groups add column if not exists upvotes int default 0;
 
 async function loadFeed() {
   loadingFeed.value = true
@@ -246,17 +237,17 @@ async function loadFeed() {
     const lim = feedLimit.value + 1
     const [resR, qR, gR] = await Promise.all([
       supabase.from('resources')
-        .select('id, title, type, public_url, created_at, course, upvotes, pinned')
+        .select('id, title, type, public_url, created_at, course, upvotes')
         .eq('course', code.value)
         .order('created_at', { ascending: false })
         .limit(lim),
       supabase.from('questions')
-        .select('id, body, display_name, created_at, course, upvotes, pinned')
+        .select('id, body, display_name, created_at, course, upvotes')
         .eq('course', code.value)
         .order('created_at', { ascending: false })
         .limit(lim),
       supabase.from('study_groups')
-        .select('id, title, place, time, created_at, course, upvotes, pinned')
+        .select('id, title, place, description, created_at, course, upvotes')
         .eq('course', code.value)
         .order('created_at', { ascending: false })
         .limit(lim)
@@ -283,7 +274,7 @@ async function loadFeed() {
     }
 
     const merged = [...files, ...qs, ...grps]
-    merged.sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+    merged.sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)))
 
     hasMore.value = merged.length > feedLimit.value
     feed.value = hasMore.value ? merged.slice(0, feedLimit.value) : merged
@@ -307,15 +298,15 @@ async function subscribeFeed(){
   const ch = supabase.channel(`course-feed-${code.value}`)
   ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'resources', filter: `course=eq.${code.value}` }, (payload) => {
     const r = payload.new
-    feed.value = [{ kind: 'file', ...r }, ...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+    feed.value = [{ kind: 'file', ...r }, ...feed.value].sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)))
   })
   ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'questions', filter: `course=eq.${code.value}` }, (payload) => {
     const r = payload.new
-    feed.value = [{ kind: 'question', ...r }, ...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+    feed.value = [{ kind: 'question', ...r }, ...feed.value].sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)))
   })
   ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_groups', filter: `course=eq.${code.value}` }, (payload) => {
     const r = payload.new
-    feed.value = [{ kind: 'group', ...r }, ...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
+    feed.value = [{ kind: 'group', ...r }, ...feed.value].sort((a,b) => (new Date(b.created_at) - new Date(a.created_at)))
   })
   ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'answers' }, (payload) => {
     const a = payload.new
@@ -406,25 +397,6 @@ async function toggleVote(item){
   }
 }
 
-async function togglePin(item){
-  const table = tableFor(item.kind)
-  if (!table) return
-  const next = !item.pinned
-  // optimistic
-  item.pinned = next
-  try {
-    const { error } = await supabase
-      .from(table)
-      .update({ pinned: next })
-      .eq('id', item.id)
-    if (error) throw error
-    // resort feed to put pinned on top
-    feed.value = [...feed.value].sort((a,b) => (Number(!!b.pinned) - Number(!!a.pinned)) || (new Date(b.created_at) - new Date(a.created_at)))
-  } catch (e) {
-    item.pinned = !next
-    console.error('[pin] failed', e)
-  }
-}
 
 // ===== Files =====
 function onPickFile(e) { upFile.value = e.target.files?.[0] || null }
@@ -581,8 +553,8 @@ async function createGroup() {
   try {
     const { data, error } = await supabase
       .from('study_groups')
-      .insert({ course: code.value, title: titleVal, place: placeVal, time: whenVal })
-      .select('id, title, place, time, created_at')
+      .insert({ course: code.value, title: titleVal, place: placeVal, groupDescription: whenVal })
+      .select('id, title, place, groupDescription, created_at')
       .single()
 
     if (error) { groupErr.value = error.message; return }
@@ -682,7 +654,6 @@ watch(() => route.params.code, () => {
 .actions { display: flex; gap: 6px; align-items: center; }
 .button.icon { padding: 4px 8px; font-size: 12px; }
 .button.icon.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
-.pin-badge { margin-left: 8px; font-size: 12px; opacity: .85; }
 
 .feed-row { position: relative; transition: background .15s, border-color .15s; }
 .feed-row:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
@@ -697,7 +668,6 @@ watch(() => route.params.code, () => {
 .iconbtn.vote { padding:6px 8px; }
 .iconbtn.vote .tri { font-size:11px; opacity:.95; }
 .iconbtn.vote .count { font-variant-numeric: tabular-nums; min-width: 1.5ch; text-align:right; }
-.iconbtn.pin.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.28); }
 
 /* badge refinement */
 .badge { text-transform: none; font-weight: 600; }
