@@ -57,11 +57,22 @@
                 <RouterLink v-else-if="item.kind!=='questions'" :to="{ path: '/course/'+item.course }" class="button">Open</RouterLink>
               </div>
               <div class="right-actions">
-                <button v-if="item.kind==='questions'" class="button subtle" @click="doUpvote(item)">▲ {{ item.upvotes || 0 }}</button>
-                <button v-if="item.kind==='questions'" class="button subtle" @click="toggleReplies(item)">
-                  💬 {{ expanded[item.id] ? 'Hide' : 'Comment' }}
+                <button
+                  v-if="item.kind==='questions'"
+                  class="button subtle"
+                  :class="{ active: voted[item.id] }"
+                  :disabled="voteBusy[item.id] || voted[item.id] || !user"
+                  @click="doUpvote(item)"
+                >
+                  ▲ {{ item.upvotes || 0 }}
+                </button>
+                <button v-if="item.kind==='questions'" class="button subtle icon-btn" @click="toggleReplies(item)">
+                  <span class="icon">💬</span><span class="count">{{ replyCounts[item.id] ?? 0 }}</span>
                 </button>
               </div>
+            </div>
+            <div v-if="voteErr" class="small" style="color:#f79; opacity:.9; margin-top:4px;">
+              {{ voteErr }}
             </div>
             <div v-if="item.kind==='questions' && expanded[item.id]" class="replies">
               <div v-if="!replies[item.id]" class="small muted">Loading replies…</div>
@@ -113,8 +124,10 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { supabase } from '../services/supabase'
+
+const router = useRouter()
 
 const user = ref(null)
 const courses = ref([])          // array of course codes from profile
@@ -140,6 +153,10 @@ const applySuccess = ref(false)
 const expanded = ref({})         // { [questionId]: true }
 const replies = ref({})          // { [questionId]: Array }
 const replyDrafts = ref({})      // { [questionId]: string }
+const replyCounts = ref({}) // { [questionId]: number }
+const voted = ref({})       // { [questionId]: true } – prevents double taps
+const voteBusy = ref({})    // { [questionId]: true }
+const voteErr = ref('')     // last error message
 
 let authSub;
 
@@ -232,7 +249,7 @@ async function loadProfileAndFeed() {
   const { data: profile } = await supabase.from('profiles')
     .select('courses')
     .eq('id', user.value.id)
-    .single()
+    .maybeSingle()
   courses.value = Array.isArray(profile?.courses) ? profile.courses : []
   await loadCourseTitles()
   await loadFeed()
@@ -269,6 +286,23 @@ async function loadFeed() {
 
   if (qErr) console.warn('[feed] questions error', qErr)
 
+  // Preload reply counts for questions (fetch IDs and count in JS for broad compatibility)
+  let countMap = {}
+  const qIds = (qs || []).map(q => q.id).filter(Boolean)
+  if (qIds.length) {
+    const { data: ans, error: aErr } = await supabase
+      .from('answers')
+      .select('question_id')
+      .in('question_id', qIds)
+    if (!aErr && Array.isArray(ans)) {
+      for (const row of ans) {
+        if (!row?.question_id) continue
+        countMap[row.question_id] = (countMap[row.question_id] || 0) + 1
+      }
+    }
+  }
+  replyCounts.value = countMap
+
   // FILES / RESOURCES (be flexible with columns)
   const { data: rs, error: rErr } = await supabase
     .from('resources')
@@ -288,6 +322,13 @@ async function loadFeed() {
     .limit(200)
 
   if (gErr) console.warn('[feed] study_groups error', gErr)
+
+  // Catch-all warning for single-object coercion errors
+  if (qErr?.message?.includes('coerce the result to a single JSON object') ||
+      rErr?.message?.includes('coerce the result to a single JSON object') ||
+      gErr?.message?.includes('coerce the result to a single JSON object')) {
+    console.warn('[feed] note: single-object coercion error detected', { qErr, rErr, gErr })
+  }
 
   const qItems = (qs || []).map(q => ({
     kind: 'questions',
@@ -363,14 +404,35 @@ function pretty(iso) {
 async function doUpvote(item) {
   try {
     if (item.kind !== 'questions') return
+    if (!user.value) { authErr.value = 'Please log in to upvote.'; return }
+    if (voted.value[item.id] || voteBusy.value[item.id]) return
+
+    // optimistic UI
+    voteErr.value = ''
+    voteBusy.value = { ...voteBusy.value, [item.id]: true }
+    const prev = item.upvotes || 0
+    item.upvotes = prev + 1
+
     const { data, error } = await supabase
       .from('questions')
-      .update({ upvotes: (item.upvotes || 0) + 1 })
+      .update({ upvotes: prev + 1 })
       .eq('id', item.id)
       .select('upvotes')
-      .single()
-    if (!error) item.upvotes = data?.upvotes ?? (item.upvotes || 0) + 1
-  } catch (e) { console.warn('upvote failed', e) }
+      .maybeSingle()
+
+    if (error) throw error
+
+    // success → lock this question to 1 vote locally
+    voted.value = { ...voted.value, [item.id]: true }
+    item.upvotes = data?.upvotes ?? (prev + 1)
+  } catch (e) {
+    // revert optimistic change
+    if (typeof item.upvotes === 'number') item.upvotes = Math.max(0, (item.upvotes || 1) - 1)
+    voteErr.value = e?.message || 'Could not upvote. Your permissions may not allow updating this post.'
+    console.warn('upvote failed', e)
+  } finally {
+    voteBusy.value = { ...voteBusy.value, [item.id]: false }
+  }
 }
 
 async function toggleReplies(item) {
@@ -387,6 +449,9 @@ async function toggleReplies(item) {
         .order('created_at', { ascending: true })
 
       if (!error) replies.value[item.id] = data || []
+      if (replyCounts.value[item.id] == null) {
+        replyCounts.value = { ...replyCounts.value, [item.id]: (data || []).length }
+      }
     } catch (e) {
       console.warn('load replies failed', e)
     }
@@ -398,11 +463,6 @@ async function toggleReplies(item) {
   }
 }
 
-function ensureReplyArea(item) {
-  if (item.kind !== 'questions') return
-  if (!expanded.value[item.id]) toggleReplies(item)
-  if (!replyDrafts.value[item.id]) replyDrafts.value[item.id] = ''
-}
 
 async function sendReply(item) {
   if (item.kind !== 'questions') return
@@ -414,9 +474,9 @@ async function sendReply(item) {
       .from('answers')
       .insert(payload)
       .select('id, body, display_name, created_at')
-      .single()
+      .maybeSingle()
     if (!error) {
-      replies.value[item.id] = (replies.value[item.id] || []).concat(data)
+      replyCounts.value = { ...replyCounts.value, [item.id]: (replyCounts.value[item.id] || 0) + 1 }
       replyDrafts.value[item.id] = ''
     }
   } catch (e) { console.warn('send reply failed', e) }
@@ -430,6 +490,7 @@ async function doSignUp() {
   authBusy.value = false
   if (error) { authErr.value = error.message; return }
   await bootstrap()
+  try { router.replace('/settings') } catch {}
 }
 
 async function doSignIn() {
@@ -604,6 +665,10 @@ async function doSignOut() {
 .feed-actions .left-actions { display:flex; gap:8px; }
 .feed-actions .right-actions { margin-left:auto; display:flex; gap:8px; }
 .button.subtle { background: rgba(255,255,255,0.10); }
+.button.subtle.active {
+  background: rgba(140,180,255,0.20);
+  border-color: rgba(140,180,255,0.55);
+}
 
 .replies { margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.18); display:grid; gap:8px; }
 .reply-list { display:grid; gap:8px; }
@@ -611,12 +676,8 @@ async function doSignOut() {
 .reply-composer { display:grid; gap:8px; }
 .muted { opacity:.75; }
 
+  /* Icon button spacing and alignment */
+  .button.icon-btn { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+  .button.icon-btn .icon { line-height: 1; display: inline-block; }
 </style>
-
-.feed-actions {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 8px;
-}
 

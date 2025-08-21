@@ -8,6 +8,19 @@
     <!-- Profile basics -->
     <section class="card">
       <h2>Profile</h2>
+      <div class="avatar-row">
+        <div class="avatar" :class="{ empty: !avatarUrl }">
+          <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" />
+          <span v-else>👤</span>
+        </div>
+        <div class="avatar-actions">
+          <input ref="avatarFileEl" type="file" accept="image/*" style="display:none" @change="onPickAvatar" />
+          <button class="button" @click="avatarFileEl && avatarFileEl.click()" :disabled="uploadingAvatar">
+            {{ uploadingAvatar ? 'Uploading…' : 'Change avatar' }}
+          </button>
+          <div class="hint error" v-if="avatarErr">{{ avatarErr }}</div>
+        </div>
+      </div>
       <div class="grid">
         <label class="field">
           <span class="label">Username</span>
@@ -70,6 +83,11 @@ const err = ref('')
 const resetBusy = ref(false)
 const resetMsg = ref('')
 const resetErr = ref('')
+
+const avatarUrl = ref('')
+const avatarFileEl = ref(null)
+const uploadingAvatar = ref(false)
+const avatarErr = ref('')
 
 const universities = [
   { code: 'DTU',  name: 'DTU — Technical University of Denmark', comingSoon: false },
@@ -169,13 +187,21 @@ const dtuStudyLines = [
 
 const userEmail = computed(() => me.value?.email || '')
 
+function resolveAvatarPublic(val) {
+  if (!val) return ''
+  if (/^https?:\/\//i.test(val)) return val
+  const key = String(val).replace(/^avatars\//, '')
+  const { data } = supabase.storage.from('avatars').getPublicUrl(key)
+  return data?.publicUrl || ''
+}
+
 async function hydrate() {
   err.value = ''
   msg.value = ''
   if (!me.value) return
   const { data, error } = await supabase
     .from('profiles')
-    .select('username, university, study_line')
+    .select('username, university, study_line, avatar_url')
     .eq('id', me.value.id)
     .maybeSingle()
   if (error) { err.value = error.message; return }
@@ -183,6 +209,7 @@ async function hydrate() {
     form.value.username = data.username || ''
     form.value.university = data.university || ''
     form.value.study_line = data.study_line || ''
+    avatarUrl.value = resolveAvatarPublic(data.avatar_url)
   }
 }
 
@@ -206,6 +233,31 @@ async function saveBasics() {
   } finally {
     saving.value = false
     setTimeout(() => (msg.value = ''), 1500)
+  }
+}
+
+async function onPickAvatar(e) {
+  const file = e?.target?.files?.[0]
+  if (!file || !me.value) return
+  uploadingAvatar.value = true
+  avatarErr.value = ''
+  try {
+    const key = `${me.value.id}/${Date.now()}_${file.name}`
+    const { error: upErr } = await supabase.storage.from('avatars').upload(key, file, { upsert: true })
+    if (upErr) { avatarErr.value = upErr.message; return }
+
+    const { error: updErr } = await supabase
+      .from('profiles')
+      .update({ avatar_url: key })
+      .eq('id', me.value.id)
+    if (updErr) { avatarErr.value = updErr.message; return }
+
+    avatarUrl.value = resolveAvatarPublic(key)
+  } catch (err) {
+    avatarErr.value = String(err?.message || err)
+  } finally {
+    uploadingAvatar.value = false
+    if (avatarFileEl?.value) avatarFileEl.value.value = ''
   }
 }
 
@@ -244,5 +296,12 @@ onMounted(() => { hydrate() })
 .button { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; color: #fff; cursor: pointer; }
 .hint { margin-left: 8px; opacity: .9; }
 .hint.error { color: #ff9a9a; }
+
+.avatar-row { display:flex; align-items:center; gap:12px; margin-bottom: 12px; }
+.avatar { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); display:grid; place-items:center; }
+.avatar img { width:100%; height:100%; object-fit: cover; display:block; }
+.avatar.empty span { opacity:.8; }
+.avatar-actions { display:flex; align-items:center; gap:10px; }
+
 @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
 </style>

@@ -34,8 +34,20 @@
         </button>
 
         <div v-if="notifOpen" class="notif-menu">
+          <div class="nm-head">Friend requests</div>
+          <div v-if="!friendReqs.length" class="nm-empty">No new requests</div>
+          <div v-for="fr in friendReqs" :key="fr.id" class="nm-item">
+            <div class="nm-line">
+              <span class="nm-course">{{ fr.sender_name || fr.sender_id }}</span>
+              <span class="nm-time">{{ new Date(fr.created_at).toLocaleString() }}</span>
+            </div>
+            <div class="nm-actions">
+              <button class="icon-mini accept" @click="acceptFriend(fr)" title="Accept">✔</button>
+              <button class="icon-mini decline" @click="declineFriend(fr)" title="Decline">✖</button>
+            </div>
+          </div>
           <div class="nm-head">Applications</div>
-          <div v-if="!applications.length" class="nm-empty">No new applications</div>
+          <div v-if="!applications.length" class="nm-empty">No new study group applications</div>
           <div v-for="app in applications" :key="app.id" class="nm-item">
             <div class="nm-line">
               <span class="nm-course">#{{ app.course }}</span>
@@ -67,10 +79,13 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { supabase, currentUser } from '../services/supabase'
+import { supabase, currentUser, authReady, ensureAuthInit } from '../services/supabase'
 import { useRouter } from 'vue-router'
+
+// Make sure global auth is initialized (idempotent)
+ensureAuthInit?.()
 
 
 const user = currentUser
@@ -85,10 +100,90 @@ async function logout () {
 
 const notifOpen = ref(false)
 const applications = ref([]) // pending applications assigned to me
-const notifCount = computed(() => applications.value.length)
+const friendReqs = ref([]) // pending friend requests for me
+const notifCount = computed(() => (applications.value.length + friendReqs.value.length))
 let notifChannel = null
+let friendReqChannel = null
 
-const signedIn = ref(false)
+async function enrichSenderNames(reqs) {
+  const ids = Array.from(new Set((reqs || []).map(r => r.sender_id).filter(Boolean)))
+  if (!ids.length) return reqs
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, email')
+    .in('id', ids)
+  if (!error && Array.isArray(data)) {
+    const byId = Object.fromEntries(data.map(p => [p.id, (p.username || p.email || '').trim()]))
+    for (const r of reqs) r.sender_name = byId[r.sender_id] || r.sender_name || ''
+  }
+  return reqs
+}
+
+async function loadFriendRequests(u) {
+  friendReqs.value = []
+  if (!u) return
+  const { data, error } = await supabase
+    .from('friend_requests')
+    .select('id, sender_id, receiver_id, status, created_at')
+    .eq('receiver_id', u.id)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(100)
+  const list = error ? [] : (data || [])
+  friendReqs.value = await enrichSenderNames(list)
+}
+
+function subscribeFriendRequests(u) {
+  if (friendReqChannel) supabase.removeChannel(friendReqChannel)
+  if (!u) return
+  friendReqChannel = supabase
+    .channel('friend_requests_notif')
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'friend_requests',
+      filter: `receiver_id=eq.${u.id}`
+    }, async (payload) => {
+      const row = payload.new
+      if (row.status === 'pending') {
+        const item = { id: row.id, sender_id: row.sender_id, receiver_id: row.receiver_id, status: row.status, created_at: row.created_at }
+        await enrichSenderNames([item])
+        friendReqs.value = [item, ...friendReqs.value]
+      }
+    })
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: 'friend_requests',
+      filter: `receiver_id=eq.${u.id}`
+    }, (payload) => {
+      const row = payload.new
+      if (row.status !== 'pending') {
+        friendReqs.value = friendReqs.value.filter(r => r.id !== row.id)
+      }
+    })
+    .subscribe()
+}
+
+async function acceptFriend(fr) {
+  if (!fr?.id) return
+  const { error } = await supabase
+    .from('friend_requests')
+    .update({ status: 'accepted' })
+    .eq('id', fr.id)
+  if (!error) {
+    friendReqs.value = friendReqs.value.filter(r => r.id !== fr.id)
+  }
+}
+
+async function declineFriend(fr) {
+  if (!fr?.id) return
+  const { error } = await supabase
+    .from('friend_requests')
+    .update({ status: 'declined' })
+    .eq('id', fr.id)
+  if (!error) {
+    friendReqs.value = friendReqs.value.filter(r => r.id !== fr.id)
+  }
+}
+
+const signedIn = computed(() => !!currentUser.value)
 
 async function loadApplications(u) {
   if (!u) { applications.value = []; return }
@@ -166,9 +261,22 @@ async function loadAvatar(u) {
       .select('avatar_url')
       .eq('id', u.id)
       .maybeSingle()
-    const url = data?.avatar_url || u.user_metadata?.avatar_url || DEFAULT_AVATAR
-    avatarSrc.value = url
-  } catch {
+
+    // Prefer profile avatar_url; fallback to auth metadata
+    let raw = data?.avatar_url
+      || currentUser.value?.user_metadata?.avatar_url
+      || currentUser.value?.user_metadata?.picture
+      || ''
+
+    if (raw && !/^https?:\/\//i.test(raw)) {
+      // If it's a storage path, ensure it's relative to the 'avatars' bucket
+      const path = String(raw).replace(/^avatars\//, '')
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path)
+      raw = pub?.publicUrl || ''
+    }
+
+    avatarSrc.value = raw || DEFAULT_AVATAR
+  } catch (e) {
     avatarSrc.value = DEFAULT_AVATAR
   }
 }
@@ -207,48 +315,38 @@ async function hydrateTitles(codes) {
   }
 }
 
-// Load right away and whenever auth state changes
-watch(user, (u) => {
-  signedIn.value = !!u
-  loadCoursesFor(u)
-  loadAvatar(u)
-  loadApplications(u)
-  subscribeApplications(u)
-}, { immediate: true })
-
-onMounted(async () => {
-  // Use getSession to restore persisted login immediately
-  const { data: { session } } = await supabase.auth.getSession()
-  const u = session?.user || null
-  signedIn.value = !!u
-  if (u) {
-    await loadCoursesFor(u)
-    await loadAvatar(u)
-    await loadApplications(u)
-    subscribeApplications(u)
-  }
-
-  // Also react to future auth changes (e.g., after refresh)
-  supabase.auth.onAuthStateChange((_event, newSession) => {
-    const usr = newSession?.user || null
-    signedIn.value = !!usr
-    if (usr) {
-      loadCoursesFor(usr)
-      loadAvatar(usr)
-      loadApplications(usr)
-      subscribeApplications(usr)
-    } else {
+// React when auth is ready and user changes
+watch(
+  () => ({ ready: authReady.value, uid: currentUser.value?.id }),
+  async ({ ready, uid }) => {
+    // Clean any previous channels if logging out or not ready
+    if (!ready || !uid) {
       courses.value = []
       courseTitles.value = {}
       avatarSrc.value = DEFAULT_AVATAR
       applications.value = []
+      friendReqs.value = []
       notifOpen.value = false
-      if (notifChannel) {
-        supabase.removeChannel(notifChannel)
-        notifChannel = null
-      }
+      if (notifChannel) { supabase.removeChannel(notifChannel); notifChannel = null }
+      if (friendReqChannel) { supabase.removeChannel(friendReqChannel); friendReqChannel = null }
+      return
     }
-  })
+
+    // We have a user; load everything and (re)subscribe
+    const u = { id: uid }
+    await loadCoursesFor(u)
+    await loadAvatar(u)
+    await loadApplications(u)
+    subscribeApplications(u)
+    await loadFriendRequests(u)
+    subscribeFriendRequests(u)
+  },
+  { immediate: true }
+)
+
+onBeforeUnmount(() => {
+  if (notifChannel) { supabase.removeChannel(notifChannel); notifChannel = null }
+  if (friendReqChannel) { supabase.removeChannel(friendReqChannel); friendReqChannel = null }
 })
 </script>
 
@@ -438,5 +536,16 @@ onMounted(async () => {
 .nm-actions { display: flex; gap: 8px; justify-content: flex-end; }
 .button.small { padding: 6px 10px; font-size: 13px; }
 .button.small.danger { background: rgba(227,93,106,0.15); border: 1px solid rgba(227,93,106,0.45); }
+
+.icon-mini {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+.icon-mini:hover { background: rgba(255,255,255,0.10); }
+.icon-mini.accept { border-color: rgba(80,200,120,0.45); background: rgba(80,200,120,0.15); }
+.icon-mini.decline { border-color: rgba(227,93,106,0.45); background: rgba(227,93,106,0.15); }
 
 </style>

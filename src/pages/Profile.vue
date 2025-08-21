@@ -2,58 +2,20 @@
   <div class="container profile-page">
     <!-- Header -->
     <div class="card header">
-      <div class="avatar clickable" v-if="user" @click="avatarFileEl && avatarFileEl.click()">
+      <div :class="['avatar', {clickable: isSelf}]" @click="isSelf && avatarFileEl && avatarFileEl.click()">
         <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" />
-        <span v-else>{{ (username || user.email || 'U').substring(0,1).toUpperCase() }}</span>
+        <span v-else>{{ (username || (user && user.email) || 'U').substring(0,1).toUpperCase() }}</span>
       </div>
       <input ref="avatarFileEl" type="file" accept="image/*" @change="onPickAvatar" style="display:none" />
       <div class="title-area">
-        <h1>Profile</h1>
-        <p class="subtitle">Choose a username and manage your account.</p>
-        <div v-if="user" class="login-row">
-          <span class="muted">Signed in as</span>
-          <span class="strong">{{ username || user.email }}</span>
-          <span class="dot">•</span>
-          <a href="#" @click.prevent="logout">Logout</a>
-        </div>
+        {{ username }}
       </div>
     </div>
       <p v-if="uploadingAvatar" class="small muted" style="margin-left:auto;">Uploading photo…</p>
       <p v-if="avatarErr" class="small" style="margin-left:auto;color:#ff9a9a;">{{ avatarErr }}</p>
 
-    <!-- Auth panel when logged out -->
-    <div v-if="!user" class="grid auth-grid">
-      <div class="card form-card">
-        <h2>Create account</h2>
-        <div class="field">
-          <label>Email</label>
-          <input class="input" v-model="email" type="email" placeholder="you@uni.dk" />
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input class="input" v-model="password" type="password" placeholder="••••••••" />
-        </div>
-        <div class="actions">
-          <button class="button primary" :disabled="isAuthing" @click="signUp">
-            {{ isAuthing ? 'Working…' : 'Sign Up' }}
-          </button>
-          <button class="button" :disabled="isAuthing" @click="signIn">
-            {{ isAuthing ? 'Working…' : 'Log In' }}
-          </button>
-        </div>
-      </div>
-      <div class="card tips">
-        <h2>Why create an account?</h2>
-        <ul class="small">
-          <li>Save your university and courses</li>
-          <li>Upload resources and ask questions</li>
-          <li>Earn points for helpful answers</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Main content when logged in -->
-    <div v-else class="grid main-grid">
+    <!-- Public profile content -->
+    <div class="grid main-grid">
 
       <!-- Snapshot -->
       <div class="card snapshot">
@@ -83,11 +45,45 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 <script setup>
-import { ref, watch, onMounted, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watch, onMounted, reactive, computed } from 'vue'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
+const route = useRoute()
+const viewingId = ref('')
+const isSelf = computed(() => viewingId.value && user.value && viewingId.value === user.value.id)
+async function hydrateById(id) {
+  if (!id) return
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, points, university, courses, username, study_line, avatar_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (!profile) return
+  points.value = profile.points || 0
+  profileUni.value = profile.university || ''
+  profileStudyLine.value = profile.study_line || ''
+  studyLine.value = profile.study_line || ''
+  username.value = profile.username || ''
+  courses.value = Array.isArray(profile.courses) ? profile.courses : []
+
+  if (profile.avatar_url) {
+    if (/^https?:\/\//i.test(profile.avatar_url)) {
+      avatarUrl.value = profile.avatar_url
+    } else {
+      const key = String(profile.avatar_url).replace(/^avatars\//, '')
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(key)
+      avatarUrl.value = pub?.publicUrl || ''
+    }
+  } else {
+    avatarUrl.value = ''
+  }
+
+  await ensureAllCourseTitles()
+}
 import { supabase, currentUser, getSession } from '../services/supabase'
 
 const username = ref('')
@@ -128,21 +124,21 @@ async function onPickAvatar(e) {
   uploadingAvatar.value = true
   avatarErr.value = ''
   try {
-    const path = `${user.value.id}/${Date.now()}_${file.name}`
-    const { error: upErr } = await supabase.storage.from('resources').upload(path, file)
+    // Store under avatars bucket with user folder, keep only the key in DB
+    const key = `${user.value.id}/${Date.now()}_${file.name}`
+    const { error: upErr } = await supabase.storage.from('avatars').upload(key, file, { upsert: true })
     if (upErr) { avatarErr.value = upErr.message; return }
 
-    const { data: pub } = supabase.storage.from('resources').getPublicUrl(path)
-    const url = pub?.publicUrl
+    // Save the storage key in profiles.avatar_url
+    const { error: updErr } = await supabase
+      .from('profiles')
+      .update({ avatar_url: key })
+      .eq('id', user.value.id)
+    if (updErr) { avatarErr.value = updErr.message; return }
 
-    if (url) {
-      const { error: updErr } = await supabase
-        .from('profiles')
-        .update({ avatar_url: url })
-        .eq('id', user.value.id)
-      if (updErr) { avatarErr.value = updErr.message; return }
-      avatarUrl.value = url
-    }
+    // Resolve public URL for display
+    const { data: pub } = supabase.storage.from('avatars').getPublicUrl(key)
+    avatarUrl.value = pub?.publicUrl || ''
   } catch (err) {
     avatarErr.value = String(err?.message || err)
   } finally {
@@ -159,14 +155,25 @@ async function hydrateFromUser(u) {
     .from('profiles')
     .select('points, university, courses, username, study_line, avatar_url')
     .eq('id', u.id)
-    .single()
+    .maybeSingle()
   points.value = profile?.points || 0
   profileUni.value = profile?.university || ''
   profileStudyLine.value = profile?.study_line || ''
   studyLine.value = profile?.study_line || ''
   username.value = profile?.username || u.user_metadata?.full_name || u.email
   courses.value = Array.isArray(profile?.courses) ? profile.courses : []
-  avatarUrl.value = profile?.avatar_url || ''
+  // avatar_url holds a storage key or full URL; resolve if it's a key
+  if (profile?.avatar_url) {
+    if (/^https?:\/\//i.test(profile.avatar_url)) {
+      avatarUrl.value = profile.avatar_url
+    } else {
+      const key = String(profile.avatar_url).replace(/^avatars\//, '')
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(key)
+      avatarUrl.value = pub?.publicUrl || ''
+    }
+  } else {
+    avatarUrl.value = ''
+  }
   await ensureAllCourseTitles()
   await fetchFriends()
   await fetchRequests()
@@ -174,20 +181,35 @@ async function hydrateFromUser(u) {
 
 onMounted(async () => {
   if (!supabase) return
-  // restore immediately from persisted session
   const session = await getSession()
   if (session?.user) {
     user.value = session.user
   }
-  const u = user.value
-  if (u) {
-    await hydrateFromUser(u)
+  const routeId = String(route.query.user || route.query.u || '').trim()
+  viewingId.value = routeId || (user.value && user.value.id) || ''
+  if (viewingId.value) {
+    if (isSelf.value) await hydrateFromUser(user.value)
+    else await hydrateById(viewingId.value)
   }
 })
 
 watch(currentUser, async (u) => {
   if (!supabase) return
-  await hydrateFromUser(u)
+  // If self, hydrate; otherwise, hydrateById
+  if (isSelf.value) {
+    await hydrateFromUser(u)
+  } else if (viewingId.value) {
+    await hydrateById(viewingId.value)
+  }
+})
+
+watch(() => route.query.user || route.query.u, async (nv) => {
+  const routeId = String(nv || '').trim()
+  viewingId.value = routeId || (user.value && user.value.id) || ''
+  if (viewingId.value) {
+    if (isSelf.value) await hydrateFromUser(user.value)
+    else await hydrateById(viewingId.value)
+  }
 })
 
 async function saveBasics() {
@@ -574,4 +596,10 @@ label { font-size: 0.9rem; opacity: 0.85; }
 .avatar.small { width: 32px; height: 32px; font-size: 0.9rem; }
 .col { display: grid; }
 .spacer { flex: 1; }
+
+.form-card h2 { margin-top: 0; }
+.form-card .actions { margin-top: 8px; }
+.snapshot h2 { margin-top: 0; }
+.header { margin-bottom: 18px; }
+.main-grid { align-items: start; }
 </style>

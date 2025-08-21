@@ -94,9 +94,12 @@
             {{ f.study_line }}
           </router-link>
           <div v-else class="study small muted">—</div>
-          <div class="courses" v-if="Array.isArray(f.courses) && f.courses.length">
+          <div
+            class="courses"
+            :class="{ empty: !(Array.isArray(f.courses) && f.courses.length) }"
+          >
             <router-link
-              v-for="c in f.courses"
+              v-for="c in (Array.isArray(f.courses) ? f.courses : [])"
               :key="c"
               :to="`/course/${c}`"
               class="badge"
@@ -514,36 +517,54 @@ create policy "friend_invites: update" on public.friend_invites for update using
 }
 
 /* Friend row refinements */
-.item.friend { align-items: center; padding: 12px; }
-.item.friend .info { gap: 2px; }
-.item.friend .name { font-size: 15px; }
-.item.friend .meta { margin-top: 2px; }
-.item.friend .actions { margin-left: 12px; display: flex; align-items: center; }
-
-/* Make button compact and avoid full-width expansion */
-.button { width: auto; white-space: nowrap; }
-.button.small { padding: 6px 10px; font-size: 12px; border-radius: 7px; }
-.button.danger { border-color: rgba(255, 99, 99, .35); background: rgba(255, 99, 99, .08); }
-.button.danger:hover { background: rgba(255, 99, 99, .15); }
-
-/* Badges for courses already exist; keep them tidy */
-.courses { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.badge { background: rgba(255,255,255,0.07); padding: 3px 8px; border-radius: 999px; font-size: 12px; border: 1px solid rgba(255,255,255,0.12); }
-
-
-/* Friend row uses full width with columns: avatar | username | university | study_line | courses | actions */
+/* avatar | name | university | study line | courses | actions */
 .item.friend {
+  box-sizing: border-box;
+  width: 100%;
   display: grid;
-  grid-template-columns: 40px minmax(120px, 1fr) minmax(140px, 220px) minmax(160px, 260px) minmax(220px, 1.5fr) auto;
+  /* Keep five data columns + actions. Let actions auto-size and always stick to the far right. */
+  grid-template-columns: 56px minmax(180px, 1fr) 120px minmax(320px, 1.2fr) minmax(260px, 1fr) auto;
   align-items: center;
-  gap: 14px;
+  column-gap: 14px;
+  row-gap: 8px;
   padding: 14px;
+  min-height: 72px;           /* consistent row height */
 }
-
 .item.friend .name { font-size: 16px; }
-.item.friend .university, .item.friend .study { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.item.friend .courses { display: flex; flex-wrap: wrap; gap: 6px; }
-.item.friend .actions { display: flex; justify-content: flex-end; }
+
+/* Prevent long text and badges from breaking the grid */
+.item.friend .university,
+.item.friend .study {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item.friend .courses {
+  justify-self: start;
+  display: flex;
+  flex-wrap: nowrap;          /* keep on one line to avoid row height changes */
+  gap: 8px;
+  overflow: hidden;           /* hide overflow if too many tags */
+  align-items: center;
+  min-width: 0;               /* allow shrinking in grid */
+}
+.item.friend .courses .badge { flex: 0 0 auto; }
+
+/* Actions always on the far right, same vertical alignment */
+.item.friend .actions {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;      /* don't wrap the buttons */
+}
+.button.small {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 7px;
+  min-width: 84px;          /* a bit narrower to fit side-by-side comfortably */
+  text-align: center;
+}
 
 @media (max-width: 900px) {
   .item.friend {
@@ -559,7 +580,11 @@ create policy "friend_invites: update" on public.friend_invites for update using
   .item.friend .university { grid-area: university; }
   .item.friend .study { grid-area: study; }
   .item.friend .courses { grid-area: courses; }
-  .item.friend .actions { grid-area: actions; }
+  .item.friend .actions { grid-area: actions; justify-self: end; }
+}
+
+.item.friend .courses.empty {
+  visibility: hidden;   /* keep column width so actions stay aligned */
 }
 
 </style>

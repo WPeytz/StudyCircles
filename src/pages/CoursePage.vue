@@ -17,7 +17,10 @@
 
       <!-- Composer -->
       <div class="composer">
-        <div class="avatar large">{{ (displayName || 'U').slice(0,1).toUpperCase() }}</div>
+        <div class="avatar large">
+          <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" />
+          <span v-else>{{ (displayName || 'U').slice(0,1).toUpperCase() }}</span>
+        </div>
         <div class="composer-col">
           <textarea
             class="input composer-input"
@@ -68,10 +71,10 @@
                 <a class="iconbtn ghost" :href="item.public_url" target="_blank" rel="noopener" title="Open file">Open</a>
               </template>
               <template v-else-if="item.kind==='question'">
-                <button class="iconbtn ghost" @click="toggleReplies(item)" :title="(item._showReplies ? 'Hide replies' : 'Show replies') + (item.answers?.length ? ' ('+item.answers.length+')' : '')">
-                  {{ item._showReplies ? 'Hide' : 'Show' }} replies<span v-if="item.answers?.length"> ({{ item.answers.length }})</span>
+                <button class="iconbtn ghost" @click="toggleComment(item)" :title="item._showReplies ? 'Hide replies' : 'Show replies'">
+                  <span class="icon">💬</span>
+                  <span class="count">{{ item.answers?.length || 0 }}</span>
                 </button>
-                <button class="iconbtn ghost" @click="item._replying = !item._replying" title="Reply">Reply</button>
               </template>
               <template v-else>
                 <button class="iconbtn ghost" @click="tab='groups'" title="View group">View</button>
@@ -205,10 +208,43 @@ const loadingFeed = ref(false)
 const postBody = ref('')
 const posting = ref(false)
 const postErr = ref('')
+const myProfile = ref(null)
 const displayName = computed(() => {
   const u = currentUser.value
-  return u?.user_metadata?.full_name || u?.email || ''
+  return myProfile.value?.username || u?.user_metadata?.full_name || u?.email || ''
 })
+
+// Resolved public avatar URL (handles both direct URLs and storage paths)
+const avatarSrc = ref('')
+const avatarUrl = computed(() => avatarSrc.value)
+
+async function loadMyProfile() {
+  const uid = currentUser.value?.id
+  if (!uid) { myProfile.value = null; avatarSrc.value = ''; return }
+  const { data } = await supabase
+    .from('profiles')
+    .select('username, avatar_url, avatar')
+    .eq('id', uid)
+    .maybeSingle()
+  myProfile.value = data || null
+
+  // Resolve avatar source
+  const u = currentUser.value
+  let raw = data?.avatar_url || data?.avatar || u?.user_metadata?.avatar_url || u?.user_metadata?.picture || ''
+
+  // If it's a Supabase Storage path (not an absolute URL), turn it into a public URL
+  if (raw && !/^https?:\/\//i.test(raw)) {
+    try {
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(raw)
+      raw = pub?.publicUrl || ''
+    } catch (e) {
+      // ignore
+    }
+  }
+  avatarSrc.value = raw || ''
+}
+onMounted(loadMyProfile)
+watch(currentUser, () => loadMyProfile())
 
 // active kinds filter
 const feedKinds = ref(new Set(['file','question','group']))
@@ -451,11 +487,10 @@ async function askQuestion() {
   askErr.value = ''
   asking.value = true
   try {
-    const u = currentUser.value
     await supabase.from('questions').insert({
       body: questionBody.value.trim(),
       course: code.value,
-      display_name: (u?.user_metadata?.full_name || u?.email || 'Anonymous')
+      display_name: (displayName.value || 'Anonymous')
     })
     questionBody.value = ''
     await loadQuestions()
@@ -473,12 +508,10 @@ async function createPost(){
   postErr.value = ''
   posting.value = true
   try {
-    const u = currentUser.value
-    const name = (u?.user_metadata?.full_name || u?.email || 'Anonymous')
     await supabase.from('questions').insert({
       body,
       course: code.value,
-      display_name: name
+      display_name: (displayName.value || 'Anonymous')
     })
     postBody.value = ''
     // feed will update via realtime; also refresh lists
@@ -494,12 +527,10 @@ async function createPost(){
 async function replyTo(q) {
   const text = (q._reply || '').trim()
   if (!text) return
-  const u = currentUser.value
-  const name = (u?.user_metadata?.full_name || u?.email || 'Anonymous')
   const { data, error } = await supabase.from('answers').insert({
     question_id: q.id,
     body: text,
-    display_name: name
+    display_name: (displayName.value || 'Anonymous')
   }).select('id, question_id, body, display_name, created_at').single()
   if (!error) {
     // attach to feed item if present
@@ -540,6 +571,12 @@ async function loadQuestions() {
 }
 function toggleReplies(item){
   item._showReplies = !item._showReplies
+  item._replying = !!item._showReplies
+}
+
+function toggleComment(item){
+  item._showReplies = !item._showReplies
+  item._replying = !!item._showReplies
 }
 
 // ===== Groups =====
@@ -669,6 +706,9 @@ watch(() => route.params.code, () => {
 .iconbtn.vote .tri { font-size:11px; opacity:.95; }
 .iconbtn.vote .count { font-variant-numeric: tabular-nums; min-width: 1.5ch; text-align:right; }
 
+/* icon and count alignment for comment button */
+.iconbtn .icon { line-height: 1; display: inline-block; }
+.iconbtn .count { font-variant-numeric: tabular-nums; }
 /* badge refinement */
 .badge { text-transform: none; font-weight: 600; }
 
@@ -678,6 +718,8 @@ watch(() => route.params.code, () => {
 /* --- Composer --- */
 .composer { display:flex; gap:10px; align-items:flex-start; background: rgba(0,0,0,0.10); border:1px solid rgba(255,255,255,0.12); padding:10px; border-radius:10px; margin:8px 0 12px; }
 .avatar.large { width:40px; height:40px; border-radius:50%; background: rgba(255,255,255,0.14); display:grid; place-items:center; font-weight:800; }
+.avatar.large img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.avatar.large span { display: grid; place-items: center; width: 100%; height: 100%; }
 .composer-col { flex:1; }
 .composer-input { border-radius:14px; resize: vertical; }
 .composer-actions { display:flex; align-items:center; gap:10px; margin-top:6px; }

@@ -4,8 +4,8 @@
     <aside class="friends-list">
       <div class="section-title">Direct Messages</div>
       <div class="quick-dm">
-        <select v-model="quickTo" class="qc-select">
-          <option :value="null" disabled>Select friend…</option>
+        <select v-model="quickTo" class="qc-select" @change="onSelectFriend">
+          <option value="" disabled>Select friend…</option>
           <option v-for="f in friends" :key="f.id" :value="f.id">{{ f.username || f.email }}</option>
         </select>
       </div>
@@ -103,9 +103,16 @@ const me = currentUser
 const friends = ref([]) 
 const activeFriend = ref(null)
 const messages = ref([])
+
+// Helper to push unique messages by id
+function pushUniqueMessage(arr, msg) {
+  if (!msg || !msg.id) return
+  if (!Array.isArray(arr)) return
+  if (arr.findIndex(x => x.id === msg.id) === -1) arr.push(msg)
+}
 const newMessage = ref('')
 
-const quickTo = ref(null)
+const quickTo = ref('')
 const quickText = ref('')
 const unread = ref({}) // { [friendId]: number }
 
@@ -163,7 +170,9 @@ async function ensureFriendById(id) {
     .maybeSingle()
   if (error || !data) return null
   // push into friends list as an ad‑hoc entry so the DM UI can open
-  friends.value = [...friends.value, data]
+  if (!friends.value.some(x => x.id === data.id)) {
+    friends.value = [...friends.value, data]
+  }
   // also warm avatar cache
   senderProfiles.value[id] = {
     id: data.id,
@@ -180,6 +189,18 @@ async function ensureFriendById(id) {
     })()
   }
   return data
+}
+
+async function onSelectFriend() {
+  const id = quickTo.value && String(quickTo.value)
+  if (!id) return
+  let f = friends.value.find(x => x.id === id)
+  if (!f) {
+    f = await ensureFriendById(id)
+  }
+  if (f) {
+    openChat(f)
+  }
 }
 
 // react to `?to=<friendId>` even if friends load slightly later or list is empty
@@ -291,20 +312,43 @@ async function loadFriends() {
     }
   }
 
-  // Try 4: fallback to friend_requests where status='accepted'
+  // Try 4: fallback to friend_requests (sender_id/receiver_id) where status='accepted'
   if (!idSet.size) {
     try {
       const { data: reqs, error } = await supabase
         .from('friend_requests')
-        .select('requester_id, addressee_id, status')
-        .or(`requester_id.eq.${myId.value},addressee_id.eq.${myId.value}`)
+        .select('sender_id, receiver_id, status')
+        .or(`sender_id.eq.${myId.value},receiver_id.eq.${myId.value}`)
         .eq('status', 'accepted')
 
       if (!error && Array.isArray(reqs)) {
-        for (const r of reqs) idSet.add(r.requester_id === myId.value ? r.addressee_id : r.requester_id)
+        for (const r of reqs) {
+          const other = r.sender_id === myId.value ? r.receiver_id : r.sender_id
+          if (other) idSet.add(other)
+        }
       }
     } catch (e) {
-      console.warn('[Friends] friend_requests fallback failed:', e?.message || e)
+      console.warn('[Friends] friend_requests (sender/receiver) fallback failed:', e?.message || e)
+    }
+  }
+
+  // Try 5: derive contacts from messages table (anyone you've messaged with)
+  if (!idSet.size) {
+    try {
+      const { data: msgs, error } = await supabase
+        .from('messages')
+        .select('sender_id, receiver_id')
+        .or(`sender_id.eq.${myId.value},receiver_id.eq.${myId.value}`)
+        .limit(200)
+
+      if (!error && Array.isArray(msgs)) {
+        for (const m of msgs) {
+          const other = m.sender_id === myId.value ? m.receiver_id : m.sender_id
+          if (other) idSet.add(other)
+        }
+      }
+    } catch (e) {
+      console.warn('[Friends] messages-derived contacts failed:', e?.message || e)
     }
   }
 
@@ -315,14 +359,18 @@ async function loadFriends() {
     const ids = Array.from(idSet)
     const { data: profs, error } = await supabase
       .from('profiles')
-      .select('id, username, university, study_line, email')
+      .select('id, username, university, study_line, email, avatar_url')
+      .order('username', { ascending: true })
       .in('id', ids)
 
     if (error) {
       console.warn('[Friends] profiles error:', error)
       friends.value = []
     } else {
-      friends.value = profs || []
+      friends.value = (profs || []).map(p => ({
+        ...p,
+        id: String(p.id)
+      }))
     }
   } catch (e) {
     console.warn('[Friends] profiles query threw:', e)
@@ -395,6 +443,8 @@ async function openChat(friend) {
     .or(`and(sender_id.eq.${myId.value},receiver_id.eq.${f.id}),and(sender_id.eq.${f.id},receiver_id.eq.${myId.value})`)
     .order('created_at', { ascending: true })
   messages.value = data || []
+  // De-duplicate messages by id after initial fetch
+  messages.value = Array.from(new Map(messages.value.map(m => [m.id, m])).values())
   await loadSenderProfiles(messages.value)
   scrollToBottom()
 
@@ -407,7 +457,7 @@ async function openChat(friend) {
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
       const m = payload.new
       if ((m.sender_id === myId.value && m.receiver_id === f.id) || (m.receiver_id === myId.value && m.sender_id === f.id)) {
-        messages.value.push(m)
+        pushUniqueMessage(messages.value, m)
         loadSenderProfiles([m])
         scrollToBottom()
       }
@@ -427,6 +477,8 @@ async function openCourse(code) {
     .eq('course', code)
     .order('created_at', { ascending: true })
   messages.value = data || []
+  // De-duplicate messages by id after initial fetch
+  messages.value = Array.from(new Map(messages.value.map(m => [m.id, m])).values())
   await loadSenderProfiles(messages.value)
   scrollToBottom()
 
@@ -435,7 +487,7 @@ async function openCourse(code) {
   courseChannel = supabase
     .channel(`course-${code}`)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'course_messages', filter: `course=eq.${code}` }, payload => {
-      messages.value.push(payload.new)
+      pushUniqueMessage(messages.value, payload.new)
       loadSenderProfiles([payload.new])
       scrollToBottom()
     })
@@ -454,7 +506,7 @@ async function sendMessage() {
         .select('*')
         .single()
       if (error) throw error
-      messages.value.push(data)
+      pushUniqueMessage(messages.value, data)
       scrollToBottom()
     } else if (activeFriend.value) {
       const { data, error } = await supabase
@@ -463,7 +515,7 @@ async function sendMessage() {
         .select('*')
         .single()
       if (error) throw error
-      messages.value.push(data)
+      pushUniqueMessage(messages.value, data)
       loadSenderProfiles([data])
       scrollToBottom()
     } else {
@@ -532,7 +584,7 @@ onMounted(async () => {
   }
   console.log('[Messages] myId', myId.value, 'friends', friends.value, 'courses', courseChats.value)
   await refreshUnread()
-  if (!quickTo.value && friends.value.length) quickTo.value = friends.value[0].id
+  if (!quickTo.value && friends.value.length) quickTo.value = String(friends.value[0].id)
   startGlobalSub()
   const to = route.query.to
   if (to) {
