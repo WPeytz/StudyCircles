@@ -35,8 +35,15 @@
         <div v-if="loading" class="small">Loading feed…</div>
         <div v-else-if="!feed.length" class="small">No activity yet.</div>
 
-        <div v-else class="card feed-grid">
+        <div v-else class="card feed-grid" @click="closeAllMenus">
           <div v-for="item in filteredFeed" :key="item.kind + ':' + item.id" class="card feed-item" :class="courseClass(item.course)">
+            <!-- overflow menu trigger -->
+            <button class="more-btn" @click.stop="toggleItemMenu(item)" title="More">⋯</button>
+            <!-- dropdown -->
+            <div v-if="item._menuOpen" class="more-menu" @click.stop>
+              <button v-if="isMyItem(item)" class="menu-item danger" @click="deleteItem(item)">Delete post</button>
+              <button v-else class="menu-item" @click="reportItem(item)">Report post</button>
+            </div>
             <div style="display:grid; gap:4px;">
               <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                 <span class="badge" :class="item.kind">{{ label(item.kind) }}</span>
@@ -123,9 +130,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { supabase } from '../services/supabase'
+import { onMounted, onBeforeUnmount, watch, ref, computed } from 'vue'
+import { supabase, currentUser, authReady } from '../services/supabase'
 
 const router = useRouter()
 
@@ -135,6 +142,7 @@ const loading = ref(false)
 const feed = ref([])
 const scope = ref('all')
 const courseTitles = ref({})
+const coursesVersion = ref(0)
 
 // Auth state
 const email = ref('')
@@ -196,6 +204,12 @@ async function submitApplication() {
   } finally {
     applyBusy.value = false
   }
+}
+
+async function handleCoursesUpdated(e) {
+  coursesVersion.value++
+  // Re-hydrate profile courses & reload feed using existing helpers
+  await loadProfileAndFeed()
 }
 
 function themeIndexFor(course) {
@@ -482,6 +496,87 @@ async function sendReply(item) {
   } catch (e) { console.warn('send reply failed', e) }
 }
 
+// ===== Overflow menu for unified feed =====
+function isMyItem(item){
+  // Heuristic ownership: questions created by current email (display_name) or files/groups uploaded by current email
+  const me = user.value
+  if (!me) return false
+  // Prefer a strong key if present in future (item.user_id)
+  if (item.user_id && me.id) return item.user_id === me.id
+  const by = (item.by || '').toString().trim().toLowerCase()
+  const myEmail = (me.email || '').toLowerCase()
+  return by && myEmail && by === myEmail
+}
+
+function tableFor(kind){
+  if (kind === 'questions') return 'questions'
+  if (kind === 'files') return 'resources'
+  if (kind === 'groups') return 'study_groups'
+  return null
+}
+
+function reportKind(kind){
+  if (kind === 'questions') return 'question'
+  if (kind === 'files') return 'resource'
+  if (kind === 'groups') return 'group'
+  return 'post'
+}
+
+function toggleItemMenu(item){
+  // close others, toggle this one
+  feed.value = feed.value.map(it => (it === item ? it : ({...it, _menuOpen:false})))
+  item._menuOpen = !item._menuOpen
+}
+
+function closeAllMenus(){
+  if (!feed.value.length) return
+  let changed = false
+  feed.value = feed.value.map(it => {
+    if (it._menuOpen){ changed = true; return { ...it, _menuOpen:false } }
+    return it
+  })
+  return changed
+}
+
+async function deleteItem(item){
+  const tbl = tableFor(item.kind)
+  if (!tbl) return
+  if (!isMyItem(item)) { alert('You can only delete your own posts.'); item._menuOpen = false; return }
+  if (!confirm('Delete this post? This cannot be undone.')) { item._menuOpen = false; return }
+  try {
+    const { error } = await supabase.from(tbl).delete().eq('id', item.id)
+    if (error) throw error
+    feed.value = feed.value.filter(x => !(x.kind===item.kind && x.id===item.id))
+  } catch(e) {
+    console.warn('[deleteItem]', e)
+    alert('Could not delete. You may not have permission.')
+  } finally {
+    item._menuOpen = false
+  }
+}
+
+async function reportItem(item){
+  try {
+    if (!user.value) { alert('Please log in to report.'); return }
+    let reason = prompt('Why are you reporting this post? (optional)', '')
+    if (reason === null) { item._menuOpen = false; return }
+    reason = (reason || '').slice(0, 300)
+    await supabase.from('reports').insert({
+      item_type: reportKind(item.kind),
+      item_id: item.id,
+      course: item.course,
+      reason,
+      created_by: user.value.id
+    })
+    alert('Thanks — report submitted.')
+  } catch(e) {
+    console.warn('[reportItem]', e)
+    alert('Could not submit report.')
+  } finally {
+    item._menuOpen = false
+  }
+}
+
 // Auth handlers
 async function doSignUp() {
   authErr.value = ''
@@ -517,6 +612,25 @@ async function doSignOut() {
   feed.value = []
   courses.value = []
 }
+
+onMounted(() => {
+  window.addEventListener('studycircles:courses-updated', handleCoursesUpdated)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('studycircles:courses-updated', handleCoursesUpdated)
+})
+
+watch(
+  () => ({ ready: authReady.value, uid: currentUser.value?.id, ver: coursesVersion.value }),
+  async ({ ready, uid }) => {
+    if (!ready) return
+    if (uid) {
+      await loadProfileAndFeed()
+    }
+  },
+  { immediate: true }
+)
+
 </script>
 
 <style scoped>
@@ -679,5 +793,16 @@ async function doSignOut() {
   /* Icon button spacing and alignment */
   .button.icon-btn { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
   .button.icon-btn .icon { line-height: 1; display: inline-block; }
+
+  /* Overflow menu styles */
+.more-btn { position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:8px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; line-height:1; font-size:18px; display:grid; place-items:center; }
+.more-btn:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.22); }
+.more-menu { position:absolute; top:40px; right:8px; background: rgba(0,0,0,0.9); border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:6px; min-width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 5; }
+.menu-item { width:100%; text-align:left; padding:8px 10px; border:none; background:transparent; color:#fff; cursor:pointer; border-radius:8px; font-size: 14px; }
+.menu-item:hover { background: rgba(255,255,255,0.08); }
+.menu-item.danger { color: #ffb4b4; }
+.menu-item.danger:hover { background: rgba(255, 99, 71, 0.15); }
+
 </style>
+
 

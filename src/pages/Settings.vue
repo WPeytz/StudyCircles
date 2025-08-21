@@ -46,6 +46,18 @@
           <!-- Fallback: free text for non-DTU universities -->
           <input v-else class="input" v-model="form.study_line" placeholder="e.g., Artificial Intelligence and Data" />
         </label>
+        <label class="field bio-field">
+          <span class="label">Bio <span class="small muted">(max 100 characters)</span></span>
+          <textarea
+            class="input"
+            rows="3"
+            v-model="form.bio"
+            :maxlength="100"
+            @input="limitBio"
+            placeholder="Tell others a bit about you (e.g., interests, what you’re looking for)"
+          ></textarea>
+          <div class="small muted count">{{ (form.bio || '').length }}/100</div>
+        </label>
       </div>
       <div class="row">
         <button class="button" :disabled="saving" @click="saveBasics">{{ saving ? 'Saving…' : 'Save' }}</button>
@@ -75,7 +87,7 @@ import { supabase, currentUser } from '../services/supabase'
 
 const me = currentUser
 
-const form = ref({ username: '', university: '', study_line: '' })
+const form = ref({ username: '', university: '', study_line: '', bio: '' })
 const saving = ref(false)
 const msg = ref('')
 const err = ref('')
@@ -201,7 +213,7 @@ async function hydrate() {
   if (!me.value) return
   const { data, error } = await supabase
     .from('profiles')
-    .select('username, university, study_line, avatar_url')
+    .select('username, university, study_line, avatar_url, bio')
     .eq('id', me.value.id)
     .maybeSingle()
   if (error) { err.value = error.message; return }
@@ -209,6 +221,7 @@ async function hydrate() {
     form.value.username = data.username || ''
     form.value.university = data.university || ''
     form.value.study_line = data.study_line || ''
+    form.value.bio = data.bio || ''
     avatarUrl.value = resolveAvatarPublic(data.avatar_url)
   }
 }
@@ -224,6 +237,7 @@ async function saveBasics() {
       username: (form.value.username || '').trim() || null,
       university: (form.value.university || '').trim() || null,
       study_line: (form.value.study_line || '').trim() || null,
+      bio: (form.value.bio || '').slice(0, 100) || null,
     }
     const { error } = await supabase.from('profiles').upsert(payload)
     if (error) { err.value = error.message; return }
@@ -233,6 +247,13 @@ async function saveBasics() {
   } finally {
     saving.value = false
     setTimeout(() => (msg.value = ''), 1500)
+  }
+}
+
+function limitBio() {
+  if (!form.value.bio) return
+  if (form.value.bio.length > 100) {
+    form.value.bio = form.value.bio.slice(0, 100)
   }
 }
 
@@ -289,8 +310,8 @@ onMounted(() => { hydrate() })
 .muted { opacity: .75; }
 .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; margin: 12px 0; }
 .row { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.field { display: grid; gap: 6px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.field { display: grid; gap: 6px; align-content: start; }
 .label { font-size: 13px; opacity: .85; }
 .input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px; color: #fff; }
 .button { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; color: #fff; cursor: pointer; }
@@ -304,4 +325,7 @@ onMounted(() => { hydrate() })
 .avatar-actions { display:flex; align-items:center; gap:10px; }
 
 @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+.small { font-size: 12px; }
+.bio-field .count { justify-self: end; }
 </style>

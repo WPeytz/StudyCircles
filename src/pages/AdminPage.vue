@@ -15,6 +15,8 @@
         <option value="university">University</option>
         <option value="study_line">Study line</option>
       </select>
+      <button class="btn" @click="toggleReports" v-if="!showReports">View reports</button>
+      <button class="btn ghost" @click="toggleReports" v-else>Back to users</button>
     </div>
 
     <div v-if="loading" class="empty">Loading users…</div>
@@ -23,43 +25,73 @@
       You don't have access to this page.
     </div>
     <div v-else>
-      <div v-if="filtered.length === 0" class="empty">No users found.</div>
-      <div class="list">
-        <div v-for="u in filtered" :key="u.id" class="row">
-          <RouterLink
-            :to="{ path: '/profile', query: { u: u.id }}"
-            class="avatar"
-            :title="u.username"
-          >
-            <img v-if="u.avatar_src" :src="u.avatar_src" alt="" />
-            <span v-else>{{ (u.username || '?').slice(0,1).toUpperCase() }}</span>
-          </RouterLink>
-
-          <div class="meta">
-            <div class="name">
-              <RouterLink :to="{ path: '/profile', query: { u: u.id }}">{{ u.username || 'Unknown' }}</RouterLink>
+      <!-- Reports view -->
+      <div v-if="showReports">
+        <div v-if="loadingReports" class="empty">Loading reports…</div>
+        <div v-else-if="reportsErr" class="empty">Error: {{ reportsErr }}</div>
+        <div v-else-if="!reports.length" class="empty">No reports.</div>
+        <div v-else class="list">
+          <div v-for="r in reports" :key="r.id" class="row">
+            <div class="avatar" :title="r.item_type.toUpperCase()">{{ r.item_type.slice(0,1).toUpperCase() }}</div>
+            <div class="meta">
+              <div class="name">
+                <span class="tag">{{ r.item_type }}</span>
+                <RouterLink :to="{ path: '/course/'+ (r.course || '') }" class="muted small">in {{ r.course || '—' }}</RouterLink>
+              </div>
+              <div class="sub">
+                <span class="muted">Reported {{ formatWhen(r.created_at) }}</span>
+                <span v-if="r.reason"> · {{ r.reason }}</span>
+              </div>
+              <div class="sub" v-if="r.preview">“{{ r.preview }}”</div>
             </div>
-            <div class="sub">
-              <span v-if="u.university">{{ u.university }}</span>
-              <span v-if="u.study_line"> · {{ u.study_line }}</span>
-            </div>
-
-            <div class="courses" v-if="(u.courses || []).length">
-              <RouterLink
-                v-for="c in u.courses"
-                :key="c"
-                class="chip"
-                :to="{ path: '/course/'+c }"
-                :title="'Open course '+c"
-              >
-                {{ c }}
-              </RouterLink>
+            <div class="actions">
+              <button class="btn ghost" @click="dismissReport(r)" :disabled="acting[r.id]">Dismiss</button>
+              <button class="btn danger" @click="deleteReported(r)" :disabled="acting[r.id]">Delete post</button>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="actions">
-            <RouterLink class="btn ghost" :to="{ path: '/messages', query: { to: u.id }}">Message</RouterLink>
-            <button class="btn" @click="addFriend(u)" :disabled="requesting[u.id]">Add friend</button>
+      <!-- Users view -->
+      <div v-else>
+        <div v-if="filtered.length === 0" class="empty">No users found.</div>
+        <div class="list">
+          <div v-for="u in filtered" :key="u.id" class="row">
+            <RouterLink
+              :to="{ path: '/profile', query: { u: u.id }}"
+              class="avatar"
+              :title="u.username"
+            >
+              <img v-if="u.avatar_src" :src="u.avatar_src" alt="" />
+              <span v-else>{{ (u.username || '?').slice(0,1).toUpperCase() }}</span>
+            </RouterLink>
+
+            <div class="meta">
+              <div class="name">
+                <RouterLink :to="{ path: '/profile', query: { u: u.id }}">{{ u.username || 'Unknown' }}</RouterLink>
+              </div>
+              <div class="sub">
+                <span v-if="u.university">{{ u.university }}</span>
+                <span v-if="u.study_line"> · {{ u.study_line }}</span>
+              </div>
+
+              <div class="courses" v-if="(u.courses || []).length">
+                <RouterLink
+                  v-for="c in u.courses"
+                  :key="c"
+                  class="chip"
+                  :to="{ path: '/course/'+c }"
+                  :title="'Open course '+c"
+                >
+                  {{ c }}
+                </RouterLink>
+              </div>
+            </div>
+
+            <div class="actions">
+              <RouterLink class="btn ghost" :to="{ path: '/messages', query: { to: u.id }}">Message</RouterLink>
+              <button class="btn" @click="addFriend(u)" :disabled="requesting[u.id]">Add friend</button>
+            </div>
           </div>
         </div>
       </div>
@@ -80,6 +112,109 @@ const q = ref('')
 const sortBy = ref('username')
 const requesting = ref({})
 const err = ref(null)
+
+const showReports = ref(false)
+const loadingReports = ref(false)
+const reports = ref([])
+const reportsErr = ref(null)
+const acting = ref({})
+
+function toggleReports(){
+  showReports.value = !showReports.value
+  if (showReports.value) loadReports()
+}
+
+function tableForType(t){
+  if (t === 'file' || t === 'resource' || t === 'resources') return 'resources'
+  if (t === 'question' || t === 'questions') return 'questions'
+  if (t === 'group' || t === 'study_group' || t === 'study_groups') return 'study_groups'
+  return null
+}
+
+function formatWhen(ts){
+  try { return new Date(ts).toLocaleString() } catch { return ts }
+}
+
+async function loadReports(){
+  loadingReports.value = true
+  reportsErr.value = null
+  try {
+    // Try to fetch reports + a small preview from the target table via RPC if present; else do simple fetch
+    const { data, error } = await supabase
+      .from('reports')
+      .select('id, item_type, item_id, course, reason, created_at')
+      .order('created_at', { ascending: false })
+      .limit(200)
+
+    if (error) throw error
+
+    // Optionally enrich with a small preview from each table
+    const byType = { resources: new Set(), questions: new Set(), study_groups: new Set() }
+    for (const r of data || []) {
+      const t = tableForType(r.item_type)
+      if (t && byType[t]) byType[t].add(r.item_id)
+    }
+
+    const previews = {}
+    // Questions preview
+    if (byType.questions.size) {
+      const { data: qd } = await supabase
+        .from('questions')
+        .select('id, body')
+        .in('id', Array.from(byType.questions))
+      for (const row of qd || []) previews[row.id] = (row.body || '').slice(0,140)
+    }
+    // Resources preview
+    if (byType.resources.size) {
+      const { data: rd } = await supabase
+        .from('resources')
+        .select('id, title, description')
+        .in('id', Array.from(byType.resources))
+      for (const row of rd || []) previews[row.id] = (row.title || row.description || '').slice(0,140)
+    }
+    // Study groups preview
+    if (byType.study_groups.size) {
+      const { data: gd } = await supabase
+        .from('study_groups')
+        .select('id, title, description')
+        .in('id', Array.from(byType.study_groups))
+      for (const row of gd || []) previews[row.id] = (row.title || row.description || '').slice(0,140)
+    }
+
+    reports.value = (data || []).map(r => ({ ...r, preview: previews[r.item_id] || null }))
+  } catch (e) {
+    reportsErr.value = String(e?.message || e)
+  } finally {
+    loadingReports.value = false
+  }
+}
+
+async function dismissReport(r){
+  try {
+    acting.value = { ...acting.value, [r.id]: true }
+    await supabase.from('reports').delete().eq('id', r.id)
+    reports.value = reports.value.filter(x => x.id !== r.id)
+  } finally {
+    acting.value = { ...acting.value, [r.id]: false }
+  }
+}
+
+async function deleteReported(r){
+  const table = tableForType(r.item_type)
+  if (!table) return alert('Unknown item type: '+r.item_type)
+  if (!confirm('Delete this '+table+' item? This cannot be undone.')) return
+  try {
+    acting.value = { ...acting.value, [r.id]: true }
+    const { error } = await supabase.from(table).delete().eq('id', r.item_id)
+    if (error) throw error
+    await supabase.from('reports').delete().eq('id', r.id)
+    reports.value = reports.value.filter(x => x.id !== r.id)
+  } catch (e) {
+    alert('Could not delete item. Check permissions/policies.')
+  } finally {
+    acting.value = { ...acting.value, [r.id]: false }
+  }
+}
 
 onMounted(async () => {
   try {
@@ -211,4 +346,8 @@ h1 { font-size: 28px; margin: 8px 0; }
 .btn { padding: 8px 12px; border-radius: 10px; background: #6ea8ff33; color: #fff; border: 1px solid rgba(255,255,255,.16); cursor: pointer; }
 .btn.ghost { background: transparent; }
 .btn:disabled { opacity: .5; cursor: default; }
+
+.btn.danger { background: #ff6b6b33; border-color: rgba(255,0,0,.25); }
+.tag { font-size: 12px; padding: 2px 6px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); margin-right: 8px; }
+.small { font-size: 12px; }
 </style>

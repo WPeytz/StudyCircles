@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar">
-    <RouterLink class="brand" to="/">StudyCircles</RouterLink>
+    <RouterLink class="brand" to="/" @click="closeMenus">StudyCircles</RouterLink>
 
     <!-- Course tabs (visible when signed in) -->
     <div v-if="courses.length" class="courses-strip">
@@ -11,15 +11,16 @@
         :title="courseTitles[c] ? `${c} — ${courseTitles[c]}` : c"
         :to="`/course/${c}`"
         :class="{ active: isActiveCourse(c) }"
+        @click="closeMenus"
       >
         <span class="code" :title="courseTitles[c] || ''">{{ c }}</span>
       </RouterLink>
     </div>
 
     <div v-if="signedIn" class="right">
-      <RouterLink class="nav-link" to="/add-course">Add Course</RouterLink>
-      <RouterLink class="nav-link" to="/friends">Friends</RouterLink>
-      <RouterLink class="icon-link" to="/messages" aria-label="Messages">
+      <RouterLink class="nav-link" to="/add-course" @click="closeMenus">Add Course</RouterLink>
+      <RouterLink class="nav-link" to="/friends" @click="closeMenus">Friends</RouterLink>
+      <RouterLink class="icon-link" to="/messages" aria-label="Messages" @click="closeMenus">
         <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M4 6.5C4 5.12 5.12 4 6.5 4h11c1.38 0 2.5 1.12 2.5 2.5v7c0 1.38-1.12 2.5-2.5 2.5H9.8l-3.9 3.12c-.74.59-1.9.07-1.9-.88V16H6.5C5.12 16 4 14.88 4 13.5v-7z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -84,6 +85,27 @@ import { RouterLink, useRoute } from 'vue-router'
 import { supabase, currentUser, authReady, ensureAuthInit } from '../services/supabase'
 import { useRouter } from 'vue-router'
 
+// Listen for course updates from AddCourse
+function handleCoursesUpdated(e) {
+  // 1) Optimistic UI: trust payload if provided
+  if (Array.isArray(e?.detail)) {
+    courses.value = e.detail
+  }
+  // 2) Authoritative refresh from DB
+  const uid = currentUser.value?.id
+  if (uid) {
+    loadCoursesFor({ id: uid })
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('studycircles:courses-updated', handleCoursesUpdated)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('studycircles:courses-updated', handleCoursesUpdated)
+})
+
 // Make sure global auth is initialized (idempotent)
 ensureAuthInit?.()
 
@@ -93,6 +115,7 @@ const courses = ref([])            // array of course codes from profile
 const courseTitles = ref({})       // code -> title map
 const router = useRouter()
 const menuOpen = ref(false)
+const closeMenus = () => { menuOpen.value = false; notifOpen.value = false }
 async function logout () {
   await supabase.auth.signOut()
   router.push('/')
@@ -285,6 +308,8 @@ const route = useRoute()
 function isActiveCourse(code) {
   return route.name === 'course' && String(route.params.code || '') === String(code)
 }
+
+watch(() => route.fullPath, () => { closeMenus() })
 
 async function loadCoursesFor(u) {
   if (!u || !supabase) { courses.value = []; courseTitles.value = {}; return }

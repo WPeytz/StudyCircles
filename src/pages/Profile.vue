@@ -19,26 +19,51 @@
 
       <!-- Snapshot -->
       <div class="card snapshot">
-        <h2>Your Snapshot</h2>
+        <h2>Profile Overview</h2>
+        <div class="row"> 
+          <div class="label">Username</div>
+          <div class="value">{{ username }}</div>
+        </div>
         <div class="row">
           <div class="label">University</div>
           <div class="value">{{ profileUni || uni || '—' }}</div>
         </div>
         <div class="row">
           <div class="label">Study line</div>
-          <div class="value">{{ profileStudyLine || studyLine || '—' }}</div>
+          <div class="value">
+            <template v-if="profileStudyLine || studyLine">
+              <RouterLink
+                class="link"
+                :to="`/studyline?name=${encodeURIComponent(profileStudyLine || studyLine)}`"
+              >
+                {{ profileStudyLine || studyLine }}
+              </RouterLink>
+            </template>
+            <span v-else class="muted">—</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Bio</div>
+          <div class="value">
+            <template v-if="profileBio && profileBio.length">
+              <span>{{ profileBio }}</span>
+            </template>
+            <span v-else class="muted">—</span>
+          </div>
         </div>
         <div class="row">
           <div class="label">Courses</div>
           <div class="value">
             <template v-if="courses && courses.length">
-              <div
+              <RouterLink
                 v-for="c in courses"
                 :key="c"
+                :to="`/course/${c}`"
                 class="badge course-row"
+                :title="courseTitles[c] ? `${c} — ${courseTitles[c]}` : c"
               >
                 {{ c }}<span v-if="courseTitles[c]"> — {{ courseTitles[c] }}</span>
-              </div>
+              </RouterLink>
             </template>
             <span v-else class="muted">No courses saved yet.</span>
           </div>
@@ -58,7 +83,7 @@ async function hydrateById(id) {
   if (!id) return
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, points, university, courses, username, study_line, avatar_url')
+    .select('id, points, university, courses, username, study_line, avatar_url, bio')
     .eq('id', id)
     .maybeSingle()
 
@@ -66,6 +91,7 @@ async function hydrateById(id) {
   points.value = profile.points || 0
   profileUni.value = profile.university || ''
   profileStudyLine.value = profile.study_line || ''
+  profileBio.value = profile.bio || ''
   studyLine.value = profile.study_line || ''
   username.value = profile.username || ''
   courses.value = Array.isArray(profile.courses) ? profile.courses : []
@@ -117,6 +143,7 @@ const avatarUrl = ref('')
 const uploadingAvatar = ref(false)
 const avatarErr = ref('')
 const avatarFileEl = ref(null)
+const profileBio = ref('')
 
 async function onPickAvatar(e) {
   const file = e?.target?.files?.[0]
@@ -153,12 +180,13 @@ async function hydrateFromUser(u) {
   uni.value = u.user_metadata?.university || ''
   const { data: profile } = await supabase
     .from('profiles')
-    .select('points, university, courses, username, study_line, avatar_url')
+    .select('points, university, courses, username, study_line, avatar_url, bio')
     .eq('id', u.id)
     .maybeSingle()
   points.value = profile?.points || 0
   profileUni.value = profile?.university || ''
   profileStudyLine.value = profile?.study_line || ''
+  profileBio.value = profile.bio || ''
   studyLine.value = profile?.study_line || ''
   username.value = profile?.username || u.user_metadata?.full_name || u.email
   courses.value = Array.isArray(profile?.courses) ? profile.courses : []
@@ -185,7 +213,9 @@ onMounted(async () => {
   if (session?.user) {
     user.value = session.user
   }
-  const routeId = String(route.query.user || route.query.u || '').trim()
+  // Prefer explicit id from the route (?id= or /:id), fallback to legacy (?user=/ ?u=), then self
+  const rawRouteId = route.query?.id || route.params?.id || route.query?.user || route.query?.u
+  const routeId = String(rawRouteId || '').trim()
   viewingId.value = routeId || (user.value && user.value.id) || ''
   if (viewingId.value) {
     if (isSelf.value) await hydrateFromUser(user.value)
@@ -203,14 +233,18 @@ watch(currentUser, async (u) => {
   }
 })
 
-watch(() => route.query.user || route.query.u, async (nv) => {
-  const routeId = String(nv || '').trim()
-  viewingId.value = routeId || (user.value && user.value.id) || ''
-  if (viewingId.value) {
-    if (isSelf.value) await hydrateFromUser(user.value)
-    else await hydrateById(viewingId.value)
+watch(
+  () => [route.query?.id, route.params?.id, route.query?.user, route.query?.u],
+  async () => {
+    const rawRouteId = route.query?.id || route.params?.id || route.query?.user || route.query?.u
+    const routeId = String(rawRouteId || '').trim()
+    viewingId.value = routeId || (user.value && user.value.id) || ''
+    if (viewingId.value) {
+      if (isSelf.value) await hydrateFromUser(user.value)
+      else await hydrateById(viewingId.value)
+    }
   }
-})
+)
 
 async function saveBasics() {
   if (!supabase || !user.value) {
@@ -238,7 +272,7 @@ async function saveBasics() {
       .from('profiles')
       .upsert(payload, { onConflict: 'id' })
       .abortSignal(controller.signal)
-      .select('id, username, university, courses, points, study_line')
+      .select('id, username, university, courses, points, study_line, bio')
       .maybeSingle()
 
     clearTimeout(timeout)
@@ -255,7 +289,7 @@ async function saveBasics() {
     if (!data) {
       const sel = await supabase
         .from('profiles')
-        .select('id, username, university, courses, points, study_line')
+        .select('id, username, university, courses, points, study_line, bio')
         .eq('id', user.value.id)
         .single()
 
@@ -602,4 +636,11 @@ label { font-size: 0.9rem; opacity: 0.85; }
 .snapshot h2 { margin-top: 0; }
 .header { margin-bottom: 18px; }
 .main-grid { align-items: start; }
+</style>
+<style scoped>
+.link { color: #a8c8ff; text-decoration: none; }
+.link:hover { text-decoration: underline; }
+
+a.badge.course-row { color: inherit; text-decoration: none; }
+a.badge.course-row:hover { text-decoration: underline; }
 </style>

@@ -9,7 +9,30 @@
       <button :class="{active: tab==='feed'}" @click="tab='feed'">Feed</button>
       <button :class="{active: tab==='files'}" @click="tab='files'">Files</button>
       <button :class="{active: tab==='groups'}" @click="tab='groups'">Study Groups</button>
+      <button :class="{active: tab==='users'}" @click="tab='users'">Users</button>
     </div>
+
+    <!-- USERS (inline list) -->
+    <section v-if="tab==='users'" class="card">
+      <h2>People in {{ code }}</h2>
+      <div v-if="loadingUsers" class="muted">Loading…</div>
+      <div v-else-if="!courseUsers.length" class="muted">No one has added this course yet.</div>
+      <div v-else class="user-list">
+        <div v-for="u in courseUsers" :key="u.id" class="user-row">
+          <div class="left" @click="goProfile(u.id)">
+            <div class="avatar large">
+              <img v-if="avatarFor(u)" :src="avatarFor(u)" alt="" />
+              <span v-else>{{ (u.username || 'U').slice(0,1).toUpperCase() }}</span>
+            </div>
+            <div class="col">
+              <div class="strong">{{ u.username || 'Student' }}</div>
+              <div class="small muted">{{ u.university || '—' }}<template v-if="u.study_line"> — {{ u.study_line }}</template></div>
+            </div>
+          </div>
+          <button class="button pill message-wide" @click.stop="messageUser(u.id)">Message</button>
+        </div>
+      </div>
+    </section>
 
     <!-- FEED -->
     <section v-if="tab==='feed'" class="card">
@@ -39,9 +62,16 @@
       </div>
 
       <div v-if="!filteredFeed.length" class="muted">No activity yet.</div>
-      <div v-else class="feed-list">
+      <div v-else class="feed-list" @click="closeAllMenus">
         <div v-for="item in filteredFeed" :key="item.kind + ':' + item.id">
           <div class="feed-row">
+            <!-- overflow menu trigger -->
+            <button class="more-btn" @click.stop="toggleItemMenu(item)" title="More">⋯</button>
+            <!-- dropdown -->
+            <div v-if="item._menuOpen" class="more-menu" @click.stop>
+              <button v-if="isMyItem(item)" class="menu-item danger" @click="deleteItem(item)">Delete post</button>
+              <button v-else class="menu-item" @click="reportItem(item)">Report post</button>
+            </div>
             <span class="badge" :class="'k-' + item.kind">{{ item.kind }}</span>
             <div class="col clickable" @click="openItem(item)">
               <div class="strong">
@@ -54,11 +84,6 @@
                 <template v-else>
                   {{ item.title }}
                 </template>
-              </div>
-              <div class="small muted">
-                {{ prettyDate(item.created_at) }}
-                <template v-if="item.kind==='question' && item.display_name"> — {{ item.display_name }}</template>
-                <template v-if="item.kind==='group' && (item.place || item.time)"> — {{ item.place || '—' }} {{ item.time ? ' · ' + item.time : '' }}</template>
               </div>
             </div>
             <div class="spacer"></div>
@@ -79,6 +104,11 @@
               <template v-else>
                 <button class="iconbtn ghost" @click="tab='groups'" title="View group">View</button>
               </template>
+            </div>
+            <div class="meta meta-bottom small muted">
+              {{ prettyDate(item.created_at) }}
+              <template v-if="item.kind==='question' && item.display_name"> — {{ item.display_name }}</template>
+              <template v-if="item.kind==='group' && (item.place || item.time)"> — {{ item.place || '—' }} {{ item.time ? ' · ' + item.time : '' }}</template>
             </div>
           </div>
           <div v-if="item.kind==='question' && item.answers?.length && item._showReplies" class="answers under">
@@ -223,14 +253,14 @@ async function loadMyProfile() {
   if (!uid) { myProfile.value = null; avatarSrc.value = ''; return }
   const { data } = await supabase
     .from('profiles')
-    .select('username, avatar_url, avatar')
+    .select('username, avatar_url, university, study_line, courses')
     .eq('id', uid)
     .maybeSingle()
   myProfile.value = data || null
 
   // Resolve avatar source
   const u = currentUser.value
-  let raw = data?.avatar_url || data?.avatar || u?.user_metadata?.avatar_url || u?.user_metadata?.picture || ''
+  let raw = data?.avatar_url || u?.user_metadata?.avatar_url || u?.user_metadata?.picture || ''
 
   // If it's a Supabase Storage path (not an absolute URL), turn it into a public URL
   if (raw && !/^https?:\/\//i.test(raw)) {
@@ -245,6 +275,166 @@ async function loadMyProfile() {
 }
 onMounted(loadMyProfile)
 watch(currentUser, () => loadMyProfile())
+
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+// --- Mentions (@username) helpers ---
+function extractMentions(text) {
+  if (!text) return []
+  const matches = Array.from(text.matchAll(/@([A-Za-z0-9_]{2,32})/g)).map(m => m[1])
+  // unique, case-insensitive compare but keep original case for lookup consistency
+  const lowerSeen = new Set()
+  const uniq = []
+  for (const u of matches) {
+    const k = u.toLowerCase()
+    if (!lowerSeen.has(k)) { lowerSeen.add(k); uniq.push(u) }
+  }
+  return uniq
+}
+
+async function notifyMentions({ text, kind, postId }) {
+  try {
+    const usernames = extractMentions(text)
+    if (!usernames.length) return
+
+    // Load mentioned users' ids
+    const { data: users, error: uerr } = await supabase
+      .from('profiles')
+      .select('id, username')
+      .in('username', usernames)
+
+    if (uerr || !Array.isArray(users) || users.length === 0) return
+
+    const me = currentUser.value?.id || null
+    const courseCode = code.value
+    const now = new Date().toISOString()
+
+    const mentionsRows = []
+    const notifRows = []
+
+    for (const u of users) {
+      if (!u?.id || u.id === me) continue
+      mentionsRows.push({ post_kind: kind, post_id: postId, mentioned_user_id: u.id, by_user_id: me, course: courseCode, created_at: now })
+      notifRows.push({ user_id: u.id, type: 'mention', payload: { kind, post_id: postId, course: courseCode }, created_at: now })
+    }
+
+    if (mentionsRows.length) {
+      await supabase.from('mentions').insert(mentionsRows)
+    }
+    if (notifRows.length) {
+      await supabase.from('notifications').insert(notifRows)
+    }
+  } catch (e) {
+    // Non-fatal: if tables/policies aren’t ready, just skip silently
+    console.warn('[mentions] notifyMentions skipped:', e?.message || e)
+  }
+}
+
+const courseUsers = ref([])
+const loadingUsers = ref(false)
+
+async function loadCourseUsers(){
+  loadingUsers.value = true
+  try {
+    const target = String(code.value)
+    const alt = String(parseInt(target, 10)) // non‑padded variant
+
+    let data = []
+
+    // 1) Try RPC (security definer) to bypass strict RLS while returning only safe columns
+    try {
+      const r = await supabase.rpc('get_course_members', { p_course: target })
+      if (!r.error && Array.isArray(r.data)) {
+        data = r.data
+      }
+      // If nothing with padded code, try non‑padded
+      if (!data.length) {
+        const r2 = await supabase.rpc('get_course_members', { p_course: alt })
+        if (!r2.error && Array.isArray(r2.data)) data = r2.data
+      }
+    } catch (e) {
+      // ignore and fall back
+    }
+
+    // 2) Fallback to direct query against profiles (works if RLS allows it)
+    if (!data.length) {
+      let q = await supabase
+        .from('profiles')
+        .select('id, username, university, study_line, avatar_url, courses')
+        .contains('courses', [target])
+      if (!q.error && Array.isArray(q.data)) data = q.data
+
+      if (!data.length) {
+        q = await supabase
+          .from('profiles')
+          .select('id, username, university, study_line, avatar_url, courses')
+          .contains('courses', [alt])
+        if (!q.error && Array.isArray(q.data)) data = q.data
+      }
+    }
+
+    // 3) Last‑resort: fetch a small set and filter client‑side
+    if (!data.length) {
+      const r3 = await supabase
+        .from('profiles')
+        .select('id, username, university, study_line, avatar_url, courses')
+        .limit(500)
+      const rows = r3.data || []
+      data = rows.filter(u => {
+        const arr = Array.isArray(u.courses) ? u.courses : []
+        return arr.some(c => {
+          const s = String(c)
+          return s === target || s === alt || s.padStart(5, '0') === target
+        })
+      })
+    }
+
+    // 4) Always include self if they have this course
+    const me = myProfile.value
+    const meId = currentUser.value?.id
+    if (me && meId) {
+      const arr = Array.isArray(me.courses) ? me.courses : []
+      const has = arr.some(c => {
+        const s = String(c)
+        return s === target || s === alt || s.padStart(5, '0') === target
+      })
+      if (has && !(data || []).some(u => u.id === meId)) {
+        data = [
+          ...(data || []),
+          { id: meId, username: me.username, university: me.university, study_line: me.study_line, avatar_url: me.avatar_url, courses: me.courses }
+        ]
+      }
+    }
+
+    courseUsers.value = data || []
+  } finally {
+    loadingUsers.value = false
+  }
+}
+function goProfile(id){
+  // Navigate to public profile page for that user
+  try {
+    router.push(`/profile/${id}`)
+  } catch {
+    window.location.href = `/profile/${id}`
+  }
+}
+
+function messageUser(id){
+  try { router.push(`/messages?to=${id}`) } catch { window.location.href = `/messages?to=${id}` }
+}
+
+// reset users list when course changes
+watch(code, () => { courseUsers.value = [] })
+
+// Load users when tab is 'users' or course changes while on users tab
+watch([tab, code], async ([t]) => {
+  if (t === 'users' && !loadingUsers.value) {
+    await loadCourseUsers()
+  }
+})
 
 // active kinds filter
 const feedKinds = ref(new Set(['file','question','group']))
@@ -508,11 +698,16 @@ async function createPost(){
   postErr.value = ''
   posting.value = true
   try {
-    await supabase.from('questions').insert({
-      body,
-      course: code.value,
-      display_name: (displayName.value || 'Anonymous')
-    })
+    const { data: ins, error: qErr } = await supabase
+      .from('questions')
+      .insert({ body, course: code.value, display_name: (displayName.value || 'Anonymous') })
+      .select('id')
+      .single()
+    if (qErr) throw qErr
+
+    // Fire mentions (non-blocking)
+    notifyMentions({ text: body, kind: 'question', postId: ins.id })
+
     postBody.value = ''
     // feed will update via realtime; also refresh lists
     await loadQuestions()
@@ -536,11 +731,13 @@ async function replyTo(q) {
     // attach to feed item if present
     const idx = feed.value.findIndex(x => x.kind==='question' && x.id===q.id)
     if (idx !== -1) {
-      feed.value[idx].answers = feed.value[idx].answers || []
-      feed.value[idx].answers.push(data)
+      const item = feed.value[idx]
+      item.answers = item.answers || []
+      item.answers.push(data)
       feed.value = [...feed.value]
     }
   }
+  notifyMentions({ text, kind: 'answer', postId: data?.id || null })
   q._showReplies = true
   q._reply = ''
 }
@@ -629,6 +826,18 @@ async function loadGroups() {
   groups.value = data || []
 }
 
+
+function avatarFor(u){
+  let raw = u?.avatar_url || ''
+  if (raw && !/^https?:\/\//i.test(raw)) {
+    try {
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(raw)
+      return pub?.publicUrl || ''
+    } catch { return '' }
+  }
+  return raw || ''
+}
+
 // ===== Course title =====
 async function loadTitle() {
   const { data } = await supabase
@@ -649,6 +858,72 @@ watch(() => route.params.code, () => {
   loadAll()
   subscribeFeed()
 })
+// --- Overflow menu helpers ---
+function isMyItem(item){
+  const uid = currentUser.value?.id
+  // Prefer explicit user_id if present; fallback to display_name matching my username
+  if (item.user_id && uid) return item.user_id === uid
+  const mineByName = (myProfile.value?.username && item.display_name && myProfile.value.username === item.display_name)
+  return !!mineByName
+}
+
+function toggleItemMenu(item){
+  // Close others
+  feed.value = feed.value.map(it => (it === item ? it : ({...it, _menuOpen:false})))
+  item._menuOpen = !item._menuOpen
+}
+function closeAllMenus(){
+  if (!feed.value.length) return
+  let changed = false
+  feed.value = feed.value.map(it => {
+    if (it._menuOpen){ changed = true; return { ...it, _menuOpen:false } }
+    return it
+  })
+  return changed
+}
+
+async function deleteItem(item){
+  const table = tableFor(item.kind)
+  if (!table) return
+  if (!confirm('Delete this post? This cannot be undone.')) return
+  try {
+    const { error } = await supabase.from(table).delete().eq('id', item.id)
+    if (error) throw error
+    // Remove locally
+    feed.value = feed.value.filter(x => !(x.kind===item.kind && x.id===item.id))
+  } catch (e) {
+    alert('Could not delete (permission or server error).')
+    console.error('[deleteItem]', e)
+  } finally {
+    item._menuOpen = false
+  }
+}
+
+async function reportItem(item){
+  try {
+    const uid = currentUser.value?.id
+    if (!uid) { alert('Please log in to report.'); return }
+
+    let reason = prompt('Why are you reporting this post? (optional)', '')
+    if (reason === null) { item._menuOpen = false; return } // user cancelled
+    reason = (reason || '').slice(0, 300)
+
+    await supabase.from('reports').insert({
+      item_type: item.kind,        // 'file' | 'question' | 'group'
+      item_id: item.id,
+      course: code.value,
+      reason,
+      created_by: uid
+    })
+    alert('Thanks — report submitted.')
+  } catch (e) {
+    alert('Could not submit report.')
+    console.error('[reportItem]', e)
+  } finally {
+    item._menuOpen = false
+  }
+}
+
 </script>
 
 <style scoped>
@@ -657,8 +932,8 @@ watch(() => route.params.code, () => {
 .course-header h1 { margin: 0 0 6px; }
 .subtle { opacity: 0.8; }
 
-.tabs { display: flex; gap: 8px; margin: 12px 0 16px; }
-.tabs button { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: #fff; cursor: pointer; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0 16px; }
+.tabs button { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: #fff; cursor: pointer; text-align: center; }
 .tabs button.active { background: rgba(255,255,255,0.08); }
 
 .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; }
@@ -680,7 +955,10 @@ watch(() => route.params.code, () => {
 .reply { display: flex; gap: 8px; margin-top: 8px; }
 
 .feed-list { display: grid; gap: 10px; margin-top: 10px; }
-.feed-row { display: flex; gap: 10px; align-items: center; background: rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px; }
+.feed-row { position: relative; transition: background .15s, border-color .15s; }
+.feed-row:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+.feed-row .strong { font-weight: 650; letter-spacing: .1px; }
+.feed-row .small { opacity: .75; }
 .badge.k-file { background: rgba(129, 199, 132, 0.25); }
 .badge.k-question { background: rgba(100, 149, 255, 0.25); }
 .badge.k-group { background: rgba(255, 193, 7, 0.25); }
@@ -692,12 +970,33 @@ watch(() => route.params.code, () => {
 .button.icon { padding: 4px 8px; font-size: 12px; }
 .button.icon.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
 
-.feed-row { position: relative; transition: background .15s, border-color .15s; }
-.feed-row:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
-.feed-row .strong { font-weight: 650; letter-spacing: .1px; }
-.feed-row .small { opacity: .75; }
 
-.actions { display: flex; gap: 8px; align-items: center; margin-left: 6px; }
+/* Ensure course posts match unified feed height */
+.feed-list .feed-row {
+  min-height: 92px;            /* row height to match unified feed */
+  padding: 14px 12px 40px 12px;/* extra bottom space for fixed actions */
+  align-items: center;         /* center contents vertically */
+}
+
+.feed-row .actions {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: 0; /* override any generic margins */
+}
+/* Center the text column vertically within the row */
+.feed-row .col, .feed-row .col.clickable {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+/* Keep action buttons vertically centered as well */
+.feed-row .actions { align-items: center; }
+
+.actions { display: flex; gap: 8px; align-items: center; }
 .iconbtn { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; font-size:12px; text-decoration:none; }
 .iconbtn:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.24); }
 .iconbtn.ghost { background: transparent; border-color: rgba(255,255,255,0.14); }
@@ -732,7 +1031,52 @@ watch(() => route.params.code, () => {
 .answers.under { margin: 6px 0 0 44px; display: grid; gap: 8px; }
 .answer-row { display:flex; gap:8px; align-items:flex-start; background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10); border-radius:8px; padding:8px; }
 
+
+.user-list { display: grid; gap: 8px; margin-top: 10px; }
+.user-row { display:flex; align-items:center; gap:12px; padding:12px; background: rgba(0,0,0,0.10); border:1px solid rgba(255,255,255,0.12); border-radius:12px; }
+.user-row + .user-row { margin-top: 8px; }
+.user-row .left { display:flex; align-items:center; gap:12px; cursor:pointer; }
+.user-row .left .col .strong { font-weight: 650; }
+.button.pill { border-radius: 12px; }
+.message-wide { flex: 1; justify-content: center; display: inline-flex; align-items: center; text-align:center; padding: 10px 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); font-weight: 600; }
+.message-wide:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.22); }
+
+.more-btn { position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:8px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; line-height:1; font-size:18px; display:grid; place-items:center; }
+.more-btn:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.22); }
+.more-menu { position:absolute; top:40px; right:8px; background: rgba(0,0,0,0.9); border:1px solid rgba(255,255,255,0.18); border-radius:10px; padding:6px; min-width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 5; }
+.menu-item { width:100%; text-align:left; padding:8px 10px; border:none; background:transparent; color:#fff; cursor:pointer; border-radius:8px; font-size: 14px; }
+.menu-item:hover { background: rgba(255,255,255,0.08); }
+.menu-item.danger { color: #ffb4b4; }
+.menu-item.danger:hover { background: rgba(255, 99, 71, 0.15); }
+
+.post {
+  position: relative; /* Needed so child absolute elements position correctly */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 92px; /* keep consistent height */
+  padding: 12px 16px;
+}
+
+.post-actions {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+.feed-row .meta.meta-bottom {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+}
+
 </style>
+
+
+
+
+
 
 
 

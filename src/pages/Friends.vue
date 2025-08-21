@@ -22,7 +22,7 @@
         />
         <button v-if="inviteLink" class="button" @click="copyInvite">Copy</button>
       </div>
-      <div v-if="!isLoggedIn" class="hint">Log in to create an invite link.</div>
+      <div v-if="!isLoggedIn" class="hint">Log in or sign up to create and accept invite links.</div>
       <div v-if="inviteErr" class="hint">{{ inviteErr }}</div>
     </section>
 
@@ -79,16 +79,26 @@
       <div v-if="friends.length === 0" class="muted">No friends yet.</div>
       <div v-else class="list">
         <div v-for="f in friends" :key="f.id" class="item friend">
-          <div class="avatar">
+          <router-link
+            class="avatar"
+            :to="{ path: '/profile', query: { id: f.id } }"
+            title="View profile"
+          >
             <img v-if="f.avatar_src" :src="f.avatar_src" alt="avatar" />
             <span v-else>{{ (f.username || f.email || 'U').slice(0,1).toUpperCase() }}</span>
-          </div>
-          <div class="name strong">{{ f.username || f.email }}</div>
+          </router-link>
+          <router-link
+            class="name strong link"
+            :to="{ path: '/profile', query: { id: f.id } }"
+            title="View profile"
+          >
+            {{ f.username || f.email }}
+          </router-link>
           <div class="university small muted">{{ f.university || '—' }}</div>
           <router-link
             v-if="f.study_line"
             class="study small muted"
-            :to="{ path: '/studyline', query: { value: encodeURIComponent(f.study_line) } }"
+            :to="{ path: '/studyline', query: { name: f.study_line } }"
             title="See all students on this study line"
           >
             {{ f.study_line }}
@@ -103,6 +113,7 @@
               :key="c"
               :to="`/course/${c}`"
               class="badge"
+              :title="courseTitle(c)"
             >
               {{ c }}
             </router-link>
@@ -132,6 +143,53 @@ const busy = ref({ adding:false, accepting:false, declining:false, canceling:fal
 const incoming = ref([])  // {id, sender_id, username, email}
 const outgoing = ref([])  // {id, receiver_id, username, email}
 const friends  = ref([])  // {id: friend_id, username, email}
+
+// --- Course badge tooltips ---
+const courseNames = ref({}) // { [code]: title }
+
+function courseTitle(code) {
+  return courseNames.value?.[code] || `Course ${code}`
+}
+
+async function fetchFrom(table, codeCol, titleCol, codes) {
+  try {
+    const { data, error } = await supabase
+      .from(table)
+      .select(`${codeCol}, ${titleCol}`)
+      .in(codeCol, codes)
+    if (error || !Array.isArray(data)) return {}
+    return Object.fromEntries(
+      data
+        .filter(r => r && r[codeCol])
+        .map(r => [String(r[codeCol]), String(r[titleCol] || '')])
+    )
+  } catch { return {} }
+}
+
+async function loadCourseNames(codes) {
+  const need = [...new Set((codes || []).filter(Boolean).map(String))]
+    .filter(c => !courseNames.value[c])
+  if (!need.length) return
+
+  // Try a few likely tables/column names. We merge whatever we can find.
+  const sources = [
+    ['courses', 'code', 'title'],
+    ['dtu_courses', 'code', 'title'],
+    ['course_catalog', 'code', 'name'],
+  ]
+  for (const [table, cCol, tCol] of sources) {
+    const got = await fetchFrom(table, cCol, tCol, need)
+    if (Object.keys(got).length) {
+      courseNames.value = { ...courseNames.value, ...got }
+    }
+  }
+}
+
+// Watch friends list and load any missing course names for tooltips
+watch(friends, (list) => {
+  const allCodes = (list || []).flatMap(f => Array.isArray(f.courses) ? f.courses : [])
+  loadCourseNames(allCodes)
+}, { deep: true })
 
 const route = useRoute()
 const router = useRouter()
@@ -217,22 +275,47 @@ async function addFriend() {
 async function accept(r) {
   if (!me.value) return
   busy.value.accepting = true
+  notice.value = ''
   try {
-    const { error } = await supabase
-      .from('friend_requests')
-      .update({ status: 'accepted' })
-      .eq('id', r.id)
-      .eq('receiver_id', me.value.id)
-    if (error) { notice.value = error.message; return }
+    // 1) Mark the request as accepted (I am the receiver)
+    {
+      const { error: reqErr } = await supabase
+        .from('friend_requests')
+        .update({ status: 'accepted' })
+        .eq('id', r.id)
+        .eq('receiver_id', me.value.id)
+      if (reqErr) {
+        notice.value = `friend_requests update: ${reqErr.message}`
+        clearNoticeSoon()
+        return
+      }
+    }
 
-    // mutual friendship rows
-    await supabase.from('friends').upsert([
-      { user_id: me.value.id, friend_id: r.sender_id },
-      { user_id: r.sender_id, friend_id: me.value.id },
-    ], { onConflict: 'user_id,friend_id' })
+    // 2) Create mutual friendship rows
+    {
+      const { error: upErr } = await supabase
+        .from('friends')
+        .upsert([
+          { user_id: me.value.id,   friend_id: r.sender_id },
+          { user_id: r.sender_id,   friend_id: me.value.id }
+        ], { onConflict: 'user_id,friend_id' })
+      if (upErr) {
+        notice.value = `friends upsert: ${upErr.message}`
+        clearNoticeSoon()
+        return
+      }
+    }
 
+    // 3) Refresh UI
     await Promise.all([fetchRequests(), fetchFriends()])
-  } finally { busy.value.accepting = false }
+    notice.value = 'Friend added!'
+    clearNoticeSoon()
+  } catch (e) {
+    notice.value = String(e?.message || e)
+    clearNoticeSoon()
+  } finally {
+    busy.value.accepting = false
+  }
 }
 
 async function decline(r) {
@@ -407,10 +490,15 @@ async function acceptInviteToken(token) {
     if (inv.used) { inviteErr.value = 'This invite link has already been used.'; return }
 
     if (!me.value) {
-      // store for after login
+      // Persist token and send the user to the auth screen
       localStorage.setItem('pendingInviteToken', token)
-      notice.value = 'Please log in to accept the invite.'
-      clearNoticeSoon()
+      // Optionally hint the home page to open the auth box
+      localStorage.setItem('showAuth', 'login')
+      // Redirect to home with params so SSR/static host keeps the token
+      router.replace({
+        path: '/',
+        query: { auth: 'login', invite: token, next: '/friends' }
+      })
       return
     }
 
@@ -441,6 +529,13 @@ async function acceptInviteToken(token) {
 async function bootstrap() {
   if (!supabase) return
   const { data: { session } } = await supabase.auth.getSession()
+  // If we arrived with an invite and are logged out, bounce to login and keep token
+  const rawInvite = route.query?.invite
+  if (!session?.user && rawInvite) {
+    localStorage.setItem('pendingInviteToken', String(rawInvite))
+    localStorage.setItem('showAuth', 'login')
+    return router.replace({ path: '/', query: { auth: 'login', invite: String(rawInvite), next: '/friends' } })
+  }
   if (session?.user) {
     const token = route.query?.invite
     if (token) await acceptInviteToken(String(token))
@@ -456,6 +551,7 @@ watch(me, async (u) => {
     if (pending) {
       await acceptInviteToken(pending)
       localStorage.removeItem('pendingInviteToken')
+      router.replace({ path: '/friends' })
     }
     await bootstrap()
   } else {
@@ -490,11 +586,11 @@ create policy "friend_invites: update" on public.friend_invites for update using
 .small { font-size: 12px; }
 .strong { font-weight: 600; }
 
-.card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; margin: 12px 0; }
+ .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; margin: 12px 0; overflow: hidden; }
 .row { display: flex; gap: 10px; align-items: center; }
 .col { display: grid; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.list { display: grid; gap: 10px; margin-top: 8px; }
+.list { display: grid; gap: 10px; margin-top: 8px; overflow: hidden; }
 .item { background: rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px; }
 .spacer { flex: 1; }
 .input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px; color: #fff; }
@@ -523,21 +619,31 @@ create policy "friend_invites: update" on public.friend_invites for update using
   width: 100%;
   display: grid;
   /* Keep five data columns + actions. Let actions auto-size and always stick to the far right. */
-  grid-template-columns: 56px minmax(180px, 1fr) 120px minmax(320px, 1.2fr) minmax(260px, 1fr) auto;
+  grid-template-columns: 56px minmax(160px, 1fr) 70px minmax(220px, 1.4fr) minmax(260px, 2fr) auto;
   align-items: center;
-  column-gap: 14px;
-  row-gap: 8px;
+  column-gap: 10px;
+  row-gap: 6px;
   padding: 14px;
-  min-height: 72px;           /* consistent row height */
+  min-height: 80px;           /* consistent row height */
+  max-width: 100%;
+  overflow: hidden;
 }
 .item.friend .name { font-size: 16px; }
 
 /* Prevent long text and badges from breaking the grid */
-.item.friend .university,
-.item.friend .study {
+.item.friend .university {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.item.friend .study {
+  /* allow up to two readable lines and then gracefully truncate */
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 .item.friend .courses {
   justify-self: start;
@@ -547,6 +653,7 @@ create policy "friend_invites: update" on public.friend_invites for update using
   overflow: hidden;           /* hide overflow if too many tags */
   align-items: center;
   min-width: 0;               /* allow shrinking in grid */
+  max-width: 100%;
 }
 .item.friend .courses .badge { flex: 0 0 auto; }
 
@@ -587,4 +694,10 @@ create policy "friend_invites: update" on public.friend_invites for update using
   visibility: hidden;   /* keep column width so actions stay aligned */
 }
 
+</style>
+
+<style scoped>
+.link { color: inherit; text-decoration: none; }
+.link:hover { text-decoration: underline; }
+.avatar { text-decoration: none; }
 </style>

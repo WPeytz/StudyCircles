@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 const Home = () => import('./pages/Home.vue')
-const Resources = () => import('./pages/Resources.vue')
-const Ask = () => import('./pages/Ask.vue')
 const Profile = () => import('./pages/Profile.vue')
 const Friends = () => import('./pages/Friends.vue')
 const AddCourse = () => import('./pages/AddCourse.vue')
@@ -14,8 +12,6 @@ const CoursePage = () => import('./pages/CoursePage.vue')
 
 const routes = [
   { path: '/', name: 'home', component: Home },
-  { path: '/resources', name: 'resources', component: Resources },
-  { path: '/ask', name: 'ask', component: Ask },
   { path: '/profile', name: 'profile', component: Profile },
   { path: '/course/:code', name: 'course', component: CoursePage, props: true },
   { path: '/friends', name: 'friends', component: Friends },

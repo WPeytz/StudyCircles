@@ -82,6 +82,7 @@ async function hydrateMyCourses() {
     .maybeSingle()
   if (!error && data?.courses) {
     myCourses.value = data.courses
+    window.dispatchEvent(new CustomEvent('studycircles:courses-updated', { detail: myCourses.value }))
     await hydrateTitles(data.courses)
   } else {
     myCourses.value = []
@@ -136,6 +137,7 @@ async function addCourse(code) {
       .eq('id', me.value.id)
     if (error) { err.value = error.message; return }
     myCourses.value = next
+    window.dispatchEvent(new CustomEvent('studycircles:courses-updated', { detail: next }))
     await hydrateTitles([code])
   } catch (e) {
     err.value = String(e?.message || e)
@@ -155,6 +157,7 @@ async function removeCourse(code) {
       .eq('id', me.value.id)
     if (error) { err.value = error.message; return }
     myCourses.value = next
+    window.dispatchEvent(new CustomEvent('studycircles:courses-updated', { detail: next }))
   } catch (e) {
     err.value = String(e?.message || e)
   } finally {
